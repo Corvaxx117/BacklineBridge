@@ -62,7 +62,7 @@ final class TechnicalPdfTest extends VenueTestCase
             ->create(
                 $role->value . '@pdf.example.test',
                 'Lecteur du dossier',
-                'Export PDF test password!',
+                'Export PDF test password 2026!',
                 $this->entityManager()->find(Band::class, $this->bandId),
                 $role,
             );

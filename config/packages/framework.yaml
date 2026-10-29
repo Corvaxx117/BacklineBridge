@@ -10,6 +10,10 @@ framework:
             policy: sliding_window
             limit: 5
             interval: '15 minutes'
+        account_password_change:
+            policy: sliding_window
+            limit: 5
+            interval: '15 minutes'
 
     #esi: true
     #fragments: true

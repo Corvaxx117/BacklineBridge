@@ -1,33 +1,22 @@
-# Télécharger une fiche technique
+# Télécharger la fiche technique en PDF
 
-Le bouton **Télécharger la fiche PDF** est disponible sur le patch de référence, dans chaque dossier de concert et dans l'espace invité d'une salle.
+Cliquer sur **Télécharger la fiche PDF** depuis la référence, un concert ou l'espace de la salle.
 
-Le document A4 paysage contient :
+Le PDF contient le plan de scène enregistré, le patch, le matériel demandé et les notes techniques. **Enregistrer le plan avant de télécharger** pour retrouver la dernière modification.
 
-- le groupe, la version de la fiche et les informations publiques du concert ;
-- le plan de scène enregistré, avec ses positions, rotations et tailles ;
-- les sources actives du patch, dans l'ordre des canaux, avec les précisions par canal ;
-- le matériel demandé, regroupé par catégorie, les quantités et les spécifications ;
-- les notes techniques, les informations pratiques publiques du concert et les précisions complètes du plan.
+Les conditions financières, l'hébergement privé, les disponibilités personnelles et les entrées mises à la corbeille ne sont pas inclus.
 
-Le PDF reprend les données enregistrées. Il faut donc enregistrer les modifications du plan avant de le télécharger. Les éléments retirés du patch et les conditions internes du concert (rémunération, paiement, transport, hébergement et notes privées des conditions) ne sont pas exportés.
+## Quelle version reçoit la salle ?
 
-## Accès et publications
+Le PDF de la salle reprend la version partagée lors de la création de son invitation. Si le groupe modifie le dossier depuis, créer une nouvelle publication et un nouveau lien pour partager ces changements.
 
-Un membre disposant du droit de consulter la fiche peut la télécharger. L'autorisation est vérifiée à chaque téléchargement, y compris si l'adresse du PDF est ouverte directement.
+Les réponses de la salle ne remplacent pas les demandes du groupe dans ce PDF. Elles restent visibles dans le suivi du concert. Un lien expiré ou révoqué ne permet plus de télécharger.
 
-Le PDF d'un invité reprend la publication datée liée à son invitation. Une modification ultérieure du dossier par le groupe ne change pas cette version : il faut publier et transmettre une nouvelle invitation pour partager un autre état. Le téléchargement vérifie la session invitée, l'expiration et la révocation du lien. Les réponses de la salle ne remplacent pas les demandes du groupe dans cette fiche ; elles restent consultables dans le suivi du concert.
+## Pour modifier le document
 
-## Organisation du code
+- `templates/pdf/` : présentation du PDF et dessin du plan.
+- `src/Service/Pdf/TechnicalDossierFactory.php` : choix des informations à inclure.
+- `src/Service/Pdf/StagePlanLayout.php` : positions et rotations sur le plan.
+- `src/Service/Pdf/TechnicalPdfRenderer.php` : création du fichier avec la bibliothèque Dompdf.
 
-- `src/Controller/TechnicalSheet/DownloadPdfAction.php` : téléchargement d'une fiche avec le voter existant.
-- `src/Controller/Guest/DownloadPdfAction.php` : téléchargement de la publication autorisée pour l'invité.
-- `src/Dto/Pdf/TechnicalDossier.php` : données techniques à exporter, sans les conditions internes.
-- `src/Service/Pdf/TechnicalDossierFactory.php` : préparation depuis une fiche ou une publication figée.
-- `src/Service/Pdf/StagePlanLayout.php` : disposition vectorielle, orientations et cadre du plan.
-- `src/Service/Pdf/TechnicalPdfRenderer.php` : génération avec Dompdf, sans accès réseau ni exécution de JavaScript.
-- `src/Service/Pdf/TechnicalPdfResponseFactory.php` : réponse de téléchargement, nom de fichier et en-têtes de confidentialité.
-- `templates/pdf/` : document, styles et dessin SVG du plan, indépendants de l'interface interactive.
-- `tests/Functional/Pdf/` et `tests/Unit/Service/Pdf/` : contenu, autorisations, publications figées et transformations.
-
-Dompdf est installé par `composer install`. Il ne nécessite ni navigateur automatisé ni service tiers en production. Ses fichiers temporaires et caches de polices sont créés sous `var/cache/<environnement>/pdf/`, qui doit être accessible en écriture comme le cache Symfony habituel. Aucune migration de base de données n'est nécessaire pour cette fonctionnalité.
+L'export fonctionne sur le serveur sans navigateur ni service externe. Dompdf est installé avec Composer ; ses fichiers temporaires restent dans `var/cache/`. Il n'y a pas de changement de base à appliquer pour une simple retouche du PDF.

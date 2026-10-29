@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Dto\Member;
 
+use App\Validator\AccountPassword;
 use Symfony\Component\Validator\Constraints as Assert;
 
 final class ActivationInput
@@ -13,13 +14,6 @@ final class ActivationInput
         Assert\Length(max: 100),
     ]
     public string $code = '';
-    #[
-        Assert\NotBlank(message: 'Choisis et confirme ton mot de passe.'),
-        Assert\Length(min: 12, max: 128),
-        Assert\PasswordStrength(
-            minScore: Assert\PasswordStrength::STRENGTH_STRONG,
-            message: 'Choisis un mot de passe plus robuste, par exemple une longue phrase de passe.',
-        ),
-    ]
+    #[AccountPassword]
     public string $password = '';
 }

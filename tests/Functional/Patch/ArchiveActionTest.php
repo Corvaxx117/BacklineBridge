@@ -141,7 +141,7 @@ final class ArchiveActionTest extends DatabaseTestCase
             ->create(
                 'restricted@example.test',
                 'Accès restreint',
-                'Restricted test password!',
+                'Restricted test password 2026!',
                 $this->entityManager()->find(Band::class, $this->bandId),
                 $role,
             );

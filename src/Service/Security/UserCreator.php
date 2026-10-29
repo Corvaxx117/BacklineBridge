@@ -10,7 +10,7 @@ use App\Entity\User;
 use App\Enum\BandRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator\AccountPassword;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -31,17 +31,7 @@ final readonly class UserCreator
     ): User {
         $user = new User($email, $name);
         $violations = $this->validator->validate($user);
-        $violations->addAll(
-            $this->validator->validate($plainPassword, [
-                new Assert\NotBlank(message: 'Le mot de passe est obligatoire.'),
-                new Assert\Length(
-                    min: 12,
-                    max: 128,
-                    minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères.',
-                    maxMessage: 'Le mot de passe ne peut pas dépasser {{ limit }} caractères.',
-                ),
-            ]),
-        );
+        $violations->addAll($this->validator->validate($plainPassword, new AccountPassword()));
         if (count($violations) > 0) {
             throw new ValidationFailedException($user, $violations);
         }

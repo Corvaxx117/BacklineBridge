@@ -1,124 +1,149 @@
-# Démonstration privée sur alwaysdata Free
+# Comprendre la démo et la mettre à jour
 
-L'instance de démonstration fonctionne indépendamment du Mac. Elle utilise PHP 8.4, le mode production de Symfony, une base SQLite persistante séparée et des identités, stocks et soldes fictifs. La fiche technique de départ vient des fichiers déjà présents dans `data/` ; ce n'est pas une copie de la base locale du groupe.
+## Les trois copies du projet
 
-## Limites et responsabilité
+| Emplacement | À quoi il sert |
+| --- | --- |
+| Le Mac, dans VS Code | Modifier le code et essayer les changements en local |
+| GitHub | Garder l'historique du code et le retrouver ailleurs |
+| alwaysdata | Faire tourner la copie accessible sur Internet, Mac éteint |
 
-L'offre Free annonce 1 Go de stockage, 256 Mo de mémoire, un quart de CPU et trois jours de sauvegardes. Seule l'adresse `compte.alwaysdata.net` est disponible pour le site. Elle est destinée à un usage personnel non lucratif : faire confirmer l'éligibilité avant de transformer cette démonstration en outil d'exploitation réelle des concerts et du merch. L'hébergeur gère le système ; les accès et mises à jour de BacklineBridge restent à notre charge.
+Enregistrer un fichier dans VS Code modifie le Mac. Un `git commit` garde une étape de travail ; un `git push` l'envoie sur GitHub. **Aucun de ces gestes ne met actuellement alwaysdata à jour.** L'envoi du site reste une opération séparée.
 
-Le contrôle des extensions et l'export PDF doivent réussir sur le serveur. Les vérifications sur le Mac ne remplacent pas ce contrôle. Garder le site désactivé dans **Web → Sites** pendant sa préparation.
+## Ce qui a été fait pour la première mise en ligne
 
-## 1. Accès au compte
+1. Vérifier que le serveur propose PHP 8.4 et les fonctions utilisées par l'application.
+2. Préparer une copie du code avec les bibliothèques PHP nécessaires. Les installer avant l'envoi évite de surcharger le petit compte gratuit.
+3. Envoyer cette copie sur alwaysdata par **SFTP**, un transfert de fichiers protégé.
+4. Créer sur le serveur une configuration et une base propres à la démo, avec six profils et des exemples fictifs. La base réelle du Mac n'a pas été envoyée.
+5. Faire pointer l'adresse web vers `public/`, le dossier qui sert d'entrée au site. Le dossier `www` du compte renvoie vers ce dossier ; l'ancienne page d'accueil a été conservée.
+6. Fermer l'accès aux personnes non invitées, utiliser HTTPS et vérifier les connexions, les droits et le PDF.
 
-Créer l'offre **Free**, puis activer l'authentification à deux facteurs du compte d'administration. Dans **Accès distant → SSH/SFTP**, ajouter une clé publique dédiée à l'utilisateur voulu. La clé privée reste sur le Mac et hors Git. Les empreintes du serveur SSH sont affichées dans ce même menu : les comparer avant la première connexion. Ne pas désactiver le contrôle de l'identité du serveur.
+**SSH** permet de lancer une commande sur le serveur. **SFTP** permet d'y copier des fichiers. La clé de connexion est déjà préparée sur ce Mac dans `var/private/alwaysdata/` ; elle reste hors GitHub.
 
-Le compte de cette démonstration est `backlinebridge` :
+## Exemple : changer un texte dans la liste des concerts
 
-```text
-Hôte SSH : ssh-backlinebridge.alwaysdata.net
-Utilisateur : backlinebridge
-Adresse web : https://backlinebridge.alwaysdata.net
-Répertoire du projet : /home/backlinebridge/backlinebridge
-Racine web : /home/backlinebridge/backlinebridge/public
+Cet exemple convient à un petit changement dans un fichier déjà présent. Il montre aussi où lancer chaque commande.
+
+### 1. Sur le Mac : modifier et vérifier
+
+Dans VS Code, ouvrir `templates/concert/index.html.twig`, modifier le texte, puis regarder le résultat sur la version locale. Dans le terminal de VS Code, depuis le dossier du projet :
+
+```bash
+export PATH="/usr/local/opt/php@8.4/bin:$PATH"
+composer test
+npm run format:check
+git diff
 ```
 
-## 2. Envoyer les sources sans les données locales
+Si tout est correct, enregistrer cette étape de travail :
 
-Préparer une archive à partir d'une version relue du code et ajouter les dépendances de production installées depuis `composer.lock`. Aucun fichier `.env.local`, `.env.dev.local`, base SQLite locale, répertoire `var/`, `.git/`, `node_modules/` ou document administratif ne doit être envoyé. Les fichiers `.env` et `.env.test` versionnés contiennent seulement des valeurs par défaut et des valeurs fictives.
+```bash
+git add templates/concert/index.html.twig
+git commit -m "Clarifie le titre de la liste des concerts"
+```
 
-Pour un déploiement depuis Git, utiliser une révision qui contient les fichiers `deploy/alwaysdata/` et `data/demo/group.json`. Le compte GitHub ne donne aucun accès automatique à alwaysdata. On peut également transférer une archive par SFTP, sans donner l'accès au dépôt.
+`git push` peut ensuite sauvegarder ce commit sur GitHub. Cette étape est indépendante de l'envoi chez alwaysdata.
 
-Créer un nouveau dossier `/home/backlinebridge/backlinebridge` et y placer les sources. Ne pas remplacer un ancien dossier d'application sans conserver une sauvegarde.
+### 2. Sur le serveur : sauvegarder avant de remplacer
 
-Dans **Environnement → PHP**, choisir la branche **8.4**, puis vérifier la version également en SSH :
+Depuis le terminal du Mac :
+
+```bash
+ssh -F var/private/alwaysdata/ssh_config backlinebridge-demo
+```
+
+Le terminal commande maintenant le serveur. Y lancer :
 
 ```bash
 cd /home/backlinebridge/backlinebridge
-php -v
-composer install --no-dev --no-scripts --prefer-dist --optimize-autoloader --no-interaction
-php deploy/alwaysdata/check.php
+php deploy/alwaysdata/backup.php
+cp templates/concert/index.html.twig var/private/concert-index-avant-maj-01.html.twig
+exit
 ```
 
-`--no-scripts` évite de démarrer Symfony avant la configuration de ses secrets. Si la mémoire du compte empêche Composer de terminer, installer les dépendances de production localement dans un dossier de livraison isolé, puis envoyer son `vendor/`. Node.js n'est pas nécessaire sur le serveur.
+La commande PHP crée une copie cohérente de la base et des accès privés, dans un nouveau dossier daté sous `var/private/backups/`. Elle n'inclut pas le code ; `cp` conserve ici le fichier que l'on va remplacer. Si la sauvegarde échoue, s'arrêter. Pour une autre mise à jour, choisir un autre numéro que `01` pour conserver cette ancienne version.
 
-## 3. Préparer les secrets et fermer l'accès anonyme
+`exit` ramène le terminal sur le Mac. Garder aussi une copie des sauvegardes hors du serveur pour pouvoir les récupérer si le compte devient inaccessible.
 
-Depuis ce dossier neuf, lancer :
+### 3. Sur le Mac : envoyer le fichier
 
 ```bash
-php deploy/alwaysdata/prepare.php backlinebridge
+sftp -F var/private/alwaysdata/ssh_config backlinebridge-demo
 ```
 
-Cette commande :
+À l'invite `sftp>`, saisir :
 
-- refuse un dossier qui possède déjà une configuration, une base ou des fichiers privés ;
-- génère deux clés distinctes pour Symfony et les profils, dans `.env.local`, avec des permissions `0600` ;
-- configure `APP_ENV=prod`, `APP_DEBUG=0`, `APP_DEMO_MODE=1` et `var/demo.db` ;
-- limite les hôtes HTTP au domaine du compte ;
-- installe une authentification Apache devant toutes les pages, y compris le choix des profils et les invitations de salles ;
-- conserve le mot de passe de cette première protection uniquement dans `var/private/demo-access.json`, jamais dans la sortie de commande.
+```text
+put templates/concert/index.html.twig /home/backlinebridge/backlinebridge/templates/concert/index.html.twig
+bye
+```
 
-La commande commence par fermer l'accès HTTP. Si sa préparation échoue en cours de route, garder le site désactivé et diagnostiquer l'erreur ; ne pas retirer la protection pour contourner le problème. Elle ne réinitialise pas une configuration déjà utilisée et ne doit jamais être lancée dans le dossier de développement du Mac.
+`put` copie le fichier du Mac vers le serveur. `bye` ferme le transfert. Le chemin de départ est local, celui d'arrivée est chez alwaysdata.
 
-La protection Apache utilise le fichier `var/private/.htpasswd`. Les sessions applicatives imposent des cookies HTTPS, HttpOnly et SameSite=Lax. Le bandeau de démonstration ne constitue pas une protection d'accès.
-
-L'accès HTTP est refusé par la protection Apache avant toute demande d'identifiants. Le proxy alwaysdata fournit un en-tête `X-Forwarded-Proto` contrôlé ; la protection vérifie qu'il vaut exactement `https`, puis configure la variable CGI `HTTPS` pour Symfony. Le `%{HTTPS}` d'Apache reste à `off` derrière ce proxy, même sur une connexion HTTPS extérieure. Un contrôle réel avec un en-tête forgé en HTTP doit confirmer que le proxy le retire. Si une redirection HTTPS est activée dans le panneau alwaysdata, elle s'effectue en amont ; sinon l'adresse HTTP reste volontairement inaccessible.
-
-## 4. Initialiser seulement les exemples
+### 4. Sur le serveur : prendre en compte le nouveau fichier
 
 ```bash
-php bin/console doctrine:migrations:migrate --no-interaction
-php bin/console app:seed-avee-mana
-php bin/console app:band:import-private data/demo/group.json
+ssh -F var/private/alwaysdata/ssh_config backlinebridge-demo
+```
+
+Puis :
+
+```bash
+cd /home/backlinebridge/backlinebridge
 php bin/console cache:clear --env=prod --no-debug
-php bin/console doctrine:schema:validate
-php -d memory_limit=128M deploy/alwaysdata/verify.php
+exit
 ```
 
-Le jeu de démonstration fournit quatre musiciens, un ingénieur son et un booker, tous fictifs. Les comptes en `example.test` ne reçoivent pas d'e-mails. Les quatre musiciens disposent de la trésorerie et du stock ; l'ingénieur et le booker conservent leurs restrictions habituelles. Les clés et codes sont propres à cette instance.
+Le **cache** rassemble des versions préparées par Symfony pour répondre plus vite. Cette commande les reconstruit avec le code envoyé. Ouvrir ensuite https://backlinebridge.alwaysdata.net/concerts et vérifier le résultat.
 
-Les codes d'activation sont dans le nouveau fichier `var/private/activation-codes-….json` indiqué par l'import. Consulter ces fichiers uniquement en SSH/SFTP. Attribuer un profil fictif à chaque testeur et lui transmettre individuellement son code. Chaque testeur crée son propre mot de passe sur `/premiere-connexion`. Le premier accès Apache et le compte BacklineBridge sont deux étapes différentes.
+Pour une correction CSS, transférer plutôt `public/styles/app.css` vers le même chemin dans le projet distant. Actualiser complètement la page si le navigateur affiche encore l'ancien style.
 
-Créer ensuite un concert fictif depuis l'interface pour tester les disponibilités, les conditions et la publication vers une salle. L'import Bandsintown reste désactivé, sans clé réelle ni appel réseau.
+## Et pour une modification plus importante ?
 
-## 5. Régler le site, puis vérifier
-
-Dans **Web → Sites**, configurer le site :
-
-| Champ | Valeur |
+| Modification | Ce qu'il faut prévoir en plus |
 | --- | --- |
-| Adresse | `backlinebridge.alwaysdata.net` |
-| Type | PHP |
-| Version | PHP 8.4, ou version par défaut du compte si réglée sur 8.4 |
-| Répertoire racine | `/home/backlinebridge/backlinebridge/public` |
-| HTTPS | Actif, avec redirection forcée depuis HTTP |
-| Cache HTTP de l'hébergeur | Désactivé pour cette démonstration privée |
+| Plusieurs fichiers PHP ou Twig liés | Sauvegarder et envoyer l'ensemble dans une courte interruption de la démo, puis reconstruire le cache |
+| Nouvelle classe PHP | Actualiser aussi la liste des classes avec `composer dump-autoload --no-dev --optimize` |
+| Nouvelle bibliothèque PHP | Envoyer `composer.json` et `composer.lock`, puis installer les versions prévues avec `composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction` |
+| Nouvelle colonne ou table | Préparer et tester une **migration**, c'est-à-dire un script qui adapte les tables en conservant les données |
 
-Activer le site une fois sa préparation terminée. Avant de transmettre le lien :
+Pour une nouvelle bibliothèque, vérifier d'abord que Composer peut terminer avec la mémoire du compte. Sinon, préparer les bibliothèques dans un dossier séparé sur le Mac et envoyer ce dossier `vendor/`, comme lors de la première mise en ligne. Ne pas envoyer le `vendor/` de développement tel quel.
 
-Lorsque le site initial pointe déjà vers `/home/backlinebridge/www/` et autorise les liens symboliques, une autre possibilité consiste à conserver ce réglage : renommer le dossier d'accueil initial pour le sauvegarder, puis créer un lien `www` vers `backlinebridge/public`. Vérifier d'abord que `www` ne contient que la page d'accueil par défaut. Les sources et données restent hors de la racine web ; revenir au dossier sauvegardé annule la bascule.
+Après sauvegarde et envoi d'un changement de base, lancer sur le serveur :
 
-1. Une fenêtre privée sans identifiants doit demander l'authentification Apache ; `/connexion`, `/premiere-connexion` et `/styles/app.css` doivent tous être protégés.
-2. Un mauvais mot de passe Apache doit être refusé. Avec le bon accès, la page de connexion doit afficher le bandeau de démonstration.
-3. Les URL `/.env.local`, `/var/demo.db`, `/var/private/demo-access.json` et `/vendor/autoload.php` ne doivent jamais exposer leur contenu, même après authentification. Le dossier `public/` est la seule racine web.
-4. Activer un profil fictif, vérifier ses droits et exporter le PDF avec le plan de scène. Relever la mémoire dans le tableau de consommation alwaysdata ; limiter les exports simultanés si nécessaire.
-5. Vérifier les cookies `Secure`, `HttpOnly`, `SameSite=Lax`, l'absence de détails techniques en cas d'erreur et les en-têtes `Cache-Control: private, no-store`.
-6. Tester également l'adresse HTTP : elle doit être refusée sans demander d'identifiants, ou rediriger vers HTTPS si cette redirection est configurée chez l'hébergeur.
+```bash
+php bin/console doctrine:migrations:migrate --no-interaction --env=prod
+php bin/console cache:clear --env=prod --no-debug
+php bin/console doctrine:schema:validate --env=prod
+```
 
-Une erreur 500 Apache peut venir des permissions du fichier `.htpasswd` ou d'une directive non prise en charge : lire les logs Apache sans ouvrir l'accès anonyme. Les scripts PHP de préparation doivent rester hors de `public/`.
+Pour ces changements liés, réserver un moment sans testeurs et suspendre le site dans **Web → Sites** pendant l'envoi. Le remplacement manuel d'un seul fichier convient à un petit correctif ; un envoi complet automatisé et préparé à l'avance serait la prochaine amélioration.
 
-## 6. Sauvegarder et mettre à jour
+## Les fichiers à conserver sur place
 
-Les données de l'instance sont dans `var/demo.db` ; les clés restent dans `.env.local`. Sauvegarder séparément la base et les secrets. Une copie cohérente de SQLite peut être créée avec son API de sauvegarde ou `VACUUM INTO`, sans copier à chaud le fichier ouvert par l'application. Ne jamais remplacer cette base par celle du Mac au détour d'un déploiement.
+Ne pas remplacer `.env.local`, `public/.htaccess` ni `var/` par leurs versions locales : ils contiennent les réglages, la protection d'accès et les données propres au serveur. Ne pas envoyer `.git/`, `node_modules/`, les bases du Mac ou les documents administratifs. Les fichiers d'exemple dans `data/` ne servent pas à remettre à zéro la démo lors d'une mise à jour.
 
-Pour une mise à jour : sauvegarder la base et les secrets, envoyer les sources relues sans écraser `.env.local`, `public/.htaccess` ni `var/`, appliquer les migrations, reconstruire le cache puis vérifier connexion, droits et PDF. Ne pas relancer `prepare.php` : cela changerait les clés. Les erreurs de production se diagnostiquent dans les logs privés, sans activer le debug public.
+**Ne pas relancer `prepare.php` ni les imports de départ pour mettre à jour le code.** Ils servent à l'installation initiale.
 
-Les sauvegardes de l'hébergeur ont une rétention limitée. Garder une copie extérieure avant une mise à jour. La désactivation du site dans alwaysdata permet d'interrompre la démonstration sans supprimer ses données.
+## Si le petit changement ne convient pas
 
-## Références
+Pour revenir au fichier sauvegardé dans l'exemple, se reconnecter en SSH et lancer :
 
-- [Offre Free et conditions](https://help.alwaysdata.com/fr/docs/admin-facturation/facturation/prix-cloud-public/)
-- [Configuration de PHP](https://help.alwaysdata.com/fr/docs/hebergement-web/langages/php/configuration/)
-- [SSH et empreintes du serveur](https://help.alwaysdata.com/fr/docs/hebergement-web/acces-distant/ssh/)
-- [Protection par fichier .htaccess](https://help.alwaysdata.com/fr/docs/hebergement-web/sites/serveurs-http/fichier-htaccess/)
-- [Configuration du serveur web Symfony](https://symfony.com/doc/current/setup/web_server_configuration.html)
+```bash
+cd /home/backlinebridge/backlinebridge
+cp var/private/concert-index-avant-maj-01.html.twig templates/concert/index.html.twig
+php bin/console cache:clear --env=prod --no-debug
+```
+
+En cas d'erreur 500, consulter le journal PHP privé `/home/backlinebridge/admin/logs/php/php.log`. Pour revenir après un changement de base, il faut traiter ensemble le code et la base ; remettre seulement un ancien fichier peut ne pas suffire.
+
+## Repères
+
+- Projet distant : `/home/backlinebridge/backlinebridge`.
+- Base de la démo : `/home/backlinebridge/backlinebridge/var/demo.db`.
+- Base du Mac : `var/backlinebridge.db`, indépendante de celle de la démo.
+- Accès privés sur ce Mac : `var/private/alwaysdata/ACCES-DEMO.md`.
+- Serveur de connexion : `ssh-backlinebridge.alwaysdata.net`, utilisateur `backlinebridge`.
+
+[Transfert SFTP chez alwaysdata](https://help.alwaysdata.com/fr/docs/hebergement-web/acces-distant/sftp/) · [Étapes d'un déploiement Symfony](https://symfony.com/doc/current/deployment.html)

@@ -24,6 +24,7 @@ final class PrivateDataSubscriber implements EventSubscriberInterface
                 'app_stock_',
                 'app_profile_',
                 'app_activation_',
+                'app_account_',
                 'app_concert_bandsintown_',
             ]
             as $prefix

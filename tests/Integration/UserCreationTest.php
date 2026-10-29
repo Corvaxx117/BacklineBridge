@@ -20,28 +20,23 @@ final class UserCreationTest extends DatabaseTestCase
     public function testInteractiveCommandCreatesAHashedAccountAndItsScopedMembership(): void
     {
         $tester = new CommandTester(static::getContainer()->get(CreateUserCommand::class));
-        $tester->setInputs([
-            'NEW@EXAMPLE.TEST',
-            'Nouvelle personne',
-            'Synthetic password for test!',
-            'Synthetic password for test!',
-        ]);
+        $tester->setInputs(['NEW@EXAMPLE.TEST', 'Nouvelle personne', 'Corail!94x', 'Corail!94x']);
         $tester->execute(
             ['--band' => (string) $this->bandId, '--role' => 'editor'],
             ['interactive' => true],
         );
         $tester->assertCommandIsSuccessful();
-        self::assertStringNotContainsString('Synthetic password for test!', $tester->getDisplay());
+        self::assertStringNotContainsString('Corail!94x', $tester->getDisplay());
         $em = $this->entityManager();
         $em->clear();
         $user = $em->getRepository(User::class)->findOneBy(['email' => 'new@example.test']);
         self::assertInstanceOf(User::class, $user);
-        self::assertNotSame('Synthetic password for test!', $user->getPassword());
+        self::assertNotSame('Corail!94x', $user->getPassword());
         self::assertStringNotContainsString($user->getPassword(), serialize($user));
         self::assertTrue(
             static::getContainer()
                 ->get(UserPasswordHasherInterface::class)
-                ->isPasswordValid($user, 'Synthetic password for test!'),
+                ->isPasswordValid($user, 'Corail!94x'),
         );
         self::assertSame(
             BandRole::Editor,
@@ -58,7 +53,7 @@ final class UserCreationTest extends DatabaseTestCase
         $tester->setInputs([
             'new@example.test',
             'Nouvelle personne',
-            'Synthetic password for test!',
+            'Corail!94x',
             'Different confirmation!',
         ]);
         $tester->execute(['--role' => 'manager'], ['interactive' => true]);

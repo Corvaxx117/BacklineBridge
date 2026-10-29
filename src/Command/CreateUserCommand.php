@@ -7,6 +7,7 @@ namespace App\Command;
 use App\Entity\Band;
 use App\Enum\BandRole;
 use App\Service\Security\UserCreator;
+use App\Validator\AccountPassword;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -91,7 +92,7 @@ final class CreateUserCommand extends Command
         );
         $email = (string) $io->ask('Adresse e-mail');
         $name = (string) $io->ask('Nom affiché');
-        $passwordQuestion = new Question('Mot de passe (12 à 128 caractères)')
+        $passwordQuestion = new Question('Mot de passe — ' . AccountPassword::HELP)
             ->setHidden(true)
             ->setHiddenFallback(false);
         $confirmationQuestion = new Question('Confirmer le mot de passe')

@@ -102,7 +102,13 @@
                             {% endif %}
                         {% endif %}
                         <span class="session-info">
-                            <span class="session-name">{{ app.user.displayName }}</span>
+                            <a
+                                class="session-name"
+                                href="{{ path('app_account_password') }}"
+                                title="Changer mon mot de passe"
+                            >
+                                {{ app.user.displayName }}
+                            </a>
                             {% if currentRole %}
                                 <span class="role-badge">{{ currentRole.label }}</span>
                             {% endif %}

@@ -6,6 +6,7 @@ namespace App\Service\Member;
 
 use App\Entity\MemberProfile;
 use App\Dto\Member\ActivationInput;
+use App\Validator\AccountPassword;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -34,9 +35,7 @@ final readonly class AccountActivator
         $input->code = $code;
         $input->password = $password;
         if (count($this->validator->validate($input)) > 0) {
-            throw new \DomainException(
-                'Choisis une phrase de passe robuste entre 12 et 128 caractères.',
-            );
+            throw new \DomainException(AccountPassword::HELP);
         }
         $profile
             ->getUser()

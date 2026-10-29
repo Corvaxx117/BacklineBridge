@@ -111,8 +111,10 @@ final class MemberWorkspaceTest extends DatabaseTestCase
         yield 'Romain can read' => [MemberKind::Booker, BandRole::Booker, 200];
         yield 'Musician can read' => [MemberKind::Musician, BandRole::Manager, 200];
     }
-    public function testActivationConsumesCodeAndLogsInWithMatchingSecurePassword(): void
-    {
+    #[DataProvider('acceptedPasswords')]
+    public function testActivationConsumesCodeAndLogsInWithMatchingSecurePassword(
+        string $password,
+    ): void {
         [$profile, $code] = $this->pending();
         $uri = '/premiere-connexion/' . $profile->getPublicId();
         $this->client->request('GET', '/premiere-connexion');
@@ -131,8 +133,8 @@ final class MemberWorkspaceTest extends DatabaseTestCase
             'activation' => [
                 'code' => $code,
                 'password' => [
-                    'first' => 'Une longue phrase Corail!94 lune?',
-                    'second' => 'Une longue phrase Corail!94 lune?',
+                    'first' => $password,
+                    'second' => $password,
                 ],
             ],
         ]);
@@ -148,11 +150,16 @@ final class MemberWorkspaceTest extends DatabaseTestCase
         $saved = $em->find(MemberProfile::class, $profile->getId());
         self::assertNull($saved->getActivationHash());
         self::assertTrue($saved->getUser()->isActivated());
-        self::assertNotSame('Une longue phrase Corail!94 lune?', $saved->getUser()->getPassword());
+        self::assertNotSame($password, $saved->getUser()->getPassword());
         $this->client->restart();
         $this->client->catchExceptions(true);
         $this->client->request('GET', $uri);
         self::assertResponseStatusCodeSame(404);
+    }
+    public static function acceptedPasswords(): iterable
+    {
+        yield 'exactly ten characters' => ['Corail!94x'];
+        yield 'longer password' => ['Une longue phrase Corail!94 lune?'];
     }
     #[DataProvider('badActivation')]
     public function testInvalidActivationDoesNotSetPassword(string $mode): void
@@ -161,7 +168,14 @@ final class MemberWorkspaceTest extends DatabaseTestCase
         $uri = '/premiere-connexion/' . $profile->getPublicId();
         $form = $this->client->request('GET', $uri)->filter('form[name="activation"]')->form();
         $values = $form->getPhpValues();
-        $password = 'Une longue phrase Corail!94 lune?';
+        $password = match ($mode) {
+            'short' => 'Corai!94x',
+            'uppercase' => 'corail!94x',
+            'digit' => 'Corail!xxx',
+            'symbol' => 'Corail194xx',
+            'whitespace' => 'Corail194 x',
+            default => 'Une longue phrase Corail!94 lune?',
+        };
         $values['activation']['code'] = $mode === 'code' ? 'INVALID' : $code;
         $values['activation']['password'] = [
             'first' => $mode === 'weak' ? 'password' : $password,
@@ -192,6 +206,11 @@ final class MemberWorkspaceTest extends DatabaseTestCase
         yield ['weak'];
         yield ['mismatch'];
         yield ['csrf'];
+        yield ['short'];
+        yield ['uppercase'];
+        yield ['digit'];
+        yield ['symbol'];
+        yield ['whitespace'];
     }
     #[DataProvider('incompleteActivation')]
     public function testIncompleteActivationShowsErrorsAndPreservesTheCode(array $missing): void
