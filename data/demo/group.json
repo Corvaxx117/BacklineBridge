@@ -1,0 +1,72 @@
+{
+    "bandName": "AVEE MANA",
+    "members": [
+        {
+            "name": "Alex Démo",
+            "function": "Chant et guitare — profil fictif",
+            "kind": "musician",
+            "email": "alex@example.test",
+            "administrative": { "Information": "Profil fictif réservé aux essais." }
+        },
+        {
+            "name": "Sam Démo",
+            "function": "Guitare — profil fictif",
+            "kind": "musician",
+            "email": "sam@example.test",
+            "administrative": { "Information": "Profil fictif réservé aux essais." }
+        },
+        {
+            "name": "Noa Démo",
+            "function": "Basse — profil fictif",
+            "kind": "musician",
+            "email": "noa@example.test",
+            "administrative": { "Information": "Profil fictif réservé aux essais." }
+        },
+        {
+            "name": "Lou Démo",
+            "function": "Batterie — profil fictif",
+            "kind": "musician",
+            "email": "lou@example.test",
+            "administrative": { "Information": "Profil fictif réservé aux essais." }
+        },
+        {
+            "name": "Charlie Démo",
+            "function": "Ingénierie son — profil fictif",
+            "kind": "engineer",
+            "email": "charlie@example.test",
+            "administrative": { "Information": "Profil fictif réservé aux essais." }
+        },
+        {
+            "name": "Morgan Démo",
+            "function": "Booking — profil fictif",
+            "kind": "booker",
+            "email": "morgan@example.test",
+            "administrative": { "Information": "Profil fictif réservé aux essais." }
+        }
+    ],
+    "accounts": { "cash": 10000, "bank": 50000 },
+    "products": [
+        {
+            "name": "CD — Album Démo",
+            "category": "CD",
+            "variants": [{ "label": "Standard", "quantity": 20 }]
+        },
+        {
+            "name": "Vinyle — EP Démo",
+            "category": "Vinyle",
+            "variants": [{ "label": "Standard", "quantity": 10 }]
+        },
+        {
+            "name": "T-shirt — Collection Démo",
+            "category": "T-shirt",
+            "variants": [
+                { "label": "S", "quantity": 4 },
+                { "label": "M", "quantity": 8 },
+                { "label": "L", "quantity": 6 },
+                { "label": "XL", "quantity": null }
+            ]
+        }
+    ],
+    "notes": ["Exemple fictif : vérifier une avance avant de créer une dépense."],
+    "links": [{ "label": "Site d’exemple", "url": "https://example.org" }]
+}

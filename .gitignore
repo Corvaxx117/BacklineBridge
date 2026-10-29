@@ -39,6 +39,7 @@
 /coverage/
 /public/uploads/
 /public/exports/
+/public/.htaccess*
 
 # Identifiants et clés privés
 /auth.json

@@ -1,0 +1,7 @@
+framework:
+    trusted_hosts:
+        - '%env(APP_TRUSTED_HOST)%'
+    session:
+        cookie_secure: true
+        cookie_httponly: true
+        cookie_samesite: lax

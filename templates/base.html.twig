@@ -121,6 +121,11 @@
         </header>
 
         <main id="contenu" class="page-shell">
+            {% if app_demo_mode %}
+                <p class="demo-banner">
+                    Démonstration privée · Les comptes, stocks et montants sont fictifs.
+                </p>
+            {% endif %}
             {% for message in app.flashes('success') %}
                 <div class="flash flash-success" role="status">
                     <span class="flash-mark" aria-hidden="true">✓</span>{{ message }}

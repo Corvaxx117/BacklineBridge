@@ -53,6 +53,10 @@ Voir [l’import privé, l’activation et les droits](docs/espace-groupe.md) av
 
 Depuis **Concerts → Importer Bandsintown**, les responsables et le booker peuvent sélectionner les annonces du groupe, passées ou à venir. L’aperçu repère les doublons et permet de rattacher une annonce à un concert déjà saisi sans modifier ses données internes. La clé de l’API officielle reste dans la configuration locale, hors Git. Voir [la configuration et le fonctionnement de l’import](docs/bandsintown.md).
 
+## Démonstration privée hébergée
+
+Une préparation pour alwaysdata Free est disponible dans [le guide de déploiement](docs/deploiement-alwaysdata.md). Elle utilise une base SQLite séparée, des données fictives, des secrets générés sur le serveur et une protection Apache devant l'application. L'offre gratuite reste soumise à ses limites et à son usage non lucratif. La compatibilité doit être confirmée sur le compte avant l'ouverture aux testeurs.
+
 ## Vérifier
 
 ```bash
