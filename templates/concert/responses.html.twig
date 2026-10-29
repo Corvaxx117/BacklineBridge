@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Réponses de la salle · {{ app_name }}
+{% endblock %}
+{% block body %}
+    <a
+        class="back-link"
+        href="{{
+        path(
+            'app_concert_show',
+            {
+                id: concert.id
+            }
+        )
+        }}"
+    >
+        ← Revenir au concert
+    </a>
+    <section class="form-heading">
+        <p class="eyebrow">
+            {{ concert.venue }} / {{ concert.date|date('d/m/Y') }}
+        </p>
+        <h1>Les réponses de la salle<span class="title-period">.</span></h1>
+        <p>
+            Chaque réponse concerne le dossier daté reçu par son destinataire. Une alternative ne
+            vaut pas validation par le groupe.
+        </p>
+    </section>
+    {% for row in invitations %}
+        <section class="technical-panel response-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="eyebrow">
+                        Dossier publié #{{ row.invitation.publication.id }}
+                    </p>
+                    <h2>{{ row.invitation.label }}</h2>
+                </div>
+                <span class="muted-caption">
+                    {{ row.reply
+                        ? row.reply.updatedAt|date('d/m/Y à H:i')
+                        : 'En attente de réponse' }}
+                </span>
+            </div>
+            {% if row.outdated %}
+                <p class="version-warning response-warning">
+                    Attention : le patch, le plan, le matériel ou les informations du concert ont
+                    changé. Cette réponse concerne l’ancienne publication.
+                </p>
+            {% endif %}
+            {% if row.reply %}
+                <div class="response-author">
+                    <strong>{{ row.reply.respondent }}</strong>
+                    {% if row.reply.notes %}
+                        <p>
+                            {{ row.reply.notes|nl2br }}
+                        </p>
+                    {% endif %}
+                </div>
+            {% endif %}
+            <div class="response-totals">
+                {% for value, label in statusLabels %}
+                    {% set total = row.reply
+                        ? row.reply.answers|filter(a => a.status == value)|length
+                        : value == 'unknown' ? row.requests|length : 0
+                    %}
+                    {% set pluralLabels = {
+                        unknown: 'à confirmer',
+                        available: 'disponibles',
+                        alternative: 'alternatives proposées',
+                        unavailable: 'indisponibles'
+                    } %}<span class="availability availability-{{ value }}">
+                        {{ total }} {{ total > 1 ? pluralLabels[value] : label|lower }}
+                    </span>
+                {% endfor %}
+            </div>
+            <details class="response-details">
+                <summary>
+                    Voir les {{ row.requests|length }} demandes et propositions
+                </summary>
+                {% for key, item in row.requests %}
+                    {% set answer = row.reply ? row.reply.answers[key]|default(null) : null %}
+                    {% set value = answer ? answer.status : 'unknown' %}
+                    <div class="response-row">
+                        <div>
+                            <span class="eyebrow">{{ item.category }}</span>
+                            <strong>{{ item.label }}</strong>
+                            <p>
+                                {{ item.specification }}
+                            </p>
+                            {% if answer and answer.details %}
+                                <p class="proposal-text">
+                                    Salle : {{ answer.details }}
+                                </p>
+                            {% endif %}
+                        </div>
+                        <span class="availability availability-{{ value }}">
+                            {{ statusLabels[value] }}
+                        </span>
+                    </div>
+                {% endfor %}
+            </details>
+        </section>
+    {% else %}
+        <p class="panel-message">
+            Aucun dossier n’a encore été partagé avec la salle.
+        </p>
+    {% endfor %}
+    {% if is_granted('CONCERT_SHARE', concert) %}
+        <a
+            class="button button-primary"
+            href="{{
+            path(
+                'app_concert_invitations',
+                {
+                    id: concert.id
+                }
+            )
+            }}"
+        >
+            Inviter la salle
+        </a>
+    {% endif %}
+{% endblock %}

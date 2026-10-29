@@ -1,0 +1,253 @@
+{% extends 'base.html.twig' %}
+{% import _self as tools %}
+{% macro tool(action, label, icon) %}
+    <button
+        type="button"
+        class="stage-tool"
+        data-stage-action="{{ action }}"
+        title="{{ label }}"
+        aria-label="{{ label }}"
+    >
+        {{
+            include(
+                'stage/_editor_icon.html.twig',
+                {
+                    icon: icon
+                },
+                with_context: false
+            )
+        }}
+    </button>
+{% endmacro %}
+{% block title %}
+    Modifier le plan de scène · {{ app_name }}
+{% endblock %}
+{% block body %}
+    {% set backUrl = sheet.concert
+        ? path(
+            'app_concert_show',
+            {
+                id: sheet.concert.id
+            }
+        )
+        : path('app_patch_index')
+    %}
+    <section class="stage-editor-heading">
+        <div>
+            <a class="back-link" href="{{ backUrl }}">← Revenir au dossier</a>
+            <p class="eyebrow">
+                {{ sheet.bandName }} / {{ sheet.concert
+                    ? 'Plan de ce concert'
+                    : 'Plan de référence' }}
+            </p>
+            <h1>Le plan de scène<span class="title-period">.</span></h1>
+        </div>
+        <p>
+            Cliquez sur un élément pour le modifier.<br />Glissez-le pour le déplacer.
+        </p>
+    </section>
+    {{
+        form_start(
+            form,
+            {
+                attr: {
+                    class: 'stage-editor',
+                    'data-stage-editor': '',
+                    'data-stage-unsaved': form.vars.submitted ? 'true' : 'false',
+                    novalidate: 'novalidate'
+                }
+            }
+        )
+    }}
+    {% if form.vars.submitted and not form.vars.valid %}
+        <div class="form-error-summary" role="alert">
+            <strong>Le plan n’a pas été enregistré.</strong>{{ form_errors(form) }}{{
+                form_errors(form.items)
+            }}
+            <ul>
+                {% for item in form.items %}
+                    {% for field in item %}
+                        {% for error in field.vars.errors %}
+                            <li>
+                                {{ item.label.vars.value ? : 'Élément sans nom' }} — {{
+                                    field.vars.label
+                                }} : {{ error.message }}
+                            </li>
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <header class="stage-editor-topbar">
+        <div class="stage-history">
+            {{ tools.tool('undo', 'Annuler la dernière action', 'undo') }}{{
+                tools.tool('redo', 'Rétablir la dernière action', 'redo')
+            }}<span class="stage-save-status" data-stage-status role="status">
+                Chargement de l’éditeur…
+            </span>
+        </div>
+        <button class="button button-primary" type="submit" data-stage-save disabled>
+            Enregistrer le plan
+        </button>
+    </header>
+    <div class="stage-editor-workspace">
+        <aside class="stage-palette" aria-label="Ajouter des éléments au plan">
+            <h2>Ajouter un élément</h2>
+            <p>
+                Cliquez, ou glissez sur la scène.
+            </p>
+            <div class="stage-palette-items">
+                {% for label, kind in constant('App\\Dto\\Stage\\StageItemInput::KINDS') %}
+                    <button
+                        type="button"
+                        class="stage-palette-item"
+                        data-add-stage-kind="{{ kind }}"
+                        data-label="{{ label }}"
+                        draggable="false"
+                        aria-label="Ajouter : {{ label }}"
+                    >
+                        {{
+                            include(
+                                'stage/_icon.html.twig',
+                                {
+                                    kind: kind
+                                },
+                                with_context: false
+                            )
+                        }}<span>{{ label }}</span>
+                    </button>
+                {% endfor %}
+            </div>
+            <label class="stage-element-list-label" for="stage-element-list">
+                Sur la scène <span data-stage-count></span>
+            </label>
+            <select
+                id="stage-element-list"
+                data-stage-element-list
+                aria-label="Sélectionner un élément du plan"
+            >
+                <option value="">
+                    Choisir un élément…
+                </option>
+            </select>
+            <p class="stage-keyboard-help">
+                Flèches : déplacer<br />Suppr : retirer · Échap : désélectionner<br />⌘ / Ctrl + Z :
+                annuler
+            </p>
+        </aside>
+        <section class="stage-canvas-shell" aria-label="Zone d’édition du plan">
+            {{
+                include(
+                    'stage/_board.html.twig',
+                    {
+                        items: [],
+                        editable: true
+                    },
+                    with_context: false
+                )
+            }}
+            <div
+                class="stage-context-toolbar"
+                data-stage-context
+                role="toolbar"
+                aria-label="Options de l’élément"
+                hidden
+            >
+                <strong class="stage-selected-label" data-selected-label></strong>
+                <div class="stage-tool-group">
+                    {{ tools.tool('rotate-left', 'Pivoter de 15° à gauche', 'rotate-left') }}<input
+                        type="number"
+                        min="0"
+                        max="360"
+                        step="1"
+                        class="stage-angle-input"
+                        data-stage-angle
+                        aria-label="Angle de rotation"
+                        title="Angle en degrés"
+                    />{{ tools.tool('rotate-right', 'Pivoter de 15° à droite', 'rotate-right') }}
+                </div>
+                <div class="stage-tool-group">
+                    {{ tools.tool('shrink', 'Réduire l’élément', 'minus') }}<output
+                        class="stage-size-output"
+                        data-stage-size
+                        aria-label="Taille de l’élément"
+                    >
+                        100 %
+                    </output>{{ tools.tool('grow', 'Agrandir l’élément', 'plus') }}
+                </div>
+                <div class="stage-tool-group">
+                    {{ tools.tool('text', 'Modifier le nom et les précisions', 'text') }}{{
+                        tools.tool('duplicate', 'Dupliquer l’élément', 'duplicate')
+                    }}{{ tools.tool('delete', 'Supprimer l’élément', 'trash') }}
+                </div>
+                <div class="stage-context-properties" data-stage-properties hidden>
+                    <div class="field">
+                        <label for="stage-selected-name">Nom de l’élément</label>
+                        <input
+                            id="stage-selected-name"
+                            type="text"
+                            maxlength="70"
+                            data-stage-name
+                        />
+                    </div>
+                    <div class="field">
+                        <label for="stage-selected-notes">Précisions (facultatif)</label>
+                        <textarea
+                            id="stage-selected-notes"
+                            rows="2"
+                            maxlength="250"
+                            data-stage-notes
+                        ></textarea>
+                    </div>
+                    <button
+                        type="button"
+                        class="button button-secondary"
+                        data-stage-action="finish-text"
+                    >
+                        Terminer
+                    </button>
+                </div>
+            </div>
+            <p class="stage-empty-hint" data-stage-empty hidden>
+                Ajoutez un premier élément depuis la palette.
+            </p>
+        </section>
+    </div>
+    <p class="stage-editor-footnote">
+        La poignée ronde fait pivoter l’élément ; la poignée carrée change sa taille. Les
+        modifications restent propres à {{ sheet.concert
+            ? 'ce concert'
+            : 'la fiche de référence' }}.
+    </p>
+    <p class="visually-hidden" aria-live="polite" data-stage-announcement></p>
+    {{ form_widget(form.revision) }}
+    <div data-stage-payload data-root-name="{{ form.items.vars.full_name }}" hidden>
+        {% for item in form.items %}
+            <div data-stage-initial-item>
+                {{ form_widget(item) }}
+            </div>
+        {% endfor %}
+    </div>
+    {% do form.items.setRendered %}
+    {% for label, kind in constant('App\\Dto\\Stage\\StageItemInput::KINDS') %}
+        <template data-stage-icon="{{ kind }}">
+            {{
+                include(
+                    'stage/_icon.html.twig',
+                    {
+                        kind: kind
+                    },
+                    with_context: false
+                )
+            }}
+        </template>
+    {% endfor %}
+    <noscript>
+        <p class="form-error-summary">
+            Activez JavaScript pour utiliser l’éditeur visuel du plan de scène.
+        </p>
+    </noscript>
+    {{ form_end(form) }}
+    <script src="/scripts/stage-editor.js" defer></script>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% if section == 'patch' %}
+    <ul class="reference-items">
+        {% for line in content %}
+            <li>
+                <strong>{{ '%02d'|format(line.channel) }} · {{ line.source }}</strong>
+                <span>
+                    {{ line.microphone ? : 'Micro non précisé' }} · {{ line.stand
+                        ?
+                        : 'Pied non précisé' }}
+                </span>
+                <small>
+                    {{
+                        constant('App\\Entity\\PatchLine::SECTION_LABELS')[line.section]|default(
+                            line.section
+                        )
+                    }}
+                </small>
+                {% if line.notes %}
+                    <p>
+                        {{ line.notes|nl2br }}
+                    </p>
+                {% endif %}
+            </li>
+        {% else %}
+            <li>Aucune source.</li>
+        {% endfor %}
+    </ul>
+{% elseif section == 'stage' %}
+    {% if content %}
+        {{
+            include(
+                'stage/_board.html.twig',
+                {
+                    items: content
+                },
+                with_context: false
+            )
+        }}
+        <ul class="reference-items">
+            {% for item in content %}
+                <li>
+                    <strong>{{ item.label }}</strong>
+                    <small>
+                        Position {{ item.x }} % / {{ item.y }} % · Rotation {{ item.rotation }}° ·
+                        Taille {{ (item.scale * 100)|round }} %
+                    </small>
+                    {% if item.notes %}
+                        <p>
+                            {{ item.notes|nl2br }}
+                        </p>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>
+            Aucun élément sur le plan.
+        </p>
+    {% endif %}
+{% elseif section == 'equipment' %}
+    <ul class="reference-items">
+        {% for item in content %}
+            <li>
+                <small>{{ item.category }}</small>
+                <strong>{{ item.quantity }} × {{ item.label }}</strong>
+                {% if item.specification %}
+                    <p>
+                        {{ item.specification|nl2br }}
+                    </p>
+                {% endif %}
+            </li>
+        {% else %}
+            <li>Aucun matériel demandé.</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>
+        <strong>{{ content.bandName }}</strong> · {{ content.documentLabel }}
+    </p>
+    <ul class="reference-items">
+        {% for notice in content.notices %}
+            <li>{{ notice|nl2br }}</li>
+        {% else %}
+            <li>Aucune note technique.</li>
+        {% endfor %}
+    </ul>
+{% endif %}

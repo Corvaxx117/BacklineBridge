@@ -1,0 +1,184 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Adapter le matériel · {{ app_name }}
+{% endblock %}
+{% block body %}
+    {% set backUrl = sheet.concert
+        ? path(
+            'app_concert_show',
+            {
+                id: sheet.concert.id
+            }
+        )
+        : path('app_patch_index')
+    %}
+    {% set categoryIcons = {
+        Batterie: 'drums',
+        Amplification: 'amp',
+        'Scène': 'stage',
+        Retours: 'monitor',
+        'Façade': 'speaker'
+    } %}
+    {% set groups = {} %}
+    {% for item in form.items %}
+        {% set category = item.category.vars.value|trim ? : 'Autre' %}
+        {% set key = 'category_' ~ category %}
+        {% set groups =
+            groups|merge({
+                (key): {
+                    category: category,
+                    items: groups[key].items|default([])|merge([item])
+                }
+            })
+        %}
+    {% endfor %}
+    <a class="back-link" href="{{ backUrl }}">← Revenir au dossier</a>
+    <section class="form-heading">
+        <p class="eyebrow">
+            {{ sheet.bandName }} / {{ sheet.concert
+                ? 'Matériel de ce concert'
+                : 'Matériel de référence' }}
+        </p>
+        <h1>Le matériel à prévoir<span class="title-period">.</span></h1>
+        <p>
+            Travaillez par catégorie : quantités, préférences et conditions. Ajoutez directement un
+            équipement dans la bonne section.
+        </p>
+    </section>
+    {{
+        form_start(
+            form,
+            {
+                attr: {
+                    class: 'setup-form equipment-editor',
+                    'data-setup-editor': 'equipment',
+                    novalidate: 'novalidate'
+                }
+            }
+        )
+    }}
+    {% if form.vars.submitted and not form.vars.valid %}
+        <div class="form-error-summary" role="alert">
+            <strong>Le matériel n’a pas été enregistré. Vérifiez les champs signalés.</strong>{{
+                form_errors(form)
+            }}{{ form_errors(form.items) }}
+        </div>
+    {% endif %}
+    <div class="equipment-editor-topbar">
+        <p data-equipment-status role="status">
+            {{ form.items|length }} équipements · {{ groups|length }} catégories
+        </p>
+        <div class="material-fold-actions" data-equipment-enhancement hidden>
+            <button type="button" class="text-button" data-equipment-expand>Tout ouvrir</button>
+            <button type="button" class="text-button" data-equipment-collapse>Tout replier</button>
+        </div>
+    </div>
+    <div
+        data-collection
+        data-prototype="{{ include(
+            'equipment/_form_item.html.twig',
+            {
+                item: form.items.vars.prototype
+            },
+            with_context: false
+        )|e('html_attr') }}"
+    >
+        {% for group in groups %}
+            {% set invalid = false %}
+            {% for item in group.items %}
+                {% if not item.vars.valid %}{% set invalid = true %}{% endif %}
+            {% endfor %}
+            {% set icon = categoryIcons[group.category]|default('gear') %}
+            <details
+                class="material-form-group equipment-group-{{ icon }}"
+                data-equipment-group
+                data-category="{{ group.category }}"
+                {{ loop.first or invalid ? 'open' : '' }}
+            >
+                <summary>
+                    <span class="equipment-category-icon">
+                        {{
+                            include(
+                                'equipment/_category_icon.html.twig',
+                                {
+                                    icon: icon
+                                },
+                                with_context: false
+                            )
+                        }}
+                    </span>
+                    <span class="material-group-title">{{ group.category }}</span>
+                    <span class="material-group-progress" data-equipment-count>
+                        {{ group.items|length }} équipements
+                    </span>
+                    <span class="material-group-chevron" aria-hidden="true">⌄</span>
+                </summary>
+                <div class="equipment-group-add">
+                    <button
+                        class="button button-secondary"
+                        type="button"
+                        data-add-item
+                        data-category="{{ group.category }}"
+                        hidden
+                    >
+                        + Ajouter dans {{ group.category }}
+                    </button>
+                </div>
+                <div class="equipment-edit-items" data-group-items>
+                    {% for item in group.items %}
+                        {{
+                            include(
+                                'equipment/_form_item.html.twig',
+                                {
+                                    item: item
+                                },
+                                with_context: false
+                            )
+                        }}
+                    {% endfor %}
+                </div>
+            </details>
+        {% endfor %}
+    </div>
+    {% do form.items.setRendered %}
+    <datalist id="equipment-categories">
+        {% for group in groups %}
+            <option value="{{ group.category }}"></option>
+        {% endfor %}
+    </datalist>
+    <template data-equipment-generic-icon>
+        {{
+            include(
+                'equipment/_category_icon.html.twig',
+                {
+                    icon: 'gear'
+                },
+                with_context: false
+            )
+        }}
+    </template>
+    <div class="equipment-new-category" data-equipment-enhancement hidden>
+        <label for="new-equipment-category">Ajouter un équipement dans…</label>
+        <input
+            id="new-equipment-category"
+            type="text"
+            list="equipment-categories"
+            maxlength="60"
+            placeholder="Choisir ou créer une catégorie"
+            data-new-category
+        />
+        <button class="button button-secondary" type="button" data-add-item>
+            + Ajouter un équipement
+        </button>
+    </div>
+    <p class="equipment-undo" data-equipment-undo-panel role="status" hidden>
+        <span data-equipment-undo-label></span>
+        <button class="text-button" type="button" data-equipment-undo>Annuler le retrait</button>
+    </p>
+    <div class="setup-actions">
+        <button class="button button-primary" type="submit">Enregistrer le matériel</button>
+        <a href="{{ backUrl }}">Annuler</a>
+    </div>
+    {{ form_end(form) }}
+    <script src="/scripts/setup-editor.js" defer></script>
+{% endblock %}

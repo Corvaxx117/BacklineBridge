@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Ma disponibilité · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <a
+        class="back-link"
+        href="{{
+        path(
+            'app_concert_show',
+            {
+                id: concert.id
+            }
+        )
+        }}#disponibilites"
+    >
+        ← Recharger le concert
+    </a>
+    <section class="form-heading">
+        <p class="eyebrow">
+            {{ concert.venue }} · {{ concert.date|date('d/m/Y') }}
+        </p>
+        <h1>Ma disponibilité<span class="title-period">.</span></h1>
+        <p>
+            La réponse n’a pas été enregistrée. Vérifie les informations ci-dessous.
+        </p>
+    </section>
+    <section class="form-panel">
+        {{
+            include(
+                'concert/_availability_form.html.twig',
+                {
+                    concert: concert,
+                    availabilityForm: availabilityForm
+                },
+                with_context: false
+            )
+        }}
+    </section>
+{% endblock %}

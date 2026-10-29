@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="robots" content="noindex,nofollow" />
+        <title>
+            {% block title %}
+                Espace salle · {{ app_name }}
+            {% endblock %}
+        </title>
+        <link rel="stylesheet" href="/styles/app.css" />
+    </head>
+    <body>
+        <a class="skip-link" href="#contenu">Aller au contenu</a>
+        <header class="site-header">
+            <div class="header-inner">
+                <a
+                    class="brand"
+                    href="{{
+                    access is defined
+                        ? path(
+                            'app_guest_workspace',
+                            {
+                                access: access
+                            }
+                        )
+                        : path('app_login')
+                    }}"
+                    aria-label="{{ app_name }}, espace salle"
+                >
+                    {{ include('branding/_mark.html.twig', {}, with_context: false) }}<span>{{
+                            app_name
+                        }}<span class="brand-caption">ESPACE SALLE</span></span>
+                </a>
+                <span class="guest-badge">Accès invité · un concert</span>
+            </div>
+        </header>
+        <main class="page-shell" id="contenu">
+            {% for message in app.flashes('success') %}
+                <div class="flash flash-success" role="status">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            {% block body %}
+
+            {% endblock %}
+        </main>
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <span>{{ app_name }}</span>
+                <p>
+                    Une fiche claire. Une scène bien préparée.
+                </p>
+            </div>
+        </footer>
+    </body>
+</html>

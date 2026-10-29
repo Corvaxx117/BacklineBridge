@@ -1,0 +1,165 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Inviter la salle · {{ app_name }}
+{% endblock %}
+{% block body %}
+    <a
+        class="back-link"
+        href="{{
+        path(
+            'app_concert_show',
+            {
+                id: concert.id
+            }
+        )
+        }}"
+    >
+        ← Revenir au concert
+    </a>
+    <section class="form-heading">
+        <p class="eyebrow">
+            {{ concert.venue }} / {{ concert.date|date('d/m/Y') }}
+        </p>
+        <h1>Préparer avec la salle<span class="title-period">.</span></h1>
+        <p>
+            Publiez le dossier technique et transmettez un accès à la régie. Le lien ouvre
+            uniquement ce concert, sans compte à créer.
+        </p>
+    </section>
+    {% for link in app.flashes('invitation_link') %}
+        <section class="share-link-panel" aria-label="Lien invité créé">
+            <h2>Le lien à transmettre</h2>
+            <p>
+                Copiez-le maintenant : il ne sera plus affiché ensuite. Toute personne qui le reçoit
+                peut consulter le dossier et compléter la réponse.
+            </p>
+            <label for="invitation-link">Lien privé vers la salle</label>
+            <input
+                id="invitation-link"
+                readonly
+                value="{{ app.request.schemeAndHttpHost ~ link }}"
+                onclick="this.select()"
+            />
+            <a class="edit-link" href="{{ link }}" target="_blank" rel="noreferrer">
+                Ouvrir l’interface invitée ↗
+            </a>
+        </section>
+    {% endfor %}
+    <div class="form-layout">
+        <section class="form-panel">
+            {{
+                form_start(
+                    form,
+                    {
+                        attr: {
+                            class: 'patch-form',
+                            novalidate: 'novalidate'
+                        }
+                    }
+                )
+            }}
+            <h2 class="small-heading">Créer un accès</h2>
+            {% if form.vars.errors|length %}
+                <div class="form-error-summary" role="alert">
+                    {{ form_errors(form) }}
+                </div>
+            {% endif %}
+            <div class="form-grid">
+                {{
+                    include(
+                        'technical/_field.html.twig',
+                        {
+                            field: form.label,
+                            full: true
+                        }
+                    )
+                }}{{
+                    include(
+                        'technical/_field.html.twig',
+                        {
+                            field: form.days,
+                            full: true
+                        }
+                    )
+                }}
+            </div>
+            <p class="field-hint">
+                Le patch, le plan de scène, le matériel et les notes pratiques sont copiés dans une
+                version datée. Les conditions privées restent dans votre espace.
+            </p>
+            <div class="form-actions">
+                <button class="button button-primary" type="submit">
+                    Publier le dossier et créer le lien
+                </button>
+            </div>
+            {{ form_end(form) }}
+        </section>
+        <aside class="form-aside">
+            <p class="eyebrow">
+                Un dossier stable
+            </p>
+            <h2>Les bonnes demandes.<br />La bonne réponse.</h2>
+            <p>
+                Après une modification du dossier, créez un nouveau lien pour partager la nouvelle
+                version. Révoquez les anciens accès si nécessaire.
+            </p>
+            <p>
+                Aucun e-mail n’est envoyé automatiquement.
+            </p>
+        </aside>
+    </div>
+    <section class="invitations-history">
+        <h2 class="small-heading">Les accès créés</h2>
+        {% for row in invitations %}
+            {% set invitation = row.invitation %}
+            <article class="invitation-card">
+                <div>
+                    <strong>{{ invitation.label }}</strong>
+                    <p>
+                        Dossier #{{ invitation.publication.id }} · publié le {{
+                            invitation.createdAt|date('d/m/Y à H:i')
+                        }} · échéance {{ invitation.expiresAt|date('d/m/Y') }}
+                    </p>
+                    <p>
+                        {{ invitation.revokedAt
+                            ? 'Accès révoqué'
+                            : invitation.usable ? 'Accès actif' : 'Accès expiré' }} · {{ row.reply
+                            ? 'Réponse reçue'
+                            : 'En attente de réponse' }}
+                    </p>
+                    {% if row.outdated %}
+                        <p class="version-warning">
+                            Le dossier du concert a changé depuis cette publication.
+                        </p>
+                    {% endif %}
+                </div>
+                {% if invitation.usable %}
+                    <form
+                        method="post"
+                        action="{{
+                        path(
+                            'app_invitation_revoke',
+                            {
+                                id: invitation.id
+                            }
+                        )
+                        }}"
+                    >
+                        <input
+                            type="hidden"
+                            name="_token"
+                            value="{{ csrf_token('invitation_revoke_' ~ invitation.id) }}"
+                        />
+                        <button class="text-button danger-link" type="submit">
+                            Révoquer ce lien
+                        </button>
+                    </form>
+                {% endif %}
+            </article>
+        {% else %}
+            <p class="panel-message">
+                Aucun accès créé pour ce concert.
+            </p>
+        {% endfor %}
+    </section>
+{% endblock %}

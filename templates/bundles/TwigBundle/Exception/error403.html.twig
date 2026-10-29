@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Accès non autorisé · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <section class="form-heading" aria-labelledby="page-title">
+        <p class="eyebrow">
+            Dossier protégé
+        </p>
+        <h1 id="page-title">Accès non autorisé<span class="title-period">.</span></h1>
+        <p>
+            Votre compte ne dispose pas des droits nécessaires pour cette action.
+        </p>
+    </section>
+    <a class="button button-primary" href="{{ path('app_concert_index') }}">Revenir aux concerts</a>
+{% endblock %}

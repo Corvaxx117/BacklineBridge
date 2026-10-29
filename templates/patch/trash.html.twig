@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Corbeille du patch · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    {% set returnUrl = sheet.concert
+        ? path(
+            'app_concert_show',
+            {
+                id: sheet.concert.id
+            }
+        )
+        : path('app_patch_index')
+    %}
+    <a class="back-link" href="{{ returnUrl }}">
+        <span aria-hidden="true">←</span>Revenir au patch
+    </a>
+    <section class="form-heading" aria-labelledby="page-title">
+        <p class="eyebrow">
+            {{ sheet.bandName }} / {{ sheet.concert ? sheet.concert.venue : 'Fiche de référence' }}
+        </p>
+        <h1 id="page-title">Sources retirées<span class="title-period">.</span></h1>
+        <p>
+            Restaurez une entrée si son canal est libre. Les autres patchs restent indépendants.
+        </p>
+    </section>
+    <ul class="trash-list">
+        {% for line in lines %}
+            <li>
+                <span class="channel-number">{{ '%02d'|format(line.channelNumber) }}</span>
+                <div>
+                    <strong>{{ line.sourceName }}</strong>
+                    <p>
+                        Retirée le {{ line.deletedAt|date('d/m/Y à H:i') }}
+                    </p>
+                </div>
+                <form
+                    action="{{
+                    path(
+                        'app_patch_restore',
+                        {
+                            id: line.id
+                        }
+                    )
+                    }}"
+                    method="post"
+                >
+                    <input
+                        type="hidden"
+                        name="_token"
+                        value="{{ csrf_token('patch_restore_' ~ line.id) }}"
+                    />
+                    <button class="button button-secondary" type="submit">Restaurer</button>
+                </form>
+            </li>
+        {% else %}
+            <li class="empty-state">
+                <p>
+                    Aucune source dans la corbeille de ce patch.
+                </p>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

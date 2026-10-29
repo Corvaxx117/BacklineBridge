@@ -1,0 +1,34 @@
+<div class="stage-scroll" tabindex="0" aria-label="Plan de scène, vue depuis le public">
+    <div class="stage-board" {{ editable|default(false) ? 'data-stage-board' : '' }}>
+        <span class="stage-orientation stage-back">Fond de scène</span>
+        {% for item in items %}
+            <div
+                class="stage-node stage-{{ item.kind }}"
+                style="left: {{ item.x|number_format(1, '.', '') }}%; top: {{ item.y|number_format(
+                    1,
+                    '.',
+                    ''
+                ) }}%; --stage-rotation: {{ item.rotation
+                    |default(0)
+                    |number_format(1, '.', '') }}deg; --stage-scale: {{ item.scale
+                    |default(1)
+                    |number_format(2, '.', '') }};"
+            >
+                <span class="stage-symbol" aria-hidden="true">
+                    {{
+                        include(
+                            'stage/_icon.html.twig',
+                            {
+                                kind: item.kind
+                            },
+                            with_context: false
+                        )
+                    }}
+                </span>
+                <strong>{{ item.label }}</strong>
+                <small>{{ item.notes }}</small>
+            </div>
+        {% endfor %}
+        <span class="stage-orientation stage-front">Public · avant-scène</span>
+    </div>
+</div>

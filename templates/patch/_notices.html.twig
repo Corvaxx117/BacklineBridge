@@ -1,0 +1,24 @@
+{% if sheet.notices is not empty %}
+    <aside class="document-notice" aria-labelledby="notice-title">
+        <span class="notice-symbol" aria-hidden="true">!</span>
+        <div>
+            <h2 id="notice-title">Notes de la fiche source</h2>
+            <details class="source-details">
+                <summary>
+                    Consulter les {{ sheet.notices|length }} précisions et points à vérifier
+                </summary>
+                <ul>
+                    {% for notice in sheet.notices %}
+                        <li>{{ notice }}</li>
+                    {% endfor %}
+                </ul>
+            </details>
+        </div>
+    </aside>
+{% endif %}
+<div class="document-origin">
+    <span class="eyebrow">Document d’origine</span>
+    <p>
+        {{ sheet.documentLabel }}
+    </p>
+</div>

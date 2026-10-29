@@ -1,0 +1,11 @@
+/vendor/
+/var/
+/node_modules/
+/.git/
+/.phpunit.cache/
+/.env*
+/config/reference.php
+/composer.lock
+/symfony.lock
+/package-lock.json
+*.md

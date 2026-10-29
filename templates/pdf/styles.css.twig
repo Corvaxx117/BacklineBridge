@@ -1,0 +1,160 @@
+@page {
+    size: A4 landscape;
+    margin: 24pt 28pt 34pt;
+}
+body {
+    color: #152b38;
+    font-family: 'DejaVu Sans', sans-serif;
+    font-size: 9pt;
+    line-height: 1.45;
+}
+h1,
+h2,
+h3,
+p {
+    margin: 0;
+}
+h1 {
+    font-size: 24pt;
+    line-height: 1.15;
+    margin-bottom: 5pt;
+}
+h2 {
+    font-size: 15pt;
+    margin-bottom: 12pt;
+    page-break-after: avoid;
+}
+h3 {
+    color: #49786c;
+    font-size: 10pt;
+    margin: 10pt 0 5pt;
+    page-break-after: avoid;
+}
+p {
+    margin-bottom: 8pt;
+}
+.document-header {
+    width: 100%;
+    margin-bottom: 12pt;
+    border-bottom: 2pt solid #b44b2d;
+}
+.document-header td {
+    padding: 0 0 10pt;
+    vertical-align: bottom;
+}
+.brand {
+    width: 140pt;
+    text-align: right;
+    color: #b44b2d;
+    font-size: 11pt;
+    font-weight: bold;
+}
+.caption {
+    color: #67747a;
+    font-size: 8pt;
+}
+.stage-page {
+    page-break-after: always;
+}
+.stage-image-container {
+    text-align: center;
+    line-height: 0;
+}
+.stage-image {
+    display: inline-block;
+}
+.stage-caption {
+    margin-top: 4pt;
+    color: #67747a;
+    font-size: 8pt;
+}
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 8pt;
+    table-layout: fixed;
+}
+.data-table thead {
+    display: table-header-group;
+}
+.data-table th {
+    color: #ffffff;
+    background: #243c47;
+    text-align: left;
+    font-size: 8pt;
+    padding: 5pt 8pt;
+    line-height: 1.2;
+}
+.data-table td {
+    border-bottom: 0.5pt solid #dce2d8;
+    padding: 2pt 8pt;
+    line-height: 1.2;
+    vertical-align: top;
+    word-wrap: break-word;
+}
+.data-table tbody tr:nth-child(even) {
+    background: #f3f6ef;
+}
+.data-table tr {
+    page-break-inside: avoid;
+}
+.channel {
+    width: 6%;
+    font-weight: bold;
+}
+.source {
+    width: 44%;
+}
+.microphone {
+    width: 30%;
+}
+.stand {
+    width: 20%;
+}
+.quantity {
+    width: 7%;
+    font-weight: bold;
+}
+.equipment-label {
+    width: 28%;
+}
+.equipment-specification {
+    width: 65%;
+}
+.stage-label {
+    width: 28%;
+}
+.stage-notes {
+    width: 72%;
+}
+.patch-notes p,
+.practical-notes p,
+.notices p {
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+.patch-notes strong {
+    color: #49786c;
+}
+.patch-notes {
+    page-break-inside: avoid;
+}
+.patch-notes p {
+    margin-bottom: 4pt;
+}
+.note-section {
+    margin-top: 18pt;
+}
+.appendix-page {
+    page-break-before: always;
+}
+.equipment-group,
+.notices {
+    page-break-inside: avoid;
+}
+.empty-state {
+    background: #f2f5ee;
+    color: #67747a;
+    padding: 14pt;
+    margin-bottom: 18pt;
+}

@@ -1,0 +1,225 @@
+{% extends 'guest/base.html.twig' %}
+{% block title %}
+    {{ snapshot.venue }} · Espace salle · {{ app_name }}
+{% endblock %}
+{% block body %}
+    <section class="hero concert-hero">
+        <div>
+            <p class="eyebrow">
+                {{ snapshot.bandName }} / Préparation technique
+            </p>
+            <h1>{{ snapshot.venue }}<span class="title-period">.</span></h1>
+            <p class="hero-description">
+                {{ snapshot.date|date('d/m/Y') }} · {{ snapshot.city }}
+            </p>
+            <p class="publication-caption">
+                Dossier #{{ publication.id }} · publié le {{ publication.publishedAt|date('d/m/Y à H:i') }}
+            </p>
+        </div>
+        <form
+            method="post"
+            action="{{
+            path(
+                'app_guest_exit',
+                {
+                    access: access
+                }
+            )
+            }}"
+        >
+            <input type="hidden" name="_token" value="{{ csrf_token('guest_exit_' ~ access) }}" />
+            <button class="button button-secondary" type="submit">Quitter cet accès</button>
+        </form>
+    </section>
+    <nav class="dossier-nav" aria-label="Sections du dossier">
+        <a href="#plan-de-scene">Plan de scène</a>
+        <a href="#backline">Matériel disponible</a>
+        <a href="#patch-salle">Patch des entrées</a>
+        <a href="#reponse">Votre réponse</a>
+        <a
+            href="{{
+            path(
+                'app_guest_pdf',
+                {
+                    access: access
+                }
+            )
+            }}"
+        >
+            Télécharger la fiche PDF ↓
+        </a>
+    </nav>
+    {% if snapshot.notes %}
+        <section class="concert-notes">
+            <h2 class="small-heading">Notes du groupe</h2>
+            <p class="concert-notes-content">
+                {{ snapshot.notes|nl2br }}
+            </p>
+        </section>
+    {% endif %}
+    <section class="technical-panel" id="plan-de-scene">
+        <div class="panel-header">
+            <div>
+                <p class="eyebrow">
+                    Implantation prévue
+                </p>
+                <h2>Plan de scène</h2>
+            </div>
+            <span class="muted-caption">Vue depuis le public</span>
+        </div>
+        {% if snapshot.stagePlan %}
+            {{
+                include(
+                    'stage/_board.html.twig',
+                    {
+                        items: snapshot.stagePlan
+                    },
+                    with_context: false
+                )
+            }}
+        {% else %}
+            <p class="panel-message">
+                Le groupe n’a pas encore ajouté de plan.
+            </p>
+        {% endif %}
+    </section>
+    {% if snapshot.notices %}
+        <aside class="guest-notices">
+            <h2>À garder en tête</h2>
+            <ul>
+                {% for notice in snapshot.notices %}
+                    <li>{{ notice }}</li>
+                {% endfor %}
+            </ul>
+        </aside>
+    {% endif %}
+    {{
+        form_start(
+            form,
+            {
+                attr: {
+                    class: 'venue-reply-form',
+                    novalidate: 'novalidate',
+                    'data-venue-reply': ''
+                }
+            }
+        )
+    }}
+    {% if form.vars.submitted and not form.vars.valid %}
+        <div class="form-error-summary" role="alert">
+            <strong>
+                La réponse n’a pas été enregistrée. Vérifiez les champs signalés ci-dessous.
+            </strong>{{ form_errors(form) }}
+        </div>
+    {% endif %}
+    <div class="reply-intro">
+        <h2>Le matériel à votre disposition</h2>
+        <p>
+            Renseignez une catégorie à la fois. Les réponses rapides complètent plusieurs demandes
+            en un clic ; vous pouvez ensuite ajuster chaque ligne et préciser les alternatives.
+        </p>
+    </div>
+    <div class="reply-overview">
+        <div>
+            <strong data-reply-progress role="status">
+                Votre réponse peut être enregistrée même si elle est partielle.
+            </strong>
+            <progress
+                data-reply-meter
+                aria-label="Demandes renseignées"
+                value="0"
+                max="{{ requests|length ? : 1 }}"
+                hidden
+            ></progress>
+        </div>
+        <div class="material-fold-actions" data-reply-enhancement hidden>
+            <button type="button" class="text-button" data-reply-expand>Tout ouvrir</button>
+            <button type="button" class="text-button" data-reply-collapse>Tout replier</button>
+            <a href="#reponse">Enregistrer ma réponse ↓</a>
+        </div>
+    </div>
+    {% for section, prefix in {
+        backline: 'gear_',
+        'patch-salle': 'line_'
+    } %}
+        <section class="reply-section" id="{{ section }}" aria-labelledby="{{ section }}-title">
+            <div class="reply-section-heading">
+                <p class="eyebrow">
+                    {{ section == 'backline'
+                        ? '01 / Backline et accueil technique'
+                        : '02 / Sonorisation' }}
+                </p>
+                <h2 id="{{ section }}-title">
+                    {{ section == 'backline'
+                        ? 'Batterie, amplis et scène'
+                        : 'Microphones, DI et pieds' }}
+                </h2>
+            </div>
+            {% set groups = {} %}
+            {% for key, item in requests|filter((item, key) => key starts with prefix) %}
+                {% set groupKey = 'category_' ~ item.category %}
+                {% set groups =
+                    groups|merge({
+                        (groupKey): groups[groupKey]
+                            |default({})
+                            |merge({
+                                (key): item
+                            })
+                    })
+                %}
+            {% endfor %}
+            {% for items in groups %}
+                {{
+                    include(
+                        'guest/_request_group.html.twig',
+                        {
+                            items: items,
+                            form: form,
+                            first: loop.first and section == 'backline'
+                        },
+                        with_context: false
+                    )
+                }}
+            {% else %}
+                <p class="panel-message">
+                    Aucune demande dans cette section.
+                </p>
+            {% endfor %}
+        </section>
+    {% endfor %}
+    {% do form.answers.setRendered %}
+    <section class="reply-contact technical-panel" id="reponse">
+        <h2>Votre réponse</h2>
+        {% if reply %}
+            <p class="field-hint">
+                Dernier enregistrement : {{ reply.updatedAt|date('d/m/Y à H:i') }}. Vous pouvez
+                actualiser les informations ci-dessous.
+            </p>
+        {% endif %}
+        <div class="form-grid">
+            {{
+                include(
+                    'technical/_field.html.twig',
+                    {
+                        field: form.respondent,
+                        full: true
+                    }
+                )
+            }}{{
+                include(
+                    'technical/_field.html.twig',
+                    {
+                        field: form.notes,
+                        full: true
+                    }
+                )
+            }}
+        </div>
+        <div class="setup-actions">
+            <button class="button button-primary" type="submit">Enregistrer ma réponse</button>
+            <span class="field-hint">La réponse sera visible par l’équipe du groupe.</span>
+        </div>
+    </section>
+    {{ form_end(form) }}
+    <script src="/scripts/venue-reply.js" defer></script>
+{% endblock %}

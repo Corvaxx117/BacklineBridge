@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Concerts · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <div class="page-topline">
+        <span class="eyebrow">Les dates du groupe</span>
+        <span class="reference-tag">
+            {{ concerts|length }}
+            {{ (concerts|length) == 1 ? 'concert' : 'concerts' }}
+        </span>
+    </div>
+    <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+            {% if band_role() and band_role().value == 'booker' %}
+                <p class="eyebrow">
+                    Tournée et conditions d’accueil
+                </p>
+            {% endif %}
+            <h1 id="page-title">Concerts<span class="title-period">.</span></h1>
+            <p class="hero-description">
+                Une date, une salle, un patch à préparer.<br />Chaque concert possède son propre
+                dossier technique.
+            </p>
+        </div>
+        {% if canCreate %}
+            <a class="button button-primary hero-action" href="{{ path('app_concert_new') }}">
+                <span class="button-plus" aria-hidden="true">+</span>Créer un concert
+            </a>
+        {% endif %}
+    </section>
+
+    {% if concerts is empty %}
+        <section class="patch-panel empty-state" aria-labelledby="empty-title">
+            <span class="empty-channel" aria-hidden="true">01</span>
+            <h2 id="empty-title">Votre première date vous attend.</h2>
+            <p>
+                {{ canCreate
+                    ? 'Partez de la fiche du groupe pour préparer le prochain concert.'
+                    : 'Les concerts des groupes auxquels vous avez accès apparaîtront ici.' }}
+            </p>
+            {% if canCreate %}
+                <a class="button button-primary" href="{{ path('app_concert_new') }}">
+                    Créer un concert
+                </a>
+            {% endif %}
+        </section>
+    {% else %}
+        <ol class="concert-list" aria-label="Concerts par date croissante">
+            {% for concert in concerts %}
+                <li class="concert-card">
+                    <time class="concert-date" datetime="{{ concert.date|date('Y-m-d') }}">
+                        {{ concert.date|date('d/m/Y') }}
+                    </time>
+                    <div class="concert-card-copy">
+                        <p class="eyebrow">
+                            {{ concert.patchSheet.bandName }}
+                        </p>
+                        <h2>
+                            <a
+                                href="{{
+                                path(
+                                    'app_concert_show',
+                                    {
+                                        id: concert.id
+                                    }
+                                )
+                                }}"
+                            >
+                                {{ concert.venue }}
+                            </a>
+                        </h2>
+                        <p>
+                            {{ concert.city }}
+                            <span class="status-badge status-{{ concert.status.value }}">
+                                {{ concert.status.label }}
+                            </span>
+                        </p>
+                        <p class="concert-creator">
+                            {{ concert.createdByName
+                                ? 'Créé par ' ~ concert.createdByName
+                                : 'Créateur non renseigné' }}
+                        </p>
+                        {% if is_granted('CONCERT_RESPOND_AVAILABILITY', concert) %}
+                            {% set myStatus = myAvailabilities[concert.id].status|default(null) %}
+                            <a
+                                class="concert-availability-link"
+                                href="{{
+                                path(
+                                    'app_concert_show',
+                                    {
+                                        id: concert.id
+                                    }
+                                )
+                                }}#disponibilites"
+                            >
+                                Ma disponibilité : {{ myStatus ? myStatus.label : 'À confirmer' }}
+                            </a>
+                        {% endif %}
+                    </div>
+                    <a
+                        class="button button-secondary"
+                        href="{{
+                        path(
+                            'app_concert_show',
+                            {
+                                id: concert.id
+                            }
+                        )
+                        }}"
+                        aria-label="Ouvrir le concert à {{ concert.venue }} du {{ concert.date|date(
+                            'd/m/Y'
+                        ) }}"
+                    >
+                        Ouvrir le dossier <span aria-hidden="true">→</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ol>
+    {% endif %}
+{% endblock %}

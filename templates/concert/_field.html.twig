@@ -1,0 +1,16 @@
+<div class="field">
+    {{ form_label(field) }}
+    {{
+        form_widget(
+            field,
+            {
+                attr: {
+                    'aria-describedby': field.vars.id ~ '_errors'
+                }
+            }
+        )
+    }}
+    <div class="field-errors" id="{{ field.vars.id }}_errors">
+        {{ form_errors(field) }}
+    </div>
+</div>

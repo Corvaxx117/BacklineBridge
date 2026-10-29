@@ -1,0 +1,13 @@
+{
+    "name": "backlinebridge-tools",
+    "private": true,
+    "scripts": {
+        "format": "prettier --write . --ignore-unknown",
+        "format:check": "prettier --check . --ignore-unknown"
+    },
+    "devDependencies": {
+        "@prettier/plugin-php": "^0.25.0",
+        "@zackad/prettier-plugin-twig": "^0.17.0",
+        "prettier": "^3.6.2"
+    }
+}

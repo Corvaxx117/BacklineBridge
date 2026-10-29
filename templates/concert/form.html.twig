@@ -1,0 +1,176 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ editing ? 'Modifier le concert' : 'Créer un concert' }} — {{ sheet.bandName }} · {{
+        app_name
+    }}
+{% endblock %}
+
+{% block body %}
+    <a
+        class="back-link"
+        href="{{
+        editing
+            ? path(
+                'app_concert_show',
+                {
+                    id: concert.id
+                }
+            )
+            : path('app_concert_index')
+        }}"
+    >
+        <span aria-hidden="true">←</span>{{ editing ? 'Revenir au dossier' : 'Revenir aux concerts' }}
+    </a>
+    <section class="form-heading" aria-labelledby="page-title">
+        <p class="eyebrow">
+            {{ sheet.bandName }} / {{ editing ? 'Informations du concert' : 'Nouvelle date' }}
+        </p>
+        <h1 id="page-title">
+            {{ editing ? 'Modifier le concert' : 'Créer un concert' }}<span class="title-period">.</span>
+        </h1>
+        <p>
+            {{ editing
+                ? 'Mettez à jour la date, le lieu et la validation.'
+                : 'Renseignez la date et le lieu. Le dossier technique du groupe sera joint au concert.' }}
+        </p>
+    </section>
+    <div class="form-layout">
+        <section class="form-panel" aria-label="Informations du concert">
+            {{
+                form_start(
+                    form,
+                    {
+                        attr: {
+                            class: 'patch-form concert-form',
+                            novalidate: 'novalidate'
+                        }
+                    }
+                )
+            }}
+            {% if (form.vars.errors|length) > 0 %}
+                <div class="form-error-summary" role="alert">
+                    <strong>
+                        {{ editing
+                            ? 'Les modifications n’ont pas été enregistrées.'
+                            : 'Le concert n’a pas pu être créé.' }}
+                    </strong>{{ form_errors(form) }}
+                    {% if conflict|default(false) %}
+                        <a
+                            href="{{
+                            path(
+                                'app_concert_edit',
+                                {
+                                    id: concert.id
+                                }
+                            )
+                            }}"
+                        >
+                            Recharger la version actuelle
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+            <div class="form-section-heading">
+                <span class="step-number" aria-hidden="true">01</span>
+                <div>
+                    <h2>Préparer la date</h2>
+                    <p>
+                        La date, la salle et la ville sont obligatoires.
+                    </p>
+                </div>
+            </div>
+            <div class="form-grid">
+                {% for field in [form.date, form.venue, form.city, form.status] %}
+                    <div class="field{{ field.vars.name == 'venue' ? ' field-full' : '' }}">
+                        {{ form_label(field) }}
+                        {{
+                            form_widget(
+                                field,
+                                {
+                                    attr: {
+                                        'aria-describedby': field.vars.id ~ '_errors'
+                                    }
+                                }
+                            )
+                        }}
+                        <div class="field-errors" id="{{ field.vars.id }}_errors">
+                            {{ form_errors(field) }}
+                        </div>
+                    </div>
+                {% endfor %}
+                <div class="field field-full">
+                    {{ form_label(form.notes) }}
+                    {{
+                        form_widget(
+                            form.notes,
+                            {
+                                attr: {
+                                    'aria-describedby': form.notes.vars.id ~ '_help '
+                                        ~ form.notes.vars.id
+                                        ~ '_errors'
+                                }
+                            }
+                        )
+                    }}
+                    {{
+                        form_help(
+                            form.notes,
+                            {
+                                help_attr: {
+                                    class: 'field-hint'
+                                }
+                            }
+                        )
+                    }}
+                    <div class="field-errors" id="{{ form.notes.vars.id }}_errors">
+                        {{ form_errors(form.notes) }}
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="button button-primary" type="submit">
+                    {{ editing
+                        ? 'Enregistrer les modifications'
+                        : 'Créer le concert et son patch' }}
+                    <span aria-hidden="true">→</span>
+                </button>
+                <a
+                    class="cancel-link"
+                    href="{{
+                    editing
+                        ? path(
+                            'app_concert_show',
+                            {
+                                id: concert.id
+                            }
+                        )
+                        : path('app_concert_index')
+                    }}"
+                >
+                    Annuler
+                </a>
+            </div>
+            {{ form_end(form) }}
+        </section>
+        <aside class="form-aside">
+            <span class="aside-rule" aria-hidden="true"></span>
+            <p class="eyebrow">
+                Un dossier par concert
+            </p>
+            <h2>La bonne fiche.<br />Pour cette date.</h2>
+            <p>
+                Le statut indique si la date est validée ou encore en attente. Il reste distinct de
+                la confirmation du matériel par la salle.
+            </p>
+            <p>
+                Les conditions d’accueil et de rémunération se complètent dans une section dédiée du
+                dossier.
+            </p>
+            <p>
+                Les membres du groupe et l’ingé son confirment chacun leur disponibilité. Un
+                changement de date remet leurs réponses à confirmer.
+            </p>
+        </aside>
+    </div>
+{% endblock %}

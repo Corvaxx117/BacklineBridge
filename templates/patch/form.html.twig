@@ -1,0 +1,247 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ editing ? 'Modifier une source' : 'Ajouter une source' }} — {{ sheet.bandName }} · {{
+        app_name
+    }}
+{% endblock %}
+
+{% block body %}
+    {% set concert = sheet.concert %}
+    {% set returnUrl = concert
+        ? path(
+            'app_concert_show',
+            {
+                id: concert.id
+            }
+        )
+        : path('app_patch_index')
+    %}
+    <a class="back-link" href="{{ returnUrl }}">
+        <span aria-hidden="true">←</span>Revenir au patch
+    </a>
+    <section class="form-heading" aria-labelledby="page-title">
+        <p class="eyebrow">
+            {{ sheet.bandName }} / {{ concert
+                ? concert.venue ~ ' · ' ~ (concert.date|date('d/m/Y'))
+                : 'Fiche de référence' }}
+        </p>
+        <h1 id="page-title">
+            {{ editing ? 'Modifier une source' : 'Ajouter une source' }}<span class="title-period">.</span>
+        </h1>
+        {% if concert %}
+            <p class="concert-context">
+                Les modifications concernent uniquement ce concert.
+            </p>
+        {% endif %}
+        <p>
+            {{ editing
+                ? 'Ajustez les informations de cette entrée.'
+                : 'Donnez à cette entrée un canal et une place dans le patch.' }}
+        </p>
+    </section>
+    <div class="form-layout">
+        <section class="form-panel" aria-label="Informations de la source">
+            {{
+                form_start(
+                    form,
+                    {
+                        attr: {
+                            class: 'patch-form',
+                            novalidate: 'novalidate'
+                        }
+                    }
+                )
+            }}
+            {% if (form.vars.errors|length) > 0 %}
+                <div class="form-error-summary" role="alert">
+                    <strong>La source n’a pas pu être enregistrée.</strong>{{ form_errors(form) }}
+                </div>
+            {% endif %}
+            <div class="form-section-heading">
+                <span class="step-number" aria-hidden="true">01</span>
+                <div>
+                    <h2>Identifier l’entrée</h2>
+                    <p>
+                        Le canal, la source et la famille sont obligatoires.
+                    </p>
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="field field-channel">
+                    {{ form_label(form.channelNumber, 'Canal') }}
+                    {{
+                        form_widget(
+                            form.channelNumber,
+                            {
+                                attr: {
+                                    min: 1,
+                                    inputmode: 'numeric',
+                                    'aria-describedby': form.channelNumber.vars.id ~ '_hint '
+                                        ~ form.channelNumber.vars.id
+                                        ~ '_errors'
+                                }
+                            }
+                        )
+                    }}
+                    <div id="{{ form.channelNumber.vars.id }}_errors" class="field-errors">
+                        {{ form_errors(form.channelNumber) }}
+                    </div>
+                    <p class="field-hint" id="{{ form.channelNumber.vars.id }}_hint">
+                        Un numéro positif, unique dans cette fiche.
+                    </p>
+                </div>
+                <div class="field field-source">
+                    {{ form_label(form.sourceName, 'Source') }}
+                    {{
+                        form_widget(
+                            form.sourceName,
+                            {
+                                attr: {
+                                    placeholder: 'Ex. : Voix Ju',
+                                    'aria-describedby': form.sourceName.vars.id ~ '_errors'
+                                }
+                            }
+                        )
+                    }}
+                    <div id="{{ form.sourceName.vars.id }}_errors" class="field-errors">
+                        {{ form_errors(form.sourceName) }}
+                    </div>
+                </div>
+                <div class="field field-full">
+                    {{ form_label(form.section, 'Famille') }}
+                    {{
+                        form_widget(
+                            form.section,
+                            {
+                                attr: {
+                                    'aria-describedby': form.section.vars.id ~ '_errors'
+                                }
+                            }
+                        )
+                    }}
+                    <div id="{{ form.section.vars.id }}_errors" class="field-errors">
+                        {{ form_errors(form.section) }}
+                    </div>
+                </div>
+            </div>
+            <div class="form-section-heading equipment-heading">
+                <span class="step-number" aria-hidden="true">02</span>
+                <div>
+                    <h2>Préciser les besoins</h2>
+                    <p>
+                        Complétez seulement les informations utiles.
+                    </p>
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="field">
+                    {{
+                        form_label(
+                            form.preferredMicrophone,
+                            'Micro / DI préféré',
+                            {
+                                label_attr: {
+                                    class: 'optional-label'
+                                }
+                            }
+                        )
+                    }}
+                    <span class="optional">Facultatif</span>
+                    {{
+                        form_widget(
+                            form.preferredMicrophone,
+                            {
+                                attr: {
+                                    placeholder: 'Ex. : Shure SM58',
+                                    'aria-describedby': form.preferredMicrophone.vars.id ~ '_errors'
+                                }
+                            }
+                        )
+                    }}
+                    <div id="{{ form.preferredMicrophone.vars.id }}_errors" class="field-errors">
+                        {{ form_errors(form.preferredMicrophone) }}
+                    </div>
+                </div>
+                <div class="field">
+                    {{
+                        form_label(
+                            form.stand,
+                            'Pied',
+                            {
+                                label_attr: {
+                                    class: 'optional-label'
+                                }
+                            }
+                        )
+                    }}
+                    <span class="optional">Facultatif</span>
+                    {{
+                        form_widget(
+                            form.stand,
+                            {
+                                attr: {
+                                    placeholder: 'Ex. : Grand pied',
+                                    'aria-describedby': form.stand.vars.id ~ '_errors'
+                                }
+                            }
+                        )
+                    }}
+                    <div id="{{ form.stand.vars.id }}_errors" class="field-errors">
+                        {{ form_errors(form.stand) }}
+                    </div>
+                </div>
+                <div class="field field-full">
+                    {{
+                        form_label(
+                            form.notes,
+                            'Note',
+                            {
+                                label_attr: {
+                                    class: 'optional-label'
+                                }
+                            }
+                        )
+                    }}
+                    <span class="optional">Facultatif</span>
+                    {{
+                        form_widget(
+                            form.notes,
+                            {
+                                attr: {
+                                    rows: 4,
+                                    placeholder: 'Une précision pour préparer cette source…',
+                                    'aria-describedby': form.notes.vars.id ~ '_errors'
+                                }
+                            }
+                        )
+                    }}
+                    <div id="{{ form.notes.vars.id }}_errors" class="field-errors">
+                        {{ form_errors(form.notes) }}
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="button button-primary" type="submit">
+                    {{ editing ? 'Enregistrer les modifications' : 'Ajouter au patch' }}<span aria-hidden="true">→</span>
+                </button>
+                <a class="cancel-link" href="{{ returnUrl }}">Annuler</a>
+            </div>
+            {{ form_end(form) }}
+        </section>
+        <aside class="form-aside">
+            <span class="aside-rule" aria-hidden="true"></span>
+            <p class="eyebrow">
+                Un patch facile à lire
+            </p>
+            <h2>Une entrée.<br />Une source.</h2>
+            <p>
+                Utilisez un nom précis pour que chaque musicien et chaque technicien identifie
+                immédiatement la source.
+            </p>
+            <p>
+                Les choix de micro et de pied expriment les préférences du groupe.
+            </p>
+        </aside>
+    </div>
+{% endblock %}

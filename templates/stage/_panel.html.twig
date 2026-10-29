@@ -1,0 +1,40 @@
+<section class="technical-panel" aria-labelledby="stage-title">
+    <div class="panel-header">
+        <div>
+            <p class="eyebrow">
+                Implantation et retours
+            </p>
+            <h2 id="stage-title">Plan de scène</h2>
+        </div>
+        {% if is_granted('SHEET_MANAGE', sheet) %}
+            <a
+                class="button button-secondary"
+                href="{{
+                path(
+                    'app_stage_edit',
+                    {
+                        id: sheet.id
+                    }
+                )
+                }}"
+            >
+                Modifier le plan
+            </a>
+        {% endif %}
+    </div>
+    {% if sheet.stagePlan %}
+        {{
+            include(
+                'stage/_board.html.twig',
+                {
+                    items: sheet.stagePlan
+                },
+                with_context: false
+            )
+        }}
+    {% else %}
+        <p class="panel-message">
+            Le plan de scène n’a pas encore été renseigné.
+        </p>
+    {% endif %}
+</section>

@@ -1,0 +1,306 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ concert.venue }} — {{ concert.date|date('d/m/Y') }} · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    {% set role = band_role(concert.band) %}
+    <a class="back-link" href="{{ path('app_concert_index') }}">
+        <span aria-hidden="true">←</span>Revenir aux concerts
+    </a>
+    <section class="hero concert-hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+            <p class="eyebrow">
+                {{ sheet.bandName }} / Dossier du concert
+            </p>
+            <p class="concert-creator">
+                {% if concert.createdByName %}
+                    Créé par <strong>{{ concert.createdByName }}</strong>{% if concert.createdAt %}
+                        · {{ concert.createdAt|date('d/m/Y') }}
+                    {% endif %}
+                {% else %}
+                    Créateur non renseigné pour ce concert existant
+                {% endif %}
+            </p>
+            <h1 id="page-title">{{ concert.venue }}<span class="title-period">.</span></h1>
+            <p class="hero-description">
+                <time datetime="{{ concert.date|date('Y-m-d') }}">
+                    {{ concert.date|date('d/m/Y') }}
+                </time> · {{ concert.city }}
+                <span class="status-badge status-{{ concert.status.value }}">
+                    {{ concert.status.label }}
+                </span>
+            </p>
+        </div>
+        {% if is_granted('CONCERT_UPDATE', concert) %}
+            <a
+                class="button button-secondary hero-action"
+                href="{{
+                path(
+                    'app_concert_edit',
+                    {
+                        id: concert.id
+                    }
+                )
+                }}"
+            >
+                Modifier le concert
+            </a>
+        {% endif %}
+    </section>
+    <nav class="concert-tools" aria-label="Préparation avec la salle">
+        <a
+            class="button button-secondary"
+            href="{{
+            path(
+                'app_sheet_pdf',
+                {
+                    id: sheet.id
+                }
+            )
+            }}"
+        >
+            Télécharger la fiche PDF
+        </a>
+        <a
+            class="button button-secondary"
+            href="{{
+            path(
+                'app_concert_responses',
+                {
+                    id: concert.id
+                }
+            )
+            }}"
+        >
+            Réponses de la salle
+        </a>
+        {% if is_granted('CONCERT_SHARE', concert) %}
+            <a
+                class="button button-primary"
+                href="{{
+                path(
+                    'app_concert_invitations',
+                    {
+                        id: concert.id
+                    }
+                )
+                }}"
+            >
+                Inviter la salle
+            </a>
+        {% endif %}
+    </nav>
+    {{
+        include(
+            'concert/_availability.html.twig',
+            {
+                concert: concert,
+                availability: availability,
+                availabilityForm: availabilityForm
+            },
+            with_context: false
+        )
+    }}
+    {% if concert.notes %}
+        <section class="concert-notes" aria-labelledby="concert-notes-title">
+            <div class="concert-notes-heading">
+                <h2 id="concert-notes-title">Notes</h2>
+                {% if is_granted('CONCERT_UPDATE', concert) %}
+                    <a
+                        class="edit-link"
+                        href="{{
+                        path(
+                            'app_concert_edit',
+                            {
+                                id: concert.id
+                            }
+                        )
+                        }}#concert_notes"
+                    >
+                        Modifier les notes
+                    </a>
+                {% endif %}
+            </div>
+            <p class="concert-notes-content">
+                {{ concert.notes|nl2br }}
+            </p>
+        </section>
+    {% endif %}
+    {% if canViewConditions %}
+        <section class="conditions-panel" aria-labelledby="conditions-title">
+            <div class="panel-header">
+                <div>
+                    <p class="eyebrow">
+                        Organisation et rémunération
+                    </p>
+                    <h2 id="conditions-title">Conditions du concert</h2>
+                </div>
+                <a
+                    class="button button-secondary"
+                    href="{{
+                    path(
+                        'app_concert_conditions',
+                        {
+                            id: concert.id
+                        }
+                    )
+                    }}"
+                >
+                    {{ conditions ? 'Modifier les conditions' : 'Compléter les conditions' }}
+                </a>
+            </div>
+            <dl class="conditions-grid">
+                <div>
+                    <dt>
+                        Hébergement
+                    </dt>
+                    <dd>{{ conditions ? conditions.accommodation.label : 'À confirmer' }}</dd>
+                </div>
+                <div>
+                    <dt>
+                        Frais de transport
+                    </dt>
+                    <dd>{{ conditions ? conditions.transportCoverage.label : 'À confirmer' }}</dd>
+                </div>
+                <div>
+                    <dt>
+                        Montant convenu
+                    </dt>
+                    <dd>
+                        {{ conditions and conditions.feeCents is not null
+                            ? ((conditions.feeCents / 100)|number_format(2, ',', ' ')) ~ ' €'
+                            : 'À confirmer' }}
+                    </dd>
+                </div>
+                <div>
+                    <dt>
+                        Cadre de rémunération
+                    </dt>
+                    <dd>{{ conditions ? conditions.paymentFramework.label : 'À confirmer' }}</dd>
+                </div>
+                <div>
+                    <dt>
+                        Moyen de paiement
+                    </dt>
+                    <dd>{{ conditions ? conditions.paymentMethod.label : 'À confirmer' }}</dd>
+                </div>
+                <div>
+                    <dt>
+                        Rémunération de l’ingé son
+                    </dt>
+                    <dd>
+                        {{ conditions ? conditions.engineerPayment.label : 'À confirmer' }}{% if
+                            conditions %}
+                            <span class="condition-amount">
+                                {{ conditions.engineerPaymentFramework.label }}
+                            </span>
+                        {% endif %}
+                        {% if conditions and conditions.engineerFeeCents is not null %}
+                            <span class="condition-amount">
+                                {{ (conditions.engineerFeeCents / 100)|number_format(2, ',', ' ') }} €
+                            </span>
+                        {% endif %}
+                    </dd>
+                </div>
+                {% if conditions and conditions.notes %}
+                    <div class="field-full">
+                        <dt>
+                            Précisions
+                        </dt>
+                        <dd>{{ conditions.notes|nl2br }}</dd>
+                    </div>
+                {% endif %}
+            </dl>
+            <p class="panel-footer">
+                Le statut de la date ne vaut pas confirmation du matériel ni validation de toutes
+                les conditions.
+            </p>
+        </section>
+    {% endif %}
+    <details class="technical-dossier" {{ not role or role.value != 'booker' ? 'open' : '' }}>
+        <summary>
+            Dossier technique <span>{{ lines|length }} sources</span>
+        </summary>
+        <div class="technical-heading">
+            <p>
+                Le patch peut être adapté pour cette date, indépendamment de la fiche du groupe.
+            </p>
+            {% if is_granted('CONCERT_IMPORT_REFERENCE', concert) %}
+                <a
+                    class="button button-secondary"
+                    href="{{
+                    path(
+                        'app_concert_reference_import',
+                        {
+                            id: concert.id
+                        }
+                    )
+                    }}"
+                >
+                    Récupérer la référence
+                </a>
+            {% endif %}
+            {% if is_granted('CONCERT_EDIT', concert) %}
+                <a
+                    class="button button-primary"
+                    href="{{
+                    path(
+                        'app_concert_patch_new',
+                        {
+                            id: concert.id
+                        }
+                    )
+                    }}"
+                >
+                    Ajouter une source
+                </a>
+            {% endif %}
+        </div>
+        {{
+            include(
+                'stage/_panel.html.twig',
+                {
+                    sheet: sheet
+                },
+                with_context: false
+            )
+        }}
+        {{
+            include(
+                'patch/_panel.html.twig',
+                {
+                    sheet: sheet,
+                    lines: lines,
+                    panelLabel: 'Patch de ce concert',
+                    newSourceUrl: path(
+                        'app_concert_patch_new',
+                        {
+                            id: concert.id
+                        }
+                    )
+                },
+                with_context: false
+            )
+        }}
+        {{
+            include(
+                'equipment/_panel.html.twig',
+                {
+                    sheet: sheet
+                },
+                with_context: false
+            )
+        }}
+        {{
+            include(
+                'patch/_notices.html.twig',
+                {
+                    sheet: sheet
+                },
+                with_context: false
+            )
+        }}
+    </details>
+{% endblock %}

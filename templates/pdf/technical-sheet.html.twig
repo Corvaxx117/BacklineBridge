@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <title>
+            Fiche technique - {{ dossier.bandName }}
+        </title>
+        <style>
+            {{ include('pdf/styles.css.twig', {}, with_context: false) }}
+        </style>
+    </head>
+    <body>
+        <section class="{{ dossier.stagePlan ? 'stage-page' : '' }}">
+            <table class="document-header">
+                <tr>
+                    <td>
+                        <h1>{{ dossier.bandName }}</h1>
+                        <p>
+                            {{ dossier.label }}{% if dossier.venue %}
+                                - {{ dossier.venue }}
+                            {% endif %}
+                            {% if dossier.city %}
+                                · {{ dossier.city }}
+                            {% endif %}
+                            {% if dossier.date %}
+                                · {{ dossier.date|date('d/m/Y') }}
+                            {% endif %}
+                        </p>
+                        {% if dossier.documentLabel %}
+                            <p class="caption">
+                                {{ dossier.documentLabel }}
+                            </p>
+                        {% endif %}
+                        {% if dossier.publishedAt %}
+                            <p class="caption">
+                                Publication du {{ dossier.publishedAt|date('d/m/Y à H:i') }} - version
+                                transmise à la salle
+                            </p>
+                        {% endif %}
+                    </td>
+                    <td class="brand">
+                        {{ app_name }}<br />
+                        <span class="caption">FICHE TECHNIQUE</span>
+                    </td>
+                </tr>
+            </table>
+            <h2>Plan de scène</h2>
+            {% if dossier.stagePlan %}
+                <div class="stage-image-container">
+                    <img
+                        class="stage-image"
+                        style="width: {{ stageWidth }}pt; height: {{ stageHeight }}pt;"
+                        src="{{ stageImage }}"
+                        alt="Plan de scène de {{ dossier.bandName }}"
+                    />
+                </div>
+                <p class="stage-caption">
+                    Vue depuis le public. Les orientations et tailles correspondent au plan
+                    enregistré. Les précisions complètes des repères figurent en fin de document.
+                </p>
+            {% else %}
+                <p class="empty-state">
+                    Le plan de scène n’a pas encore été renseigné.
+                </p>
+            {% endif %}
+        </section>
+        <section>
+            <h2>Patch des entrées</h2>
+            {% if dossier.lines %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="channel">Canal</th>
+                            <th class="source">Source</th>
+                            <th class="microphone">Micro / DI</th>
+                            <th class="stand">Pied</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for line in dossier.lines %}
+                            <tr>
+                                <td class="channel">{{ '%02d'|format(line.channel) }}</td>
+                                <td>{{ line.source }}</td>
+                                <td>{{ line.microphone ? : '-' }}</td>
+                                <td>{{ line.stand ? : '-' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% set notes = dossier.lines|filter(line => line.notes) %}
+                {% if notes %}
+                    <div class="patch-notes">
+                        <h3>Précisions par canal</h3>
+                        {% for line in notes %}
+                            <p>
+                                <strong>
+                                    {{ '%02d'|format(line.channel) }} · {{ line.source }} :
+                                </strong>
+                                {{ line.notes|nl2br }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <p class="empty-state">
+                    Aucune source dans ce patch.
+                </p>
+            {% endif %}
+            {% if dossier.notes %}
+                <div class="practical-notes note-section">
+                    <h3>Informations pratiques du concert</h3>
+                    <p>
+                        {{ dossier.notes|nl2br }}
+                    </p>
+                </div>
+            {% endif %}
+        </section>
+        <section class="material-section">
+            <h2>Matériel à prévoir</h2>
+            {% set groups = {} %}
+            {% for item in dossier.equipment %}
+                {% set category = item.category|trim ? : 'Autre' %}
+                {% set key = 'category_' ~ category %}
+                {% set groups =
+                    groups|merge({
+                        (key): {
+                            label: category,
+                            items: groups[key].items|default([])|merge([item])
+                        }
+                    })
+                %}
+            {% endfor %}
+            {% for group in groups %}
+                <div class="equipment-group">
+                    <h3>{{ group.label }}</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="quantity">Qté</th>
+                                <th class="equipment-label">Équipement</th>
+                                <th class="equipment-specification">Préférences / conditions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in group.items %}
+                                <tr>
+                                    <td class="quantity">{{ item.quantity }}</td>
+                                    <td>{{ item.label }}</td>
+                                    <td>{{ item.specification ? : '-' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="empty-state">
+                    Aucune demande de matériel renseignée.
+                </p>
+            {% endfor %}
+        </section>
+        {% if dossier.notices or dossier.stagePlan %}
+            <section class="appendix-page">
+                {% if dossier.notices %}
+                    <div class="notices">
+                        <h2>Notes de la fiche technique</h2>
+                        {% for notice in dossier.notices %}
+                            <p>
+                                {{ notice|nl2br }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if dossier.stagePlan %}
+                    <div class="note-section">
+                        <h2>Repères du plan de scène</h2>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th class="stage-label">Élément</th>
+                                    <th class="stage-notes">Précisions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in dossier.stagePlan %}
+                                    <tr>
+                                        <td>{{ item.label }}</td>
+                                        <td>{{ item.notes ? : '-' }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </section>
+        {% endif %}
+    </body>
+</html>

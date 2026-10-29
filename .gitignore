@@ -1,0 +1,64 @@
+
+###> symfony/framework-bundle ###
+/.env*
+!/.env
+!/.env.test
+/config/secrets/*/*.decrypt.private.php
+/config/reference.php
+/public/bundles/
+/var/
+/vendor
+###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
+
+# Outils de développement Node.js
+/node_modules
+
+# Données locales, exports et sauvegardes
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+*.log
+*.bak
+*.dump
+*.sql.gz
+/backups/
+/dumps/
+/tmp/
+/output/
+/coverage/
+/public/uploads/
+/public/exports/
+
+# Identifiants et clés privés
+/auth.json
+/.npmrc
+/.netrc
+/.git-credentials
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+
+# Éditeurs et fichiers du système
+/.idea/
+/.vscode/
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~

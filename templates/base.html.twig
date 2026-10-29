@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="theme-color" content="#152b38" />
+        <title>
+            {% block title %}
+                {{ app_name }} — Fiche technique
+            {% endblock %}
+        </title>
+        <link rel="stylesheet" href="/styles/app.css" />
+    </head>
+    <body>
+        <a class="skip-link" href="#contenu">Aller au contenu</a>
+        <header class="site-header">
+            <div class="header-inner">
+                <a
+                    class="brand"
+                    href="{{ path('app_patch_index') }}"
+                    aria-label="{{ app_name }}, accueil"
+                >
+                    {{ include('branding/_mark.html.twig', {}, with_context: false) }}
+                    <span>{{ app_name }}<span class="brand-caption">DOSSIER TECHNIQUE</span></span>
+                </a>
+                {% if app.user %}
+                    {% set currentRole =
+                        band_role(
+                            concert is defined and concert
+                                ? concert.band
+                                : sheet is defined ? sheet.band : null
+                        )
+                    %}
+                    <nav class="site-nav" aria-label="Navigation principale">
+                        <a
+                            href="{{ path('app_patch_index') }}"
+                            aria-current="{{
+                            app.request.attributes.get('_route') starts with 'app_patch_'
+                                and (sheet is not defined or sheet.concert is null)
+                                ? 'page'
+                                : 'false'
+                            }}"
+                        >
+                            Fiche du groupe
+                        </a>
+                        <a
+                            href="{{ path('app_concert_index') }}"
+                            aria-current="{{
+                            app.request.attributes.get('_route') starts with 'app_concert_'
+                                or (sheet is defined and sheet.concert is not null)
+                                ? 'page'
+                                : 'false'
+                            }}"
+                        >
+                            Concerts
+                        </a>
+                        <span class="session-info">
+                            <span class="session-name">{{ app.user.displayName }}</span>
+                            {% if currentRole %}
+                                <span class="role-badge">{{ currentRole.label }}</span>
+                            {% endif %}
+                        </span>
+                        <form action="{{ path('app_logout') }}" method="post" class="logout-form">
+                            <input
+                                type="hidden"
+                                name="_csrf_token"
+                                value="{{ csrf_token('logout') }}"
+                            />
+                            <button type="submit">Se déconnecter</button>
+                        </form>
+                    </nav>
+                {% endif %}
+            </div>
+        </header>
+
+        <main id="contenu" class="page-shell">
+            {% for message in app.flashes('success') %}
+                <div class="flash flash-success" role="status">
+                    <span class="flash-mark" aria-hidden="true">✓</span>{{ message }}
+                </div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="flash flash-error" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            {% for removed in app.flashes('patch_removed') %}
+                <div class="flash" role="status">
+                    <span>{{ removed.name }} a été retirée du patch.</span>
+                    <form
+                        action="{{
+                        path(
+                            'app_patch_restore',
+                            {
+                                id: removed.id
+                            }
+                        )
+                        }}"
+                        method="post"
+                        class="inline-form"
+                    >
+                        <input
+                            type="hidden"
+                            name="_token"
+                            value="{{ csrf_token('patch_restore_' ~ removed.id) }}"
+                        />
+                        <button class="text-button" type="submit">Annuler</button>
+                    </form>
+                </div>
+            {% endfor %}
+            {% block body %}
+
+            {% endblock %}
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <span>{{ app_name }}</span>
+                <p>
+                    Une fiche claire. Une scène bien préparée.
+                </p>
+            </div>
+        </footer>
+    </body>
+</html>

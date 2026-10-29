@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ sheet.bandName }} — Patch des entrées · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <div class="page-topline">
+        <span class="eyebrow">Le dossier du groupe</span>
+        <span class="reference-tag">
+            <span aria-hidden="true"></span>Fiche de référence · {{ sheet.documentLabel }}
+        </span>
+    </div>
+    <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+            <h1 id="page-title">{{ sheet.bandName }}<span class="title-period">.</span></h1>
+            <p class="hero-description">
+                Chaque source, à sa place.<br />Retrouvez et préparez le patch des entrées du
+                groupe.
+            </p>
+        </div>
+        <div class="hero-actions">
+            <a
+                class="button button-secondary"
+                href="{{
+                path(
+                    'app_sheet_pdf',
+                    {
+                        id: sheet.id
+                    }
+                )
+                }}"
+            >
+                Télécharger la fiche PDF
+            </a>
+            {% if is_granted('SHEET_EDIT', sheet) %}
+                <a class="button button-primary hero-action" href="{{ path('app_patch_new') }}">
+                    <span class="button-plus" aria-hidden="true">+</span>Ajouter une source
+                </a>
+            {% endif %}
+        </div>
+    </section>
+
+    {{
+        include(
+            'stage/_panel.html.twig',
+            {
+                sheet: sheet
+            },
+            with_context: false
+        )
+    }}
+    {{
+        include(
+            'patch/_panel.html.twig',
+            {
+                sheet: sheet,
+                lines: lines,
+                sectionCount: sectionCount,
+                panelLabel: 'Fiche de référence',
+                newSourceUrl: path('app_patch_new')
+            },
+            with_context: false
+        )
+    }}
+
+    {{
+        include(
+            'equipment/_panel.html.twig',
+            {
+                sheet: sheet
+            },
+            with_context: false
+        )
+    }}
+
+    {{
+        include(
+            'patch/_notices.html.twig',
+            {
+                sheet: sheet
+            },
+            with_context: false
+        )
+    }}
+{% endblock %}

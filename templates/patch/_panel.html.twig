@@ -1,0 +1,181 @@
+{% set canEdit = is_granted('SHEET_EDIT', sheet) %}
+{% set canDelete = is_granted('SHEET_DELETE', sheet) %}
+<section class="patch-panel" aria-labelledby="patch-title">
+    <div class="panel-header">
+        <div>
+            <p class="eyebrow">
+                {{ panelLabel }}
+            </p>
+            <h2 id="patch-title">Patch des entrées</h2>
+            {% if canDelete %}
+                <a
+                    class="trash-link"
+                    href="{{
+                    path(
+                        'app_patch_trash',
+                        {
+                            id: sheet.id
+                        }
+                    )
+                    }}"
+                >
+                    Corbeille
+                </a>
+            {% endif %}
+        </div>
+        <div class="patch-stats" aria-label="Résumé du patch">
+            <div>
+                <strong>{{ lines|length }}</strong>
+                <span>{{ (lines|length) == 1 ? 'canal' : 'canaux' }}</span>
+            </div>
+            {% if sectionCount is defined %}
+                <span class="stat-divider" aria-hidden="true"></span>
+                <div>
+                    <strong>{{ sectionCount }}</strong>
+                    <span>{{ sectionCount == 1 ? 'famille' : 'familles' }}</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if lines is empty %}
+        <div class="empty-state">
+            <span class="empty-channel" aria-hidden="true">01</span>
+            <h3>Le premier canal vous attend.</h3>
+            <p>
+                Ajoutez une source pour compléter ce patch.
+            </p>
+            {% if canEdit %}
+                <a class="button button-primary" href="{{ newSourceUrl }}">Ajouter une source</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="table-frame">
+            <table class="patch-table">
+                <caption class="visually-hidden">
+                    Patch des entrées de {{ sheet.bandName }}, classé par numéro de canal.
+                </caption>
+                <thead>
+                    <tr>
+                        <th scope="col" class="channel-column">Canal</th>
+                        <th scope="col">Source</th>
+                        <th scope="col">Micro / DI</th>
+                        <th scope="col">Pied</th>
+                        <th scope="col" class="notes-column">Note</th>
+                        <th scope="col" class="action-column">
+                            <span class="visually-hidden">Actions</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for line in lines %}
+                        <tr data-section="{{ line.section }}">
+                            <td class="channel-cell" data-label="Canal">
+                                <span class="channel-number">
+                                    {{ '%02d'|format(line.channelNumber) }}
+                                </span>
+                            </td>
+                            <th scope="row" class="source-cell">
+                                <span class="source-name">{{ line.sourceName }}</span>
+                                <span class="section-label">
+                                    <span aria-hidden="true"></span>{{ line.sectionLabel }}
+                                </span>
+                                {% if line.notes %}
+                                    <details class="source-note">
+                                        <summary>
+                                            Note technique
+                                        </summary>
+                                        <div>
+                                            {{ line.notes|nl2br }}
+                                        </div>
+                                    </details>
+                                {% endif %}
+                            </th>
+                            <td class="microphone-cell" data-label="Micro / DI">
+                                {% if line.preferredMicrophone %}
+                                    {{ line.preferredMicrophone }}
+                                {% else %}
+                                    <span class="unfilled">Non renseigné</span>
+                                {% endif %}
+                            </td>
+                            <td class="stand-cell" data-label="Pied">
+                                {% if line.stand %}
+                                    {{ line.stand }}
+                                {% else %}
+                                    <span class="unfilled">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="notes-cell" data-label="Note">
+                                {% if line.notes %}
+                                    <details class="line-note">
+                                        <summary>
+                                            Note technique
+                                        </summary>
+                                        <div>
+                                            {{ line.notes|nl2br }}
+                                        </div>
+                                    </details>
+                                {% else %}
+                                    <span class="unfilled">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="row-action">
+                                {% if canEdit %}
+                                    <a
+                                        class="edit-link"
+                                        href="{{
+                                        path(
+                                            'app_patch_edit',
+                                            {
+                                                id: line.id
+                                            }
+                                        )
+                                        }}"
+                                        aria-label="Modifier le canal {{ line.channelNumber }}, {{
+                                        line.sourceName
+                                        }}"
+                                    >
+                                        Modifier<span aria-hidden="true">↗</span>
+                                    </a>
+                                {% endif %}
+                                {% if canDelete %}
+                                    <form
+                                        class="inline-form delete-source"
+                                        action="{{
+                                        path(
+                                            'app_patch_delete',
+                                            {
+                                                id: line.id
+                                            }
+                                        )
+                                        }}"
+                                        method="post"
+                                    >
+                                        <input
+                                            type="hidden"
+                                            name="_token"
+                                            value="{{ csrf_token('patch_delete_' ~ line.id) }}"
+                                        />
+                                        <button
+                                            class="text-button danger-link"
+                                            type="submit"
+                                            aria-label="Supprimer le canal {{
+                                            line.channelNumber
+                                            }}, {{ line.sourceName }}"
+                                        >
+                                            Supprimer
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-footer">
+            <span class="small-dot" aria-hidden="true"></span>Les microphones et pieds indiqués sont
+            les préférences du groupe.
+        </div>
+    {% endif %}
+</section>

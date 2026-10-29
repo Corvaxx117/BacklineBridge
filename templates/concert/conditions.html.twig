@@ -1,0 +1,152 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Conditions — {{ concert.venue }} · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <a
+        class="back-link"
+        href="{{
+        path(
+            'app_concert_show',
+            {
+                id: concert.id
+            }
+        )
+        }}"
+    >
+        <span aria-hidden="true">←</span>Revenir au dossier
+    </a>
+    <section class="form-heading" aria-labelledby="page-title">
+        <p class="eyebrow">
+            {{ concert.venue }} / {{ concert.date|date('d/m/Y') }}
+        </p>
+        <h1 id="page-title">Conditions du concert<span class="title-period">.</span></h1>
+        <p>
+            Renseignez les accords connus. Les autres points peuvent rester à confirmer.
+        </p>
+    </section>
+    <div class="form-layout">
+        <section class="form-panel" aria-label="Conditions du concert">
+            {{
+                form_start(
+                    form,
+                    {
+                        attr: {
+                            class: 'patch-form conditions-form',
+                            novalidate: 'novalidate'
+                        }
+                    }
+                )
+            }}
+            {% if (form.vars.errors|length) > 0 %}
+                <div class="form-error-summary" role="alert">
+                    Les conditions n’ont pas pu être enregistrées.{{ form_errors(form) }}
+                </div>
+            {% endif %}
+            <div class="form-section-heading">
+                <span class="step-number" aria-hidden="true">01</span>
+                <div>
+                    <h2>Accueil et déplacements</h2>
+                    <p>
+                        L’hébergement et la prise en charge du transport.
+                    </p>
+                </div>
+            </div>
+            <div class="form-grid">
+                {% for field in [form.accommodation, form.transportCoverage] %}
+                    {{
+                        include(
+                            'concert/_field.html.twig',
+                            {
+                                field: field
+                            },
+                            with_context: false
+                        )
+                    }}
+                {% endfor %}
+            </div>
+            <div class="form-section-heading equipment-heading">
+                <span class="step-number" aria-hidden="true">02</span>
+                <div>
+                    <h2>Rémunération</h2>
+                    <p>
+                        Les montants sont en euros et restent facultatifs.
+                    </p>
+                </div>
+            </div>
+            <div class="form-grid">
+                {% for field in [
+                    form.feeAmount,
+                    form.paymentFramework,
+                    form.paymentMethod,
+                    form.engineerPayment,
+                    form.engineerPaymentFramework,
+                    form.engineerFeeAmount
+                ] %}
+                    {{
+                        include(
+                            'concert/_field.html.twig',
+                            {
+                                field: field
+                            },
+                            with_context: false
+                        )
+                    }}
+                {% endfor %}
+            </div>
+            <div class="form-section-heading equipment-heading">
+                <span class="step-number" aria-hidden="true">03</span>
+                <div>
+                    <h2>Précisions</h2>
+                    <p>
+                        Adresse d’hébergement, périmètre du montant, points à négocier…
+                    </p>
+                </div>
+            </div>
+            {{
+                include(
+                    'concert/_field.html.twig',
+                    {
+                        field: form.notes
+                    },
+                    with_context: false
+                )
+            }}
+            <div class="form-actions">
+                <button class="button button-primary" type="submit">
+                    Enregistrer les conditions <span aria-hidden="true">→</span>
+                </button>
+                <a
+                    class="cancel-link"
+                    href="{{
+                    path(
+                        'app_concert_show',
+                        {
+                            id: concert.id
+                        }
+                    )
+                    }}"
+                >
+                    Annuler
+                </a>
+            </div>
+            {{ form_end(form) }}
+        </section>
+        <aside class="form-aside">
+            <span class="aside-rule" aria-hidden="true"></span>
+            <p class="eyebrow">
+                Un accord clair
+            </p>
+            <h2>Tout retrouver.<br />Au même endroit.</h2>
+            <p>
+                Les conditions sont accessibles aux responsables et au tourneur du groupe.
+            </p>
+            <p>
+                Le cadre de rémunération et le moyen de paiement sont renseignés séparément. Les
+                précisions permettent de décrire l’accord exact.
+            </p>
+        </aside>
+    </div>
+{% endblock %}

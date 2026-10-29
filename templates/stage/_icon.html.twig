@@ -1,0 +1,79 @@
+{% if kind == 'drums' %}
+    <svg
+        class="stage-drum-kit"
+        width="260"
+        height="184"
+        viewBox="0 0 260 184"
+        aria-hidden="true"
+        focusable="false"
+    >
+        <title>
+            Batterie : charleston, tom alto, tom basse, caisse claire, deux cymbales et grosse
+            caisse
+        </title>
+        {{ include('stage/_drum-kit.svg.twig', {}, with_context: false) }}
+    </svg>
+{% elseif kind == 'person' %}
+    <svg
+        width="25"
+        height="25"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+    >
+        <circle cx="12" cy="6" r="3" />
+        <path d="M5 21v-3a7 7 0 0 1 14 0v3M9 21v-5m6 5v-5" />
+    </svg>
+{% elseif kind == 'keys' %}
+    <svg
+        width="25"
+        height="25"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+    >
+        <rect x="2" y="5" width="20" height="14" rx="2" />
+        <path d="M6 5v14m4-14v14m4-14v14m4-14v14" />
+        <path d="M6 6v6m8-6v6" stroke-width="3" />
+    </svg>
+{% elseif kind == 'power' %}
+    <svg
+        width="25"
+        height="25"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+    >
+        <path d="m13 2-8 11h6l-1 9L19 9h-6V2Z" />
+    </svg>
+{% else %}
+    {% set icons = {
+        riser: 'stage',
+        amp: 'amp',
+        wedge: 'monitor'
+    } %}
+    {{
+        include(
+            'equipment/_category_icon.html.twig',
+            {
+                icon: icons[kind]|default('gear')
+            },
+            with_context: false
+        )
+    }}
+{% endif %}

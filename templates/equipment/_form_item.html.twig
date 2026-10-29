@@ -1,0 +1,63 @@
+<fieldset class="equipment-edit-row" data-collection-item>
+    <legend class="visually-hidden">
+        {{ item.label.vars.value ? : 'Nouvel équipement' }}
+    </legend>
+    {{ form_widget(item.id) }}
+    <div class="equipment-edit-main">
+        {{
+            include(
+                'technical/_field.html.twig',
+                {
+                    field: item.label
+                },
+                with_context: false
+            )
+        }}
+        {{
+            include(
+                'technical/_field.html.twig',
+                {
+                    field: item.quantity
+                },
+                with_context: false
+            )
+        }}
+    </div>
+    {{
+        include(
+            'technical/_field.html.twig',
+            {
+                field: item.specification
+            },
+            with_context: false
+        )
+    }}
+    <div class="equipment-edit-tools">
+        <details
+            class="equipment-category-change"
+            {{ item.category.vars.errors|length ? 'open' : '' }}
+        >
+            <summary>
+                Changer de catégorie
+            </summary>{{
+                include(
+                    'technical/_field.html.twig',
+                    {
+                        field: item.category
+                    },
+                    with_context: false
+                )
+            }}<button type="button" class="text-button" data-move-item>
+                Déplacer dans cette catégorie
+            </button>
+        </details>
+        <button
+            class="text-button danger-link"
+            type="button"
+            data-remove-item
+            aria-label="Retirer : {{ item.label.vars.value ? : 'cet équipement' }}"
+        >
+            Retirer
+        </button>
+    </div>
+</fieldset>

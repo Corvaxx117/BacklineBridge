@@ -1,0 +1,142 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Récupérer la référence · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <a
+        class="back-link"
+        href="{{
+        path(
+            'app_concert_show',
+            {
+                id: concert.id
+            }
+        )
+        }}"
+    >
+        ← Revenir au concert
+    </a>
+    <section class="form-heading">
+        <p class="eyebrow">
+            {{ concert.venue }} · {{ concert.date|date('d/m/Y') }}
+        </p>
+        <h1>Récupérer la référence<span class="title-period">.</span></h1>
+        <p>
+            Compare les versions, puis choisis les sections à reprendre pour ce concert.
+        </p>
+    </section>
+    {% if preview.hasChanges %}
+        <section class="reference-import-notice">
+            <strong>Les sections choisies seront remplacées intégralement.</strong>
+            <p>
+                Les adaptations propres au concert dans ces sections seront remplacées par la
+                référence actuelle. Les autres sections, les notes du concert, les conditions et les
+                disponibilités sont conservées. Les publications et réponses déjà transmises aux
+                salles restent inchangées ; une nouvelle invitation permettra de leur transmettre
+                une nouvelle version.
+            </p>
+            <p>
+                Les sources retirées du patch restent dans la corbeille.
+            </p>
+        </section>
+    {% else %}
+        <p class="reference-import-notice">
+            Le dossier technique de ce concert est déjà identique à la référence.
+        </p>
+    {% endif %}
+    <div class="reference-comparisons">
+        {% for key, section in preview.sections %}
+            <details class="reference-comparison">
+                <summary>
+                    {{ section.label }}
+                    <span>{{ section.changed ? 'Différences à examiner' : 'Identique' }}</span>
+                </summary>
+                <div class="reference-columns">
+                    <section aria-label="{{ section.label }} du concert">
+                        <h2>Dans ce concert</h2>
+                        {{
+                            include(
+                                'concert/reference/_section.html.twig',
+                                {
+                                    section: key,
+                                    content: section.current
+                                },
+                                with_context: false
+                            )
+                        }}
+                    </section>
+                    <section aria-label="{{ section.label }} de référence">
+                        <h2>Référence actuelle</h2>
+                        {{
+                            include(
+                                'concert/reference/_section.html.twig',
+                                {
+                                    section: key,
+                                    content: section.reference
+                                },
+                                with_context: false
+                            )
+                        }}
+                    </section>
+                </div>
+            </details>
+        {% endfor %}
+    </div>
+    {% if preview.hasChanges %}
+        <section class="form-panel reference-import-form">
+            {{
+                form_start(
+                    form,
+                    {
+                        attr: {
+                            novalidate: 'novalidate'
+                        }
+                    }
+                )
+            }}
+            {{ form_errors(form) }}
+            <fieldset class="reference-selection">
+                <legend>
+                    {{ form.sections.vars.label }}
+                </legend>
+                {{ form_errors(form.sections) }}
+                <div class="reference-section-choices">
+                    {% for choice in form.sections %}
+                        <label>
+                            {{ form_widget(choice) }}
+                            <span>{{ choice.vars.label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+            </fieldset>
+            <div>
+                <label class="reference-confirmation">
+                    {{ form_widget(form.confirmReplacement) }}
+                    <span>{{ form.confirmReplacement.vars.label }}</span>
+                </label>
+                {{ form_errors(form.confirmReplacement) }}
+            </div>
+            <div class="form-actions">
+                <button class="button button-primary" type="submit">
+                    Appliquer les sections choisies
+                </button>
+                <a
+                    class="cancel-link"
+                    href="{{
+                    path(
+                        'app_concert_reference_import',
+                        {
+                            id: concert.id
+                        }
+                    )
+                    }}"
+                >
+                    Recharger l’aperçu
+                </a>
+            </div>
+            {{ form_end(form) }}
+        </section>
+    {% endif %}
+{% endblock %}

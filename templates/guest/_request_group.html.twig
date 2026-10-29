@@ -1,0 +1,142 @@
+{% set category = items|first.category %}
+{% set categoryIcons = {
+    Batterie: 'drums',
+    Amplification: 'amp',
+    'Scène': 'stage',
+    Retours: 'monitor',
+    'Façade': 'speaker',
+    'Patch des entrées': 'gear'
+} %}
+{% set icon = categoryIcons[category]|default('gear') %}
+{% set answered = 0 %}
+{% set errors = false %}
+{% for key, item in items %}
+    {% if
+        form.answers[key].status.vars.value != 'unknown'
+            and (form.answers[key].status.vars.value != 'alternative'
+                or (form.answers[key].details.vars.value|trim)) %}{% set answered = answered + 1
+    %}{% endif %}
+    {% if not form.answers[key].vars.valid %}{% set errors = true %}{% endif %}
+{% endfor %}
+<details
+    class="material-form-group equipment-group-{{ icon }}"
+    data-reply-group
+    data-group-label="{{ category }}"
+    {{ errors or (first and answered < (items|length)) ? 'open' : '' }}
+>
+    <summary>
+        <span class="equipment-category-icon">
+            {{
+                include(
+                    'equipment/_category_icon.html.twig',
+                    {
+                        icon: icon
+                    },
+                    with_context: false
+                )
+            }}
+        </span>
+        <span class="material-group-title">
+            {{ category }}<span>{{ items|length }} demande{{ (items|length) > 1 ? 's' : '' }}</span>
+        </span>
+        <span class="material-group-progress" data-group-progress>
+            {{ answered }} / {{ items|length }} renseignées
+        </span>
+        <span class="material-group-chevron" aria-hidden="true">⌄</span>
+    </summary>
+    <div class="reply-bulk" data-reply-enhancement hidden>
+        <div class="reply-bulk-heading">
+            <strong>Réponse rapide</strong>
+            <label>
+                <span class="visually-hidden">Portée de la réponse rapide · {{ category }}</span>
+                <select data-bulk-scope aria-label="Portée de la réponse rapide · {{ category }}">
+                    <option value="unknown">
+                        Demandes à confirmer
+                    </option>
+                    <option value="all">
+                        Tout le groupe
+                    </option>
+                </select>
+            </label>
+        </div>
+        <div class="reply-bulk-buttons">
+            <button type="button" class="button bulk-available" data-bulk-status="available">
+                ✓ Tout disponible
+            </button>
+            <button type="button" class="button button-secondary" data-bulk-status="unavailable">
+                Tout indisponible
+            </button>
+            <button type="button" class="text-button" data-bulk-undo hidden>
+                Annuler cette action
+            </button>
+        </div>
+        <p data-bulk-hint>
+            Complète les demandes « À confirmer ». Les autres réponses et les précisions sont
+            conservées.
+        </p>
+    </div>
+    <div class="reply-group-items">
+        {% for key, item in items %}
+            {% set answer = form.answers[key] %}
+            {% set proposal = answer.status.vars.value == 'alternative' %}
+            <fieldset
+                class="availability-row"
+                data-answer-row
+                data-answer-state="{{ answer.status.vars.value }}"
+            >
+                <legend>
+                    {{ item.label }}
+                </legend>
+                {% if item.specification %}
+                    <p class="availability-specification">
+                        {{ item.specification }}
+                    </p>
+                {% endif %}
+                <div class="availability-choice-field">
+                    <span class="visually-hidden">{{ form_label(answer.status) }}</span>{{
+                        form_widget(
+                            answer.status,
+                            {
+                                attr: {
+                                    class: 'availability-choices',
+                                    'data-answer-choices': '',
+                                    'aria-describedby': answer.status.vars.id ~ '_errors'
+                                }
+                            }
+                        )
+                    }}<div class="field-errors" id="{{ answer.status.vars.id }}_errors">
+                        {{ form_errors(answer.status) }}
+                    </div>
+                </div>
+                <details
+                    class="answer-details"
+                    data-answer-details
+                    {{
+                    proposal or answer.details.vars.value or (answer.details.vars.errors|length)
+                        ? 'open'
+                        : ''
+                    }}
+                >
+                    <summary>
+                        <span data-details-label>
+                            {{ proposal
+                                ? 'Décrire l’alternative proposée'
+                                : 'Préciser le matériel' }}
+                        </span>
+                        <span class="answer-optional" data-details-optional>
+                            {{ proposal ? 'requis' : 'facultatif' }}
+                        </span>
+                    </summary>{{
+                        include(
+                            'technical/_field.html.twig',
+                            {
+                                field: answer.details
+                            },
+                            with_context: false
+                        )
+                    }}
+                </details>
+            </fieldset>
+        {% endfor %}
+    </div>
+</details>

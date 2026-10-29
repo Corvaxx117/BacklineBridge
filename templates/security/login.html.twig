@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Connexion · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <div class="login-layout">
+        <section class="form-heading" aria-labelledby="page-title">
+            <p class="eyebrow">
+                Votre espace de préparation
+            </p>
+            <h1 id="page-title">Prêts pour la scène<span class="title-period">?</span></h1>
+            <p>
+                Connectez-vous pour retrouver les fiches et les concerts de votre groupe.
+            </p>
+        </section>
+        <section class="form-panel login-panel" aria-label="Connexion à votre compte">
+            <form action="{{ path('app_login') }}" method="post" class="patch-form" name="login">
+                {% if error %}
+                    <div class="form-error-summary" role="alert">
+                        Connexion impossible. Vérifiez vos identifiants ou réessayez dans quelques
+                        minutes.
+                    </div>
+                {% endif %}
+                <div class="form-grid">
+                    <div class="field field-full">
+                        <label for="login_email">Adresse e-mail</label>
+                        <input
+                            type="email"
+                            id="login_email"
+                            name="_username"
+                            value="{{ lastUsername }}"
+                            autocomplete="username"
+                            maxlength="180"
+                            required
+                            autofocus
+                        />
+                    </div>
+                    <div class="field field-full">
+                        <label for="login_password">Mot de passe</label>
+                        <input
+                            type="password"
+                            id="login_password"
+                            name="_password"
+                            autocomplete="current-password"
+                            required
+                        />
+                    </div>
+                </div>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}" />
+                <div class="form-actions">
+                    <button class="button button-primary" type="submit">
+                        Se connecter <span aria-hidden="true">→</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+        <p class="login-note">
+            Chaque compte accède uniquement aux dossiers qui lui sont confiés.
+        </p>
+    </div>
+{% endblock %}

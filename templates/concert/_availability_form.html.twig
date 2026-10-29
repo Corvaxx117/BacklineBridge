@@ -1,0 +1,43 @@
+{{
+    form_start(
+        availabilityForm,
+        {
+            action: path(
+                'app_concert_availability',
+                {
+                    id: concert.id
+                }
+            ),
+            attr: {
+                class: 'availability-form',
+                novalidate: 'novalidate'
+            }
+        }
+    )
+}}
+{{ form_errors(availabilityForm) }}
+<fieldset class="availability-choices">
+    <legend>
+        {{ availabilityForm.status.vars.label }}
+    </legend>
+    {{ form_errors(availabilityForm.status) }}
+    {% for choice in availabilityForm.status %}
+        <label class="availability-choice">
+            {{ form_widget(choice) }}
+            <span>{{ choice.vars.label }}</span>
+        </label>
+    {% endfor %}
+</fieldset>
+<details class="availability-comment" {{ availabilityForm.comment.vars.value ? 'open' : '' }}>
+    <summary>
+        Ajouter une précision
+    </summary>
+    <div class="field">
+        {{ form_label(availabilityForm.comment) }}
+        {{ form_widget(availabilityForm.comment) }}
+        {{ form_help(availabilityForm.comment) }}
+        {{ form_errors(availabilityForm.comment) }}
+    </div>
+</details>
+<button type="submit" class="button button-primary">Enregistrer ma disponibilité</button>
+{{ form_end(availabilityForm) }}

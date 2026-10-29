@@ -1,0 +1,187 @@
+{
+    "bandName": "AVEE MANA",
+    "documentLabel": "2026.3",
+    "notices": [
+        "Les demandes ci dessous sont à considérer comme des préférences et non des exigences.",
+        "La demande OTO BAM est répartie sur les lignes 21 et 22 du document ; elle est conservée comme note commune aux deux lignes.",
+        "IEM de Sylou : mode mono ou stéréo filaire à confirmer selon les salles. Le tableau indique stéréo et le plan mentionne encore mono."
+    ],
+    "lines": [
+        {
+            "channelNumber": 1,
+            "sourceName": "KICK IN",
+            "preferredMicrophone": "BETA 91",
+            "stand": null,
+            "notes": null,
+            "section": "drums"
+        },
+        {
+            "channelNumber": 2,
+            "sourceName": "KICK OUT",
+            "preferredMicrophone": "AUDIX D6",
+            "stand": "SHORT BOOM",
+            "notes": null,
+            "section": "drums"
+        },
+        {
+            "channelNumber": 3,
+            "sourceName": "SNARE TOP",
+            "preferredMicrophone": "BETA57A",
+            "stand": "SHORT BOOM",
+            "notes": "MICRO PERSO",
+            "section": "drums"
+        },
+        {
+            "channelNumber": 4,
+            "sourceName": "SNARE BOTT",
+            "preferredMicrophone": "E904",
+            "stand": "CLAMP",
+            "notes": null,
+            "section": "drums"
+        },
+        {
+            "channelNumber": 5,
+            "sourceName": "HH",
+            "preferredMicrophone": "KM184",
+            "stand": "SHORT BOOM",
+            "notes": null,
+            "section": "drums"
+        },
+        {
+            "channelNumber": 6,
+            "sourceName": "RACK TOM",
+            "preferredMicrophone": "MD441",
+            "stand": "SHORT BOOM",
+            "notes": "MICRO PERSO",
+            "section": "drums"
+        },
+        {
+            "channelNumber": 7,
+            "sourceName": "FLOOR TOM",
+            "preferredMicrophone": "MD441",
+            "stand": "SHORT BOOM",
+            "notes": "MICRO PERSO",
+            "section": "drums"
+        },
+        {
+            "channelNumber": 8,
+            "sourceName": "OH L",
+            "preferredMicrophone": "C414 XLS",
+            "stand": "TALL BOOM",
+            "notes": null,
+            "section": "drums"
+        },
+        {
+            "channelNumber": 9,
+            "sourceName": "OH R",
+            "preferredMicrophone": "C414 XLS",
+            "stand": "TALL BOOM",
+            "notes": null,
+            "section": "drums"
+        },
+        {
+            "channelNumber": 10,
+            "sourceName": "BASS DI",
+            "preferredMicrophone": "J48",
+            "stand": "DI",
+            "notes": null,
+            "section": "bass"
+        },
+        {
+            "channelNumber": 11,
+            "sourceName": "BASS MIC",
+            "preferredMicrophone": "M88",
+            "stand": "SHORT BOOM",
+            "notes": null,
+            "section": "bass"
+        },
+        {
+            "channelNumber": 12,
+            "sourceName": "GUIT JU",
+            "preferredMicrophone": "E906",
+            "stand": "SHORT BOOM",
+            "notes": null,
+            "section": "guitar"
+        },
+        {
+            "channelNumber": 13,
+            "sourceName": "GUIT REMI",
+            "preferredMicrophone": "SM57",
+            "stand": "SHORT BOOM",
+            "notes": null,
+            "section": "guitar"
+        },
+        {
+            "channelNumber": 14,
+            "sourceName": "MICROKORG",
+            "preferredMicrophone": "J48",
+            "stand": "DI",
+            "notes": null,
+            "section": "keys"
+        },
+        {
+            "channelNumber": 15,
+            "sourceName": "MINILOGUE L",
+            "preferredMicrophone": "J48",
+            "stand": "DI",
+            "notes": null,
+            "section": "keys"
+        },
+        {
+            "channelNumber": 16,
+            "sourceName": "MINILOGUE R",
+            "preferredMicrophone": "J48",
+            "stand": "DI",
+            "notes": null,
+            "section": "keys"
+        },
+        {
+            "channelNumber": 17,
+            "sourceName": "JU VOICE",
+            "preferredMicrophone": "BETA57A",
+            "stand": "TALL BOOM",
+            "notes": "MICRO PERSO",
+            "section": "vocals"
+        },
+        {
+            "channelNumber": 18,
+            "sourceName": "REMI VOICE",
+            "preferredMicrophone": "BETA57A",
+            "stand": "TALL BOOM",
+            "notes": "MICRO PERSO",
+            "section": "vocals"
+        },
+        {
+            "channelNumber": 19,
+            "sourceName": "CLIC",
+            "preferredMicrophone": "BSS",
+            "stand": "DI",
+            "notes": null,
+            "section": "utility"
+        },
+        {
+            "channelNumber": 20,
+            "sourceName": "TALKBACK",
+            "preferredMicrophone": "U87 lol",
+            "stand": null,
+            "notes": null,
+            "section": "utility"
+        },
+        {
+            "channelNumber": 21,
+            "sourceName": "OTO BAM L",
+            "preferredMicrophone": "FX PERSO",
+            "stand": null,
+            "notes": "FOURNIR UNE SORTIE LIGNE ET DEUX RETOURS LIGNE (JACK TRS OU XLR)(FOH)",
+            "section": "effects"
+        },
+        {
+            "channelNumber": 22,
+            "sourceName": "OTO BAM R",
+            "preferredMicrophone": "FX PERSO",
+            "stand": null,
+            "notes": "FOURNIR UNE SORTIE LIGNE ET DEUX RETOURS LIGNE (JACK TRS OU XLR)(FOH)",
+            "section": "effects"
+        }
+    ]
+}
