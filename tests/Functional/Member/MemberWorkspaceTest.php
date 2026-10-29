@@ -193,6 +193,75 @@ final class MemberWorkspaceTest extends DatabaseTestCase
         yield ['mismatch'];
         yield ['csrf'];
     }
+    #[DataProvider('incompleteActivation')]
+    public function testIncompleteActivationShowsErrorsAndPreservesTheCode(array $missing): void
+    {
+        [$profile, $code] = $this->pending();
+        $uri = '/premiere-connexion/' . $profile->getPublicId();
+        $form = $this->client->request('GET', $uri)->filter('form[name="activation"]')->form();
+        $values = $form->getPhpValues();
+        $values['activation']['code'] = $code;
+        $values['activation']['password'] = [
+            'first' => 'Une longue phrase Corail!94 lune?',
+            'second' => 'Une longue phrase Corail!94 lune?',
+        ];
+        $values['activation'] = array_replace_recursive($values['activation'], $missing);
+        $this->client->request('POST', $uri, $values);
+        self::assertResponseStatusCodeSame(422);
+        self::assertSelectorExists('form[name="activation"] ul li');
+        self::assertSelectorNotExists('input[name="activation[code]"][value]:not([value=""])');
+        self::assertSelectorNotExists('input[type="password"][value]:not([value=""])');
+
+        $em = $this->entityManager();
+        $em->clear();
+        $saved = $em->find(MemberProfile::class, $profile->getId());
+        self::assertFalse($saved->getUser()->isActivated());
+        self::assertTrue($saved->canActivate());
+        self::assertSame($profile->getActivationHash(), $saved->getActivationHash());
+    }
+
+    public static function incompleteActivation(): iterable
+    {
+        yield 'empty code' => [['code' => '']];
+        yield 'missing code' => [['code' => null]];
+        yield 'empty password' => [['password' => ['first' => '', 'second' => '']]];
+        yield 'missing password' => [['password' => null]];
+        yield 'empty first password' => [['password' => ['first' => '']]];
+        yield 'empty confirmation' => [['password' => ['second' => '']]];
+        yield 'missing confirmation' => [['password' => ['second' => null]]];
+        yield 'all fields empty' => [['code' => '', 'password' => ['first' => '', 'second' => '']]];
+    }
+
+    public function testActivationCanBeRetriedAfterAValidationError(): void
+    {
+        [$profile, $code] = $this->pending();
+        $uri = '/premiere-connexion/' . $profile->getPublicId();
+        $form = $this->client->request('GET', $uri)->filter('form[name="activation"]')->form();
+        $values = $form->getPhpValues();
+        $values['activation']['code'] = $code;
+        $values['activation']['password'] = ['first' => 'password', 'second' => 'password'];
+        $this->client->request('POST', $uri, $values);
+        self::assertResponseStatusCodeSame(422);
+
+        $form = $this->client->getCrawler()->filter('form[name="activation"]')->form();
+        $this->client->submit($form);
+        self::assertResponseStatusCodeSame(422);
+
+        $form = $this->client->getCrawler()->filter('form[name="activation"]')->form();
+        $this->client->submit($form, [
+            'activation' => [
+                'code' => $code,
+                'password' => [
+                    'first' => 'Une longue phrase Corail!94 lune?',
+                    'second' => 'Une longue phrase Corail!94 lune?',
+                ],
+            ],
+        ]);
+        self::assertResponseStatusCodeSame(303);
+        $this->client->followRedirect();
+        self::assertResponseIsSuccessful();
+    }
+
     public function testExpiredCodeAndRateLimitAreEnforced(): void
     {
         [$profile, $code] = $this->pending();

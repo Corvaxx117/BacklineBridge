@@ -17,9 +17,12 @@ final class ActivationType extends AbstractType
         $b->add('code', PasswordType::class, [
             'label' => 'Ton code d’activation personnel',
             'always_empty' => true,
+            'empty_data' => '',
+            'help' => 'En cas d’erreur, renseigne à nouveau le code et les deux mots de passe.',
             'attr' => ['autocomplete' => 'one-time-code', 'maxlength' => 100],
         ])->add('password', RepeatedType::class, [
             'type' => PasswordType::class,
+            'options' => ['empty_data' => ''],
             'invalid_message' => 'Les mots de passe ne correspondent pas.',
             'first_options' => [
                 'label' => 'Choisis un mot de passe sécurisé',
