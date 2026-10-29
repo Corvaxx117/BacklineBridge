@@ -1,0 +1,153 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Stock de merch · {{ app_name }}
+{% endblock %}
+{% block body %}
+    {{ include('finance/_tabs.html.twig') }}
+    <section class="workspace-heading">
+        <div>
+            <p class="eyebrow">
+                {{ band.name }}
+            </p>
+            <h1>Le merch<span class="title-period">.</span></h1>
+            <p>
+                Un stock commun, avec les tailles pour les T-shirts.
+            </p>
+        </div><a
+            class="button button-primary"
+            href="{{
+            path(
+                'app_stock_product_new',
+                {
+                    id: band.id
+                }
+            )
+            }}"
+        >
+            + Nouveau produit
+        </a>
+    </section>
+    <div class="merch-grid">
+        {% for product in products %}
+            <section class="workspace-panel merch-card">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">
+                            {{ product.category }}
+                        </p>
+                        <h2>{{ product.name }}</h2>
+                    </div><span class="stock-total">
+                        {{ product.knownQuantity }}{{ not product.quantityComplete
+                            ? ' +'
+                            : '' }}<small>
+                            {{ product.quantityComplete ? 'en stock' : 'connus' }}
+                        </small>
+                    </span>
+                </div>
+                <ul class="merch-variants">
+                    {% for variant in product.variants %}
+                        <li>
+                            <div>
+                                <strong>{{ variant.label }}</strong><p>
+                                    {% if variant.quantity is null %}
+                                        <span class="stock-warning">Stock à renseigner</span>
+                                    {% else %}
+                                        <span class="variant-quantity">{{ variant.quantity }}</span> disponible{{ variant.quantity
+                                            > 1
+                                            ? 's'
+                                            : '' }}{% if variant.needsVerification %}
+                                            <small class="stock-warning">Quantité à vérifier</small>
+                                        {% endif %}
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="variant-actions">
+                                {% if variant.quantity is not null and variant.quantity > 0 %}
+                                    <a
+                                        class="button button-secondary"
+                                        href="{{
+                                        path(
+                                            'app_stock_movement',
+                                            {
+                                                id: variant.id
+                                            }
+                                        )
+                                        }}"
+                                    >
+                                        Vente
+                                    </a>
+                                {% endif %}<a
+                                    href="{{
+                                    path(
+                                        'app_stock_movement',
+                                        {
+                                            id: variant.id,
+                                            action: 'count'
+                                        }
+                                    )
+                                    }}"
+                                >
+                                    {{ variant.quantity is null ? 'Renseigner' : 'Ajuster' }}
+                                </a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% else %}
+            <p>
+                Aucun produit. Ajoute le premier pour commencer l’inventaire.
+            </p>
+        {% endfor %}
+    </div>
+    <section class="workspace-panel">
+        <div class="panel-heading">
+            <div>
+                <h2>Derniers mouvements de stock</h2>
+                <p>
+                    Les 30 derniers changements. Une vente ajoute sa recette à la trésorerie.
+                </p>
+            </div>
+        </div>
+        <div class="table-scroll">
+            <table class="ledger-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Produit</th>
+                        <th>Mouvement</th>
+                        <th>Stock après</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movement in movements %}
+                        <tr>
+                            <td>{{ movement.createdAt|date('d/m/Y H:i', 'Europe/Paris') }}</td>
+                            <td>
+                                <strong>{{ movement.variant.product.name }}</strong><small>{{
+                                        movement.variant.label
+                                    }}</small>
+                            </td>
+                            <td>
+                                {{ movement.kind.label }}{% if movement.difference is not null %}
+                                    ({{ movement.difference > 0 ? '+' : '' }}{{
+                                        movement.difference
+                                    }})
+                                {% endif %}<small>
+                                    {{ movement.reason }}{% if movement.createdBy %}
+                                        · {{ movement.createdBy.displayName }}
+                                    {% endif %}
+                                </small>
+                            </td>
+                            <td>{{ movement.afterQuantity }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4">Aucun mouvement.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endblock %}

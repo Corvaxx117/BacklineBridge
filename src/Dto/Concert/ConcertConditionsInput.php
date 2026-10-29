@@ -10,7 +10,7 @@ use App\Enum\PaymentFramework;
 use App\Enum\PaymentMethod;
 use App\Enum\EngineerPayment;
 use App\Entity\ConcertConditions;
-use App\Service\Concert\EuroAmount;
+use App\Service\Money\EuroAmount;
 use Symfony\Component\Validator\Constraints as Assert;
 
 final class ConcertConditionsInput

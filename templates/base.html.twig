@@ -24,6 +24,13 @@
                     <span>{{ app_name }}<span class="brand-caption">DOSSIER TECHNIQUE</span></span>
                 </a>
                 {% if app.user %}
+                    {% set currentBand =
+                        member_band(
+                            concert is defined and concert
+                                ? concert.band
+                                : sheet is defined ? sheet.band : band|default(null)
+                        )
+                    %}
                     {% set currentRole =
                         band_role(
                             concert is defined and concert
@@ -54,6 +61,46 @@
                         >
                             Concerts
                         </a>
+                        {% if currentBand %}
+                            <a
+                                href="{{
+                                path(
+                                    'app_profile_team',
+                                    {
+                                        id: currentBand.id
+                                    }
+                                )
+                                }}"
+                                aria-current="{{
+                                app.request.attributes.get('_route') starts with 'app_profile_'
+                                    ? 'page'
+                                    : 'false'
+                                }}"
+                            >
+                                Équipe & liens
+                            </a>
+                            {% if is_granted('BAND_TREASURY', currentBand) %}
+                                <a
+                                    href="{{
+                                    path(
+                                        'app_treasury_index',
+                                        {
+                                            id: currentBand.id
+                                        }
+                                    )
+                                    }}"
+                                    aria-current="{{
+                                    app.request.attributes.get('_route') starts with 'app_treasury_'
+                                        or app.request.attributes.get('_route')
+                                            starts with 'app_stock_'
+                                        ? 'page'
+                                        : 'false'
+                                    }}"
+                                >
+                                    Trésorerie & stock
+                                </a>
+                            {% endif %}
+                        {% endif %}
                         <span class="session-info">
                             <span class="session-name">{{ app.user.displayName }}</span>
                             {% if currentRole %}

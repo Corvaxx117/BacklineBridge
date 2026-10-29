@@ -1,0 +1,166 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Aperçu Bandsintown · {{ app_name }}
+{% endblock %}
+{% block body %}
+    <a
+        class="back-link"
+        href="{{
+        path(
+            'app_concert_bandsintown_prepare',
+            {
+                id: band.id
+            }
+        )
+        }}"
+    >
+        ← Choisir une autre période
+    </a>
+    <section class="workspace-heading">
+        <div>
+            <p class="eyebrow">
+                {{ band.name }} · Bandsintown
+            </p>
+            <h1>Choisir les concerts<span class="title-period">.</span></h1>
+            <p>
+                {{ rows|length }} annonce(s) · Données récupérées le {{
+                    result.fetchedAt|date('d/m/Y à H:i', 'Europe/Paris')
+                }}.
+            </p>
+        </div>
+    </section>
+    {% if result.ignored %}
+        <p class="flash">
+            {{ result.ignored }} annonce(s) écartée(s) : données incomplètes ou invalides, doublons de
+            réponse, diffusion en ligne ou annulation indiquée.
+        </p>
+    {% endif %}
+    {{
+        form_start(
+            form,
+            {
+                attr: {
+                    'data-bandsintown-import': ''
+                }
+            }
+        )
+    }}{{ form_errors(form) }}{{ form_errors(form.events) }}
+    {% if hasChoices %}
+        <div class="import-selection-tools">
+            <button class="button button-secondary" type="button" data-import-select="all">
+                Tout sélectionner
+            </button><button class="text-button" type="button" data-import-select="none">
+                Tout désélectionner
+            </button><span>100 concerts maximum par import · Aperçu valable 15 minutes.</span>
+        </div>
+    {% endif %}
+    <div class="bit-preview-list">
+        {% for id, row in rows %}
+            {% set event = row.event %}
+            <article class="workspace-panel bit-preview-card">
+                <div class="bit-preview-top">
+                    <div>
+                        <p class="eyebrow">
+                            {{ event.date|date('d/m/Y') }} · {{ event.localTime }} (heure locale annoncée)
+                        </p>
+                        <h2>{{ event.venue }}</h2>
+                        <p>
+                            {{ event.city }}{{ event.country ? ', ' ~ event.country : '' }}
+                        </p>
+                    </div><span class="reference-tag">
+                        {{
+                            {
+                                new: 'Nouveau concert',
+                                link: 'Concert existant',
+                                imported: 'Déjà importé',
+                                ambiguous: 'À vérifier',
+                                occupied: 'Déjà associé'
+                            }[row.state]
+                        }}
+                    </span>
+                </div>
+                {% if row.state in ['new', 'link'] %}{% for child in form.events %}
+                    {% if child.vars.value == id %}
+                        <div class="import-event-choice">
+                            {{ form_widget(child) }}<label for="{{ child.vars.id }}">{{ row.state
+                                    == 'link'
+                                    ? 'Rattacher cette annonce au concert existant'
+                                    : 'Importer ce concert' }}</label>
+                        </div>
+                    {% endif %}
+                {% endfor %}{% endif %}
+                {% if row.concert %}
+                    <p class="workspace-hint">
+                        <a
+                            href="{{
+                            path(
+                                'app_concert_show',
+                                {
+                                    id: row.concert.id
+                                }
+                            )
+                            }}"
+                        >
+                            Ouvrir le concert existant →
+                        </a>{% if row.state == 'link' %} · Ses informations et son statut seront conservés.{% endif %}
+                    </p>
+                {% elseif row.state == 'ambiguous' %}
+                    <p class="workspace-hint">
+                        Plusieurs concerts correspondent à cette date, salle et ville. Vérifie-les
+                        avant de poursuivre.
+                    </p>
+                {% endif %}
+                {% if
+                    event.title
+                        or event.address
+                        or event.description
+                        or event.lineup is not empty
+                        or event.tickets is not empty %}
+                    <details class="bit-details">
+                        <summary>
+                            Voir les informations publiques
+                        </summary>{{
+                            include(
+                                'concert/import/bandsintown/_event_details.html.twig',
+                                {
+                                    event: event
+                                },
+                                with_context: false
+                            )
+                        }}
+                    </details>
+                {% endif %}
+                <a
+                    class="bit-source-link"
+                    href="{{ event.sourceUrl }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Voir l’annonce Bandsintown ↗
+                </a>
+            </article>
+        {% else %}
+            <section class="workspace-panel empty-state">
+                <h2>Aucun concert pour cette période.</h2>
+                <p>
+                    Essaie une autre période ou vérifie les annonces du groupe sur Bandsintown.
+                </p>
+            </section>
+        {% endfor %}
+    </div>
+    {% if hasChoices %}
+        <div class="workspace-panel workspace-form">
+            <div class="workspace-fields">
+                {{ form_row(form.status) }}
+            </div>
+            <p class="workspace-hint">
+                Les nouveaux dossiers techniques partiront de la référence actuelle du groupe. Rien
+                n’est publié ou envoyé aux salles par cet import.
+            </p><button class="button button-primary" type="submit">Importer la sélection</button>
+        </div>
+    {% else %}
+        {% do form.events.setRendered %}
+        {% do form.status.setRendered %}
+    {% endif %}
+    {{ form_end(form) }}<script src="/scripts/bandsintown-import.js" defer></script>
+{% endblock %}

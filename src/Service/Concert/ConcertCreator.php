@@ -29,6 +29,22 @@ final readonly class ConcertCreator
         ?string $notes = null,
         ?User $createdBy = null,
     ): Concert {
+        $concert = $this->prepare($reference, $date, $venue, $city, $status, $notes, $createdBy);
+        $this->entityManager->flush();
+
+        return $concert;
+    }
+
+    /** Prépare l’agrégat dans l’unité de travail ; l’appelant valide la transaction. */
+    public function prepare(
+        TechnicalSheet $reference,
+        \DateTimeImmutable $date,
+        string $venue,
+        string $city,
+        ConcertStatus $status = ConcertStatus::Pending,
+        ?string $notes = null,
+        ?User $createdBy = null,
+    ): Concert {
         if ($reference->getConcert() !== null) {
             throw new \InvalidArgumentException(
                 'Un concert doit partir de la fiche de référence du groupe.',
@@ -75,9 +91,6 @@ final readonly class ConcertCreator
         $concert->updateDetails($date, $venue, $city, $status, $notes);
         $this->entityManager->persist($concert);
         $this->availability->initialize($concert);
-        // Le concert, la fiche et ses lignes sont enregistrés dans la même transaction Doctrine.
-        $this->entityManager->flush();
-
         return $concert;
     }
 }

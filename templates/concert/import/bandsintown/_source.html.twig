@@ -1,0 +1,42 @@
+{% if bandsintownSource %}
+    {% set event = bandsintownSource.event %}
+    <section class="workspace-panel bit-concert-source" aria-labelledby="bit-source-title">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">
+                    Informations publiques importées
+                </p>
+                <h2 id="bit-source-title">Annonce Bandsintown</h2>
+                <p>
+                    {{ event.date|date('d/m/Y') }} · {{ event.localTime }} (heure locale annoncée) · {{
+                        event.venue
+                    }} · {{ event.city }}{{ event.country ? ', ' ~ event.country : '' }}
+                </p>
+            </div><a
+                class="button button-secondary"
+                href="{{ event.sourceUrl }}"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Voir l’annonce ↗
+            </a>
+        </div>
+        <details class="bit-details">
+            <summary>
+                Adresse, affiche et billetterie
+            </summary>{{
+                include(
+                    'concert/import/bandsintown/_event_details.html.twig',
+                    {
+                        event: event
+                    },
+                    with_context: false
+                )
+            }}
+        </details>
+        <p class="workspace-hint">
+            Importé le {{ bandsintownSource.importedAt|date('d/m/Y', 'Europe/Paris') }}. Ces
+            informations correspondent à l’annonce au moment de l’import.
+        </p>
+    </section>
+{% endif %}

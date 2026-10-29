@@ -1,0 +1,327 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Trésorerie · {{ app_name }}
+{% endblock %}
+{% block body %}
+    {{ include('finance/_tabs.html.twig') }}
+    <section class="workspace-heading">
+        <div>
+            <p class="eyebrow">
+                {{ band.name }}
+            </p>
+            <h1>Trésorerie<span class="title-period">.</span></h1>
+            <p>
+                Les soldes du groupe et les mouvements enregistrés.
+            </p>
+        </div>
+        <div class="workspace-actions">
+            <a
+                class="button button-secondary"
+                href="{{
+                path(
+                    'app_treasury_transfer',
+                    {
+                        id: band.id
+                    }
+                )
+                }}"
+            >
+                Transférer
+            </a><a
+                class="button button-primary"
+                href="{{
+                path(
+                    'app_treasury_entry_new',
+                    {
+                        id: band.id
+                    }
+                )
+                }}"
+            >
+                + Recette / dépense
+            </a>
+        </div>
+    </section>
+    <div class="balance-grid">
+        {% for account in summary.accounts %}
+            <section class="balance-card">
+                <h2>{{ account.kind.label }}</h2>
+                <p class="balance-value">
+                    {{ (account.balanceCents / 100)|number_format(2, ',', ' ') }} <small>€</small>
+                </p>
+            </section>
+        {% endfor %}
+        <section class="balance-card balance-total">
+            <h2>Total disponible</h2>
+            <p class="balance-value">
+                {{ (summary.total / 100)|number_format(2, ',', ' ') }} <small>€</small>
+            </p>
+        </section>
+    </div>
+    <section class="workspace-panel" aria-labelledby="activity-title">
+        <div class="panel-heading">
+            <div>
+                <h2 id="activity-title">Les six derniers mois</h2>
+                <p>
+                    Hors soldes de départ, transferts et mouvements annulés.
+                </p>
+            </div>
+            <div class="chart-legend">
+                <span class="income-text">
+                    Recettes : {{ (summary.income / 100)|number_format(2, ',', ' ') }} €
+                </span><span class="expense-text">
+                    Dépenses : {{ (summary.expense / 100)|number_format(2, ',', ' ') }} €
+                </span>
+            </div>
+        </div>
+        <div
+            class="cash-chart"
+            role="img"
+            aria-label="Comparaison mensuelle des recettes et dépenses, détaillée dans le tableau ci-dessous"
+        >
+            {% for month in summary.months %}
+                <div class="chart-month">
+                    <div class="chart-bars">
+                        <span
+                            class="chart-bar chart-income"
+                            style="height: {{ month.income / summary.maximum * 100 }}%"
+                        >
+
+                        </span><span
+                            class="chart-bar chart-expense"
+                            style="height: {{ month.expense / summary.maximum * 100 }}%"
+                        >
+
+                        </span>
+                    </div><span>{{ month.label }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        <details class="chart-details">
+            <summary>
+                Voir les montants par mois
+            </summary>
+            <div class="table-scroll">
+                <table class="ledger-table">
+                    <caption class="visually-hidden">
+                        Recettes et dépenses mensuelles
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th>Mois</th>
+                            <th>Recettes</th>
+                            <th>Dépenses</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for month in summary.months %}
+                            <tr>
+                                <th scope="row">{{ month.label }}</th>
+                                <td>{{ (month.income / 100)|number_format(2, ',', ' ') }} €</td>
+                                <td>{{ (month.expense / 100)|number_format(2, ',', ' ') }} €</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </details>
+        {% if summary.income == 0 and summary.expense == 0 %}
+            <p class="workspace-hint">
+                Aucune recette ou dépense enregistrée sur cette période.
+            </p>
+        {% endif %}
+    </section>
+    <section class="workspace-panel" aria-labelledby="ledger-title">
+        <div class="panel-heading">
+            <div>
+                <h2 id="ledger-title">Historique des mouvements</h2>
+                <p>
+                    Une erreur ? Annule le mouvement pour conserver une trace de la correction.
+                </p>
+            </div>
+        </div>
+        <div class="table-scroll">
+            <table class="ledger-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Mouvement</th>
+                        <th>Compte</th>
+                        <th>Montant</th>
+                        <th><span class="visually-hidden">Action</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                        <tr class="{{ entry.cancelled ? 'entry-cancelled' : '' }}">
+                            <td>{{ entry.occurredOn|date('d/m/Y') }}</td>
+                            <td>
+                                <strong>{{ entry.label }}</strong><small>
+                                    {{ entry.kind.label }} · {{ entry.category }}{% if
+                                        entry.createdBy %}
+                                        · {{ entry.createdBy.displayName }}
+                                    {% endif %}
+                                </small>{% if entry.cancelled %}
+                                    <small>
+                                        Annulé : {{ entry.cancelReason }}{% if entry.cancelledBy %}
+                                            · {{ entry.cancelledBy.displayName }}
+                                        {% endif %}
+                                    </small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ entry.account.kind.label }}{% if entry.destination %}
+                                    → {{ entry.destination.kind.label }}
+                                {% endif %}
+                            </td>
+                            <td
+                                class="money-cell {{
+                                entry.kind.value == 'income'
+                                    ? 'income-text'
+                                    : entry.kind.value == 'expense' ? 'expense-text' : ''
+                                }}"
+                            >
+                                {{ entry.kind.value == 'expense'
+                                    ? '− '
+                                    : entry.kind.value == 'income' ? '+ ' : '' }}{{
+                                    (entry.amountCents / 100)|number_format(2, ',', ' ')
+                                }} €
+                            </td>
+                            <td>
+                                {% if not entry.cancelled and entry.kind.value != 'opening' %}
+                                    <a
+                                        href="{{
+                                        path(
+                                            'app_treasury_entry_cancel',
+                                            {
+                                                id: entry.id
+                                            }
+                                        )
+                                        }}"
+                                    >
+                                        Annuler
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5">Aucun mouvement pour le moment.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if pages > 1 %}
+            <nav class="workspace-pagination" aria-label="Pages des mouvements">
+                {% if page > 1 %}
+                    <a
+                        href="{{
+                        path(
+                            'app_treasury_index',
+                            {
+                                id: band.id,
+                                page: page - 1
+                            }
+                        )
+                        }}"
+                    >
+                        ← Précédente
+                    </a>
+                {% endif %}<span>Page {{ page }} / {{ pages }}</span>{% if page < pages %}
+                    <a
+                        href="{{
+                        path(
+                            'app_treasury_index',
+                            {
+                                id: band.id,
+                                page: page + 1
+                            }
+                        )
+                        }}"
+                    >
+                        Suivante →
+                    </a>
+                {% endif %}
+            </nav>
+        {% endif %}
+    </section>
+    <section class="workspace-panel" aria-labelledby="notes-title">
+        <div class="panel-heading">
+            <div>
+                <h2 id="notes-title">À vérifier ensemble</h2>
+                <p>
+                    Ces notes ne modifient aucun solde. Les remboursements doivent être enregistrés
+                    séparément s’ils sont effectués.
+                </p>
+            </div>
+        </div>
+        <ul class="finance-notes">
+            {% for note in notes %}
+                <li>
+                    <div>
+                        <p class="preserve-lines">
+                            {{ note.text }}
+                        </p>
+                        {% if note.resolvedAt %}
+                            <small>
+                                Vérifié par {{ note.resolvedBy
+                                    ? note.resolvedBy.displayName
+                                    : 'un membre' }} le {{ note.resolvedAt|date('d/m/Y', 'Europe/Paris') }}
+                            </small>
+                        {% endif %}
+                    </div>
+                    {% if not note.resolvedAt %}
+                        <form
+                            method="post"
+                            action="{{
+                            path(
+                                'app_treasury_note_resolve',
+                                {
+                                    id: note.id
+                                }
+                            )
+                            }}"
+                        >
+                            <input
+                                type="hidden"
+                                name="_token"
+                                value="{{ csrf_token('finance_note_resolve_' ~ note.id) }}"
+                            /><button class="button button-secondary" type="submit">
+                                Marquer vérifié
+                            </button>
+                        </form>
+                    {% endif %}
+                </li>
+            {% else %}
+                <li>Aucun point à vérifier.</li>
+            {% endfor %}
+        </ul>
+        <form
+            class="finance-note-form"
+            method="post"
+            action="{{
+            path(
+                'app_treasury_note_new',
+                {
+                    id: band.id
+                }
+            )
+            }}"
+        >
+            <input
+                type="hidden"
+                name="_token"
+                value="{{ csrf_token('finance_note_' ~ band.id) }}"
+            /><label for="finance-note">Ajouter une note</label><textarea
+                id="finance-note"
+                name="text"
+                rows="3"
+                maxlength="2000"
+                required
+            ></textarea><button class="button button-secondary" type="submit">
+                Ajouter la note
+            </button>
+        </form>
+    </section>
+{% endblock %}

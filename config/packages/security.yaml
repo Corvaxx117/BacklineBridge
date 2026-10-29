@@ -10,6 +10,7 @@ security:
     firewalls:
         main:
             lazy: true
+            user_checker: App\Security\ActivatedUserChecker
             provider: app_users
             form_login:
                 login_path: app_login
@@ -26,6 +27,7 @@ security:
                 invalidate_session: true
 
     access_control:
+        - { path: ^/premiere-connexion, roles: PUBLIC_ACCESS }
         - { path: '^/invitation/[a-f0-9]{64}$', roles: PUBLIC_ACCESS }
         - { path: '^/salle(?:/|$)', roles: PUBLIC_ACCESS }
         - { path: ^/connexion$, roles: PUBLIC_ACCESS }

@@ -73,6 +73,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function isActivated(): bool
+    {
+        return $this->password !== '';
+    }
+
     public function getRoles(): array
     {
         // Les responsabilités métier sont portées par BandMembership, pas par des rôles globaux.

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\Concert;
 
+use App\Service\Money\EuroAmount;
 use App\Dto\Concert\ConcertConditionsInput;
 use App\Entity\Concert;
 use App\Entity\ConcertConditions;

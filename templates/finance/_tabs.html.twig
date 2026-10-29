@@ -1,0 +1,37 @@
+<nav class="workspace-tabs" aria-label="Trésorerie et stock">
+    <a
+        href="{{
+        path(
+            'app_treasury_index',
+            {
+                id: band.id
+            }
+        )
+        }}"
+        aria-current="{{
+        app.request.attributes.get('_route') starts with 'app_treasury_'
+            ? 'page'
+            : 'false'
+        }}"
+    >
+        Trésorerie
+    </a>
+    <a
+        href="{{
+        path(
+            'app_stock_index',
+            {
+                id: band.id
+            }
+        )
+        }}"
+        aria-current="{{
+        app.request.attributes.get('_route') starts with 'app_stock_'
+            ? 'page'
+            : 'false'
+        }}"
+    >
+        Stock de merch
+    </a>
+    <span>Réservé aux musiciens du groupe</span>
+</nav>

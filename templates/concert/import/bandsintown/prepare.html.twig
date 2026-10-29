@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Importer Bandsintown · {{ app_name }}
+{% endblock %}
+{% block body %}
+    <a class="back-link" href="{{ path('app_concert_index') }}">← Revenir aux concerts</a>
+    <section class="workspace-heading">
+        <div>
+            <p class="eyebrow">
+                {{ band.name }} · Import de concerts
+            </p>
+            <h1>Depuis Bandsintown<span class="title-period">.</span></h1>
+            <p>
+                Retrouve les annonces du groupe et choisis les concerts à ajouter.
+            </p>
+        </div>
+    </section>
+    <div class="workspace-panel workspace-form">
+        {% if configured %}
+            <h2>Préparer l’import</h2>
+            <p class="workspace-hint">
+                Tu verras les dates avant de les importer. Les concerts déjà présents seront
+                reconnus par leur annonce Bandsintown ou par leur date, salle et ville.
+            </p>
+            {{ form_start(form) }}{{ form_errors(form) }}<div class="workspace-fields">
+                {{ form_row(form.period) }}
+            </div><button class="button button-primary" type="submit">Charger l’aperçu</button>{{ form_end(form) }}
+        {% else %}
+            <h2>Relier le compte du groupe</h2>
+            <p class="workspace-hint">
+                L’API officielle nécessite la clé de {{ band.name }}. Dans <a
+                    href="https://artists.bandsintown.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Bandsintown for Artists
+                </a>, ouvre <strong>Settings → General → Get API Key</strong> ou <strong>
+                    Copy API Key
+                </strong>.
+            </p>
+            <p>
+                La configuration doit ensuite être renseignée par l’administrateur de l’application.
+                La clé reste sur le serveur.
+            </p>
+        {% endif %}
+    </div>
+    <section class="workspace-panel">
+        <h2>Ce qui sera importé</h2>
+        <p>
+            La date, la salle et la ville, avec les informations publiques disponibles : heure
+            locale annoncée, adresse, pays, description, artistes et liens de billetterie.
+        </p>
+        <p class="workspace-hint">
+            Chaque nouveau concert recevra une copie de la fiche technique actuelle, même pour une
+            date passée. Les notes, conditions financières et disponibilités ne sont pas fournies
+            par Bandsintown. Les concerts existants conservent leurs données. L’import se déclenche
+            à ta demande.
+        </p>
+    </section>
+{% endblock %}

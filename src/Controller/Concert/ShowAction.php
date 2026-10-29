@@ -11,6 +11,7 @@ use App\Form\ConcertAvailabilityType;
 use App\Service\Concert\ConcertAvailabilityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\PatchLineRepository;
+use App\Repository\BandsintownConcertRepository;
 use App\Security\Voter\ConcertVoter;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,11 +35,13 @@ final class ShowAction extends AbstractController
         EntityManagerInterface $entityManager,
         #[CurrentUser] User $user,
         ConcertAvailabilityManager $availability,
+        BandsintownConcertRepository $bandsintown,
     ): Response {
         $this->denyAccessUnlessGranted(ConcertVoter::VIEW, $concert);
         $canViewConditions = $this->isGranted(ConcertVoter::CONDITIONS, $concert);
         return $this->render('concert/show.html.twig', [
             'concert' => $concert,
+            'bandsintownSource' => $bandsintown->forConcert($concert),
             'sheet' => $concert->getPatchSheet(),
             'lines' => $lines->findForSheet($concert->getPatchSheet()),
             'canViewConditions' => $canViewConditions,

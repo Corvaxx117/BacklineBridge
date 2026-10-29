@@ -51,6 +51,11 @@ class BandMembership
         return $this->user;
     }
 
+    public function setRole(BandRole $role): void
+    {
+        $this->role = $role;
+    }
+
     public function getRole(): BandRole
     {
         return $this->role;

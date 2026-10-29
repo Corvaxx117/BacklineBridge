@@ -28,6 +28,7 @@ final class IndexAction extends AbstractController
 
         return $this->render('concert/index.html.twig', [
             'concerts' => $dates,
+            'band' => $reference?->getBand(),
             'myAvailabilities' => $availability->forUserAndConcerts($user, $dates),
             'canCreate' =>
                 $reference !== null &&

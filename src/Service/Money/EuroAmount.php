@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Concert;
+namespace App\Service\Money;
 
 /** Montants EUR stockés en centimes, sans conversion intermédiaire en nombre flottant. */
 final class EuroAmount

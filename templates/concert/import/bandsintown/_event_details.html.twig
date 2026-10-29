@@ -1,0 +1,33 @@
+<div class="bit-public-details">
+    {% if event.title %}
+        <p>
+            <strong>{{ event.title }}</strong>
+        </p>
+    {% endif %}
+    {% if event.address %}
+        <p>
+            {{ event.address }}
+        </p>
+    {% endif %}
+    {% if event.lineup is not empty %}
+        <p>
+            À l’affiche : {{ event.lineup|join(', ') }}
+        </p>
+    {% endif %}
+    {% if event.description %}
+        <p class="preserve-lines">
+            {{ event.description }}
+        </p>
+    {% endif %}
+    {% if event.tickets is not empty %}
+        <ul class="useful-links">
+            {% for ticket in event.tickets %}
+                <li>
+                    <a href="{{ ticket.url }}" target="_blank" rel="noopener noreferrer">
+                        {{ ticket.label }} ↗
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>

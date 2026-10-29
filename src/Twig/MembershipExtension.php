@@ -19,9 +19,33 @@ final class MembershipExtension extends AbstractExtension
         private readonly BandMembershipRepository $memberships,
     ) {}
 
+    public function band(?Band $band = null): ?Band
+    {
+        $user = $this->security->getUser();
+        if (!($user instanceof User)) {
+            return null;
+        }
+        // Charger le groupe via l'adhésion courante évite les proxys détachés après un conflit ORM.
+        $query = $this->memberships
+            ->createQueryBuilder('membership')
+            ->addSelect('band')
+            ->join('membership.band', 'band')
+            ->where('membership.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('band.id', 'ASC')
+            ->setMaxResults(1);
+        if ($band !== null) {
+            $query->andWhere('membership.band = :band')->setParameter('band', $band);
+        }
+        return $query->getQuery()->getOneOrNullResult()?->getBand();
+    }
+
     public function getFunctions(): array
     {
-        return [new TwigFunction('band_role', $this->role(...))];
+        return [
+            new TwigFunction('band_role', $this->role(...)),
+            new TwigFunction('member_band', $this->band(...)),
+        ];
     }
 
     public function role(?Band $band = null): ?BandRole

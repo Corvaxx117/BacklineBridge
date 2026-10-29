@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    {{ title }} · {{ app_name }}
+{% endblock %}
+{% block body %}
+    {{ include('finance/_tabs.html.twig') }}
+    <section class="workspace-heading">
+        <div>
+            <p class="eyebrow">
+                {{ band.name }}
+            </p>
+            <h1>{{ title }}<span class="title-period">.</span></h1>
+        </div>
+    </section>
+    <div class="workspace-panel workspace-form">
+        {% if help is defined %}
+            <p class="workspace-hint">
+                {{ help }}
+            </p>
+        {% endif %}{{
+            form_start(
+                form,
+                {
+                    attr: {
+                        novalidate: 'novalidate'
+                    }
+                }
+            )
+        }}{{ form_errors(form) }}<div class="workspace-fields">
+            {% for field in form %}
+                {{ form_row(field) }}
+            {% endfor %}
+        </div>
+        <div class="workspace-actions">
+            <button class="button button-primary" type="submit">{{ button }}</button><a
+                class="button button-secondary"
+                href="{{
+                path(
+                    backRoute,
+                    {
+                        id: band.id
+                    }
+                )
+                }}"
+            >
+                Revenir sans enregistrer
+            </a>
+        </div>{{ form_end(form) }}
+    </div>
+{% endblock %}

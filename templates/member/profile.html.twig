@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    {{ profile.publicName }} · Fiche administrative · {{ app_name }}
+{% endblock %}
+{% block body %}
+    <a
+        class="back-link"
+        href="{{
+        path(
+            'app_profile_team',
+            {
+                id: band.id
+            }
+        )
+        }}"
+    >
+        ← Retour à l’équipe
+    </a><section class="workspace-heading">
+        <div>
+            <p class="eyebrow">
+                Fiche administrative · accès restreint
+            </p>
+            <h1>{{ profile.publicName }}<span class="title-period">.</span></h1>
+            <p>
+                {{ profile.function }}
+            </p>
+        </div>
+    </section>
+    <section class="workspace-panel administrative-profile">
+        <h2>Informations administratives</h2>
+        {% if administrative is empty %}
+            <p>
+                Les coordonnées de cette personne sont encore à compléter.
+            </p>
+        {% else %}
+            <dl class="profile-fields">
+                {% for label, value in administrative %}
+                    <div>
+                        <dt>
+                            {{ label }}
+                        </dt><dd class="preserve-lines">{{ value }}</dd>
+                    </div>
+                {% endfor %}
+            </dl>
+        {% endif %}
+        <p class="workspace-hint">
+            Consultable par cette personne, les quatre musiciens et le booker. Les autres membres
+            voient uniquement leur propre fiche.
+        </p>
+    </section>
+{% endblock %}

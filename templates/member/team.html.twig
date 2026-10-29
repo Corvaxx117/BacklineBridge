@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Équipe & liens · {{ app_name }}
+{% endblock %}
+{% block body %}
+    <section class="workspace-heading">
+        <div>
+            <p class="eyebrow">
+                {{ band.name }}
+            </p>
+            <h1>L’équipe<span class="title-period">.</span></h1>
+            <p>
+                Les membres du groupe et les contacts de la tournée.
+            </p>
+        </div>
+    </section>
+    <div class="team-grid">
+        {% for profile in profiles %}
+            <article class="workspace-panel member-card">
+                <span class="member-avatar" aria-hidden="true">
+                    {{ profile.publicName|slice(0, 1) }}
+                </span><div>
+                    <h2>{{ profile.publicName }}</h2>
+                    <p>
+                        {{ profile.function }}
+                    </p><small>
+                        {{ profile.kind.label }}{% if profile.user is null %}
+                            · Coordonnées à compléter
+                        {% elseif not profile.user.activated %}
+                            · Première connexion à effectuer
+                        {% endif %}
+                    </small>
+                </div>
+                {% if is_granted('MEMBER_PROFILE_VIEW', profile) %}
+                    <a
+                        href="{{
+                        path(
+                            'app_profile_show',
+                            {
+                                publicId: profile.publicId
+                            }
+                        )
+                        }}"
+                    >
+                        Fiche administrative →
+                    </a>
+                {% endif %}
+            </article>
+        {% endfor %}
+    </div>
+    <section class="workspace-panel">
+        <div class="panel-heading">
+            <div>
+                <h2>Retrouver le groupe</h2>
+                <p>
+                    Les liens utiles, réunis au même endroit.
+                </p>
+            </div>
+        </div>
+        <ul class="useful-links">
+            {% for link in band.usefulLinks %}
+                <li>
+                    <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">
+                        {{ link.label }} <span aria-hidden="true">↗</span><span class="visually-hidden">(nouvel
+                            onglet)</span>
+                    </a>
+                </li>
+            {% else %}
+                <li>Aucun lien renseigné.</li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endblock %}

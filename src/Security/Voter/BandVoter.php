@@ -8,6 +8,7 @@ use App\Entity\Band;
 use App\Entity\User;
 use App\Enum\BandRole;
 use App\Repository\BandMembershipRepository;
+use App\Service\Finance\MusicianAccess;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -15,6 +16,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 /** @extends Voter<string, Band> */
 final class BandVoter extends Voter
 {
+    public const TREASURY = 'BAND_TREASURY';
     public const VIEW = 'BAND_VIEW';
     public const MANAGE_TECHNICAL = 'BAND_MANAGE_TECHNICAL';
     public const EDIT_PATCH = 'BAND_EDIT_PATCH';
@@ -22,7 +24,10 @@ final class BandVoter extends Voter
     public const PLAN_CONCERT = 'BAND_PLAN_CONCERT';
     public const CONDITIONS = 'BAND_CONDITIONS';
 
-    public function __construct(private readonly BandMembershipRepository $memberships) {}
+    public function __construct(
+        private readonly BandMembershipRepository $memberships,
+        private readonly MusicianAccess $musicians,
+    ) {}
 
     protected function supports(string $attribute, mixed $subject): bool
     {
@@ -31,6 +36,7 @@ final class BandVoter extends Voter
                 $attribute,
                 [
                     self::VIEW,
+                    self::TREASURY,
                     self::EDIT_PATCH,
                     self::DELETE_PATCH,
                     self::PLAN_CONCERT,
@@ -57,6 +63,7 @@ final class BandVoter extends Voter
 
         return match ($attribute) {
             self::VIEW => true,
+            self::TREASURY => $this->musicians->allows($user, $subject),
             self::EDIT_PATCH => $role->canEdit(),
             self::DELETE_PATCH, self::MANAGE_TECHNICAL => $role === BandRole::Manager,
             self::PLAN_CONCERT, self::CONDITIONS => $role->canPlanConcerts(),

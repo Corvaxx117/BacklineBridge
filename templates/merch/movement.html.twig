@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Mouvement de stock · {{ app_name }}
+{% endblock %}
+{% block body %}
+    {{ include('finance/_tabs.html.twig') }}
+    <section class="workspace-heading">
+        <div>
+            <p class="eyebrow">
+                {{ variant.product.name }} · {{ variant.label }}
+            </p>
+            <h1>Mouvement de stock<span class="title-period">.</span></h1>
+            <p>
+                Stock actuel : {{ variant.quantity is null ? 'à renseigner' : variant.quantity }}.
+            </p>
+        </div>
+    </section>
+    <div class="workspace-panel workspace-form">
+        {{
+            form_start(
+                form,
+                {
+                    attr: {
+                        novalidate: 'novalidate',
+                        'data-merch-form': ''
+                    }
+                }
+            )
+        }}{{ form_errors(form) }}<div class="workspace-fields">
+            {{ form_row(form.kind) }}{{ form_row(form.quantity) }}<p class="workspace-hint">
+                Pour un inventaire, indique le nouveau stock total. Pour les autres mouvements,
+                indique le nombre d’articles concernés.
+            </p>{{ form_row(form.reason) }}<div data-sale-fields>
+                <p class="workspace-hint">
+                    La vente ajoute automatiquement une recette. Indique le total encaissé, pour
+                    tous les articles de cette vente.
+                </p>{{ form_row(form.amount) }}{{ form_row(form.account) }}
+            </div>
+        </div>{{ form_rest(form) }}<div class="workspace-actions">
+            <button class="button button-primary" type="submit">Enregistrer</button><a
+                class="button button-secondary"
+                href="{{
+                path(
+                    'app_stock_index',
+                    {
+                        id: band.id
+                    }
+                )
+                }}"
+            >
+                Revenir sans enregistrer
+            </a>
+        </div>{{ form_end(form) }}
+    </div>
+    <script src="/scripts/merch-form.js" defer></script>
+{% endblock %}

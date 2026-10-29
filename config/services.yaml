@@ -27,3 +27,19 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Integration\Bandsintown\BandsintownGateway:
+        alias: App\Integration\Bandsintown\BandsintownClient
+
+    # Client isolé du profiler : app_id est un secret transmis en paramètre d'URL.
+    bandsintown.http_client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: ['Symfony\Component\HttpClient\HttpClient', 'create']
+        autowire: false
+        autoconfigure: false
+        arguments:
+            - base_uri: 'https://rest.bandsintown.com/'
+              headers: { Accept: 'application/json' }
+              timeout: 5
+              max_duration: 12
+              max_redirects: 0

@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Activer mon compte · {{ app_name }}
+{% endblock %}
+{% block body %}
+    <section class="workspace-panel activation-card">
+        <p class="eyebrow">
+            Première connexion
+        </p>
+        <h1>{{ profile.publicName }}</h1>
+        <p>
+            Entre ton code personnel et choisis une longue phrase de passe unique, d’au moins 12
+            caractères.
+        </p>{{
+            form_start(
+                form,
+                {
+                    attr: {
+                        novalidate: 'novalidate'
+                    }
+                }
+            )
+        }}{{ form_errors(form) }}{{ form_row(form.code) }}{{ form_row(form.password) }}<button
+            class="button button-primary"
+            type="submit"
+        >
+            Créer mon mot de passe
+        </button>{{ form_end(form) }}<a href="{{ path('app_activation_select') }}">
+            ← Choisir un autre nom
+        </a>
+    </section>
+{% endblock %}

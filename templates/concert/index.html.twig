@@ -26,9 +26,26 @@
             </p>
         </div>
         {% if canCreate %}
-            <a class="button button-primary hero-action" href="{{ path('app_concert_new') }}">
-                <span class="button-plus" aria-hidden="true">+</span>Créer un concert
-            </a>
+            <div class="hero-actions">
+                {% if band %}
+                    <a
+                        class="button button-secondary"
+                        href="{{
+                        path(
+                            'app_concert_bandsintown_prepare',
+                            {
+                                id: band.id
+                            }
+                        )
+                        }}"
+                    >
+                        Importer Bandsintown
+                    </a>
+                {% endif %}
+                <a class="button button-primary hero-action" href="{{ path('app_concert_new') }}">
+                    <span class="button-plus" aria-hidden="true">+</span>Créer un concert
+                </a>
+            </div>
         {% endif %}
     </section>
 

@@ -8,7 +8,7 @@ L'application permet de consulter et modifier la fiche de référence d'Avee Man
 
 ## Démarrer
 
-Prérequis : PHP 8.4.1 ou supérieur dans la branche 8.4, extensions PDO SQLite, mbstring, intl, XML et Composer. La branche PHP est déclarée dans `.php-version` pour les outils compatibles.
+Prérequis : PHP 8.4.1 ou supérieur dans la branche 8.4, extensions PDO SQLite, mbstring, intl, XML, Sodium et Composer. La branche PHP est déclarée dans `.php-version` pour les outils compatibles.
 
 Depuis le dossier du projet, sélectionner PHP 8.4 dans la session du terminal. Sur ce Mac :
 
@@ -39,7 +39,19 @@ Avec Symfony CLI, `symfony composer install`, `symfony composer setup` et `symfo
 
 `composer setup` applique les migrations et charge les données de départ uniquement si aucune fiche n'existe. Relancer cette commande conserve les modifications déjà effectuées. La base de développement est stockée dans `var/backlinebridge.db`, hors des fichiers à versionner.
 
-Le serveur est lié à `127.0.0.1`. La connexion et les autorisations par groupe sont maintenant actives. Le jalon reste destiné au développement local ; invitations des membres, vérification de l'adresse e-mail et récupération de mot de passe ne sont pas encore disponibles.
+Le serveur est lié à `127.0.0.1`. La connexion et les autorisations par groupe sont maintenant actives. Le jalon reste destiné au développement local ; l’activation des comptes prévus se fait par nom et code personnel. La vérification de l’adresse e-mail et la récupération de mot de passe restent à réaliser.
+
+## Espace privé du groupe
+
+Les musiciens disposent d’un espace **Trésorerie & stock**, distinct des droits techniques des responsables. Les ventes alimentent le compte choisi et diminuent le stock dans une même transaction. Les transferts entre comptes et les soldes de départ sont exclus du graphique des recettes et dépenses. Les ajustements et annulations gardent une trace de leur auteur.
+
+La page **Équipe & liens** rassemble les profils et les réseaux du groupe. Chaque personne lit sa fiche administrative ; les musiciens et le booker peuvent lire celles du groupe. Les données administratives sont chiffrées avec une clé privée distincte du secret Symfony. Aucun profil personnel ni solde réel n’est fourni dans les sources.
+
+Voir [l’import privé, l’activation et les droits](docs/espace-groupe.md) avant d’initialiser ces fonctionnalités.
+
+## Import Bandsintown
+
+Depuis **Concerts → Importer Bandsintown**, les responsables et le booker peuvent sélectionner les annonces du groupe, passées ou à venir. L’aperçu repère les doublons et permet de rattacher une annonce à un concert déjà saisi sans modifier ses données internes. La clé de l’API officielle reste dans la configuration locale, hors Git. Voir [la configuration et le fonctionnement de l’import](docs/bandsintown.md).
 
 ## Vérifier
 
@@ -99,7 +111,7 @@ Le bouton **Télécharger la fiche PDF** exporte le plan de scène enregistré, 
 
 **Un patch distinct par concert.** Une relation OneToOne lie chaque concert à sa propre fiche. Les sources sont copiées à la création et restent indépendantes de la référence, dans les deux sens. Ce dossier est encore modifiable ; il ne constitue pas une version publiée immuable. Le plan et le backline sont également copiés. Une publication datée distincte fige ce dossier pour les réponses de la salle ; les alternatives restent à discuter avec le groupe.
 
-**Une personne, des droits contextualisés.** `User`, `Band` et `BandMembership` séparent l'identité et l'accès au groupe. Les cinq responsables (les quatre membres et Marty) peuvent gérer le patch, la corbeille, les dates et leurs conditions. Le rôle `booker` permet à Romain de créer, modifier et valider les dates et de gérer leurs conditions, avec un accès en consultation au patch. Les profils de régie technique et de lecture seule n'ont pas accès aux conditions financières. Les liens invités sont limités à une publication de concert ; les invitations de membres du groupe restent à réaliser.
+**Une personne, des droits contextualisés.** `User`, `Band` et `BandMembership` séparent l'identité et l'accès au groupe. Les cinq responsables (les quatre membres et Marty) peuvent gérer le patch, la corbeille, les dates et leurs conditions. Le rôle `booker` permet à Romain de créer, modifier et valider les dates et de gérer leurs conditions, avec un accès en consultation au patch. Les profils de régie technique et de lecture seule n'ont pas accès aux conditions financières. Les liens invités sont limités à une publication de concert ; les comptes des membres prévus s’activent par nom et code personnel.
 
 **Des sources retirées, puis restaurables.** Le canal d'une source mise à la corbeille est libéré. L'identifiant reste conservé et la restauration refuse un canal déjà réutilisé. Une modification de la référence n'affecte pas les concerts existants.
 
