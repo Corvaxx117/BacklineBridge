@@ -21,12 +21,10 @@ final class StageItemInput
 
     #[Assert\NotBlank, Assert\Length(max: 70)]
     public string $label = '';
-    #[
-        Assert\NotNull,
+    #[Assert\NotNull,
         Assert\Choice(
             choices: ['drums', 'riser', 'amp', 'person', 'keys', 'wedge', 'power', 'other'],
-        ),
-    ]
+        ),]
     public ?string $kind = 'other';
     #[Assert\NotNull, Assert\Range(min: 0, max: 100)]
     public ?float $x = 50;

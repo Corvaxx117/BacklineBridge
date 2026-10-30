@@ -10,7 +10,9 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class PatchLineArchiver
 {
-    public function __construct(private EntityManagerInterface $entityManager) {}
+    public function __construct(private EntityManagerInterface $entityManager)
+    {
+    }
 
     public function archive(PatchLine $line): void
     {

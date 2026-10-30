@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Repository\ConcertRepository;
 use App\Enum\ConcertStatus;
+use App\Repository\ConcertRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -76,7 +76,7 @@ class Concert
         $this->venue = $venue;
         $this->city = $city;
         $this->status = $status;
-        $this->notes = $notes !== null && trim($notes) !== '' ? trim($notes) : null;
+        $this->notes = null !== $notes && '' !== trim($notes) ? trim($notes) : null;
     }
 
     public function __construct(

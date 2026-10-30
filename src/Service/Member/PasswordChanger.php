@@ -16,7 +16,8 @@ final readonly class PasswordChanger
         private EntityManagerInterface $entityManager,
         private UserPasswordHasherInterface $hasher,
         private ValidatorInterface $validator,
-    ) {}
+    ) {
+    }
 
     public function change(User $user, #[\SensitiveParameter] string $password): void
     {

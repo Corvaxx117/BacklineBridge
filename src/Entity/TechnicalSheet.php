@@ -10,6 +10,24 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @phpstan-type StageElement array{
+ *     label: string,
+ *     kind: string,
+ *     x: float|int,
+ *     y: float|int,
+ *     notes: string,
+ *     rotation?: float|int,
+ *     scale?: float|int
+ * }
+ * @phpstan-type EquipmentRequest array{
+ *     id: string,
+ *     category: string,
+ *     label: string,
+ *     quantity: int,
+ *     specification: string
+ * }
+ */
 #[ORM\Entity(repositoryClass: TechnicalSheetRepository::class)]
 #[ORM\Table(name: 'technical_sheet')]
 class TechnicalSheet
@@ -29,19 +47,21 @@ class TechnicalSheet
     #[ORM\Column(type: Types::JSON)]
     private array $notices = [];
 
-    /** @var list<array{label: string, kind: string, x: float|int, y: float|int, notes: string, rotation?: float, scale?: float}> */
+    /** @var list<StageElement> */
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $stagePlan = null;
 
-    /** @var list<array{id: string, category: string, label: string, quantity: int, specification: string}> */
+    /** @var list<EquipmentRequest> */
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $equipmentRequests = null;
 
+    /** @return list<StageElement> */
     public function getStagePlan(): array
     {
         return $this->stagePlan ?? [];
     }
 
+    /** @param array<array-key, StageElement> $items */
     public function setStagePlan(array $items): self
     {
         $this->stagePlan = array_values($items);
@@ -49,11 +69,13 @@ class TechnicalSheet
         return $this;
     }
 
+    /** @return list<EquipmentRequest> */
     public function getEquipmentRequests(): array
     {
         return $this->equipmentRequests ?? [];
     }
 
+    /** @param array<array-key, EquipmentRequest> $items */
     public function setEquipmentRequests(array $items): self
     {
         $this->equipmentRequests = array_values($items);
@@ -137,7 +159,7 @@ class TechnicalSheet
         return $this->notices;
     }
 
-    /** @param list<string> $notices */
+    /** @param array<array-key, string> $notices */
     public function setNotices(array $notices): self
     {
         $this->notices = array_values($notices);
@@ -153,7 +175,7 @@ class TechnicalSheet
 
     public function getActiveLineCount(): int
     {
-        return $this->lines->filter(static fn(PatchLine $line): bool => $line->isActive())->count();
+        return $this->lines->filter(static fn (PatchLine $line): bool => $line->isActive())->count();
     }
 
     public function addLine(PatchLine $line): self

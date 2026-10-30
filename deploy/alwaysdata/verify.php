@@ -11,6 +11,7 @@ use App\Service\Pdf\StagePlanLayout;
 use App\Service\Pdf\TechnicalDossierFactory;
 use App\Service\Pdf\TechnicalPdfRenderer;
 use App\Service\Venue\PublicationBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpFoundation\Request;
 use Twig\Environment;
@@ -18,17 +19,17 @@ use Twig\Loader\FilesystemLoader;
 
 if (PHP_SAPI !== 'cli') {
     http_response_code(404);
-    exit();
+    exit;
 }
 
 try {
     $projectDir = dirname(__DIR__, 2);
-    require $projectDir . '/vendor/autoload.php';
-    new Dotenv()->bootEnv($projectDir . '/.env');
+    require $projectDir.'/vendor/autoload.php';
+    new Dotenv()->bootEnv($projectDir.'/.env');
     if (
-        $_SERVER['APP_ENV'] !== 'prod' ||
-        $_SERVER['APP_DEBUG'] !== '0' ||
-        ($_SERVER['APP_DEMO_MODE'] ?? '') !== '1'
+        'prod' !== $_SERVER['APP_ENV']
+        || '0' !== $_SERVER['APP_DEBUG']
+        || ($_SERVER['APP_DEMO_MODE'] ?? '') !== '1'
     ) {
         throw new RuntimeException('Ce contrôle nécessite la démonstration en mode production.');
     }
@@ -36,12 +37,15 @@ try {
     $kernel = new Kernel('prod', false);
     $kernel->boot();
     $manager = $kernel->getContainer()->get('doctrine')->getManager();
+    if (!$manager instanceof EntityManagerInterface) {
+        throw new RuntimeException('Le contrôle nécessite Doctrine ORM.');
+    }
     $databasePath = $manager->getConnection()->getParams()['path'] ?? '';
-    if (realpath($databasePath) !== realpath($projectDir . '/var/demo.db')) {
+    if (realpath($databasePath) !== realpath($projectDir.'/var/demo.db')) {
         throw new RuntimeException('Le contrôle doit utiliser uniquement var/demo.db.');
     }
     $profiles = $manager->getRepository(MemberProfile::class)->findAll();
-    if (count($profiles) !== 6) {
+    if (6 !== count($profiles)) {
         throw new RuntimeException('Les six profils fictifs doivent être initialisés.');
     }
     $cipher = new ProfileCipher($_SERVER['PROFILE_DATA_KEY']);
@@ -55,33 +59,33 @@ try {
     }
 
     $sheet = $manager->getRepository(TechnicalSheet::class)->findReference();
-    if ($sheet === null) {
+    if (null === $sheet) {
         throw new RuntimeException('Initialiser la fiche technique avant ce contrôle.');
     }
     $factory = new TechnicalDossierFactory(
         $manager->getRepository(PatchLine::class),
         new PublicationBuilder(),
     );
-    $twig = new Environment(new FilesystemLoader($projectDir . '/templates'), [
+    $twig = new Environment(new FilesystemLoader($projectDir.'/templates'), [
         'strict_variables' => true,
     ]);
     $twig->addGlobal('app_name', 'BacklineBridge');
     $renderer = new TechnicalPdfRenderer(
         $twig,
         new StagePlanLayout(),
-        $projectDir . '/var/cache/prod/pdf',
-        $projectDir . '/public',
+        $projectDir.'/var/cache/prod/pdf',
+        $projectDir.'/public',
     );
     $pdf = $renderer->render($factory->forSheet($sheet));
     if (!str_starts_with($pdf, '%PDF-') || !str_contains($pdf, '%%EOF')) {
         throw new RuntimeException('L’export PDF de démonstration a échoué.');
     }
 
-    $request = Request::create($_SERVER['DEFAULT_URI'] . '/connexion');
+    $request = Request::create($_SERVER['DEFAULT_URI'].'/connexion');
     $response = $kernel->handle($request);
     if (
-        $response->getStatusCode() !== 200 ||
-        !str_contains($response->getContent(), 'demo-banner')
+        200 !== $response->getStatusCode()
+        || !str_contains($response->getContent() ?: '', 'demo-banner')
     ) {
         throw new RuntimeException('La connexion de démonstration ne s’affiche pas correctement.');
     }
@@ -98,8 +102,8 @@ try {
             'peak_memory_mib' => round(memory_get_peak_usage(true) / 1048576, 1),
         ],
         JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
-    ) . "\n";
+    )."\n";
 } catch (Throwable $error) {
-    fwrite(STDERR, $error->getMessage() . "\n");
+    fwrite(STDERR, $error->getMessage()."\n");
     exit(1);
 }

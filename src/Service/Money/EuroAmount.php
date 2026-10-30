@@ -9,7 +9,7 @@ final class EuroAmount
 {
     public static function toCents(?string $amount): ?int
     {
-        if ($amount === null || $amount === '') {
+        if (null === $amount || '' === $amount) {
             return null;
         }
         if (!preg_match('/^\d{1,7}(?:[,.]\d{1,2})?$/D', $amount)) {
@@ -22,8 +22,8 @@ final class EuroAmount
 
     public static function fromCents(?int $cents): ?string
     {
-        return $cents === null
+        return null === $cents
             ? null
-            : intdiv($cents, 100) . '.' . str_pad((string) ($cents % 100), 2, '0', STR_PAD_LEFT);
+            : intdiv($cents, 100).'.'.str_pad((string) ($cents % 100), 2, '0', STR_PAD_LEFT);
     }
 }

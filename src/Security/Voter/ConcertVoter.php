@@ -7,8 +7,8 @@ namespace App\Security\Voter;
 use App\Entity\Concert;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 /** @extends Voter<string, Concert> */
 final class ConcertVoter extends Voter
@@ -21,12 +21,14 @@ final class ConcertVoter extends Voter
     public const RESPOND_AVAILABILITY = 'CONCERT_RESPOND_AVAILABILITY';
     public const IMPORT_REFERENCE = 'CONCERT_IMPORT_REFERENCE';
 
-    public function __construct(private readonly AccessDecisionManagerInterface $decisions) {}
+    public function __construct(private readonly AccessDecisionManagerInterface $decisions)
+    {
+    }
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return $subject instanceof Concert &&
-            in_array(
+        return $subject instanceof Concert
+            && in_array(
                 $attribute,
                 [
                     self::VIEW,
@@ -47,21 +49,18 @@ final class ConcertVoter extends Voter
         TokenInterface $token,
         ?Vote $vote = null,
     ): bool {
-        return $this->decisions->decide(
-            $token,
-            [
-                match ($attribute) {
-                    self::VIEW => BandVoter::VIEW,
-                    self::EDIT => BandVoter::EDIT_PATCH,
-                    self::UPDATE => BandVoter::PLAN_CONCERT,
-                    self::CONDITIONS => BandVoter::CONDITIONS,
-                    self::SHARE,
-                    self::RESPOND_AVAILABILITY,
-                    self::IMPORT_REFERENCE
-                        => BandVoter::MANAGE_TECHNICAL,
-                },
-            ],
-            $subject->getBand(),
-        );
+        $bandAttribute = match ($attribute) {
+            self::VIEW => BandVoter::VIEW,
+            self::EDIT => BandVoter::EDIT_PATCH,
+            self::UPDATE => BandVoter::PLAN_CONCERT,
+            self::CONDITIONS => BandVoter::CONDITIONS,
+            self::SHARE,
+            self::RESPOND_AVAILABILITY,
+            self::IMPORT_REFERENCE => BandVoter::MANAGE_TECHNICAL,
+            default => null,
+        };
+
+        return null !== $bandAttribute
+            && $this->decisions->decide($token, [$bandAttribute], $subject->getBand());
     }
 }

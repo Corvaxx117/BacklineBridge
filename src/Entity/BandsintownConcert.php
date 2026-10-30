@@ -11,12 +11,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BandsintownConcertRepository::class)]
 #[ORM\Table(name: 'bandsintown_concert')]
-#[
-    ORM\UniqueConstraint(
-        name: 'uniq_bit_band_artist_event',
-        columns: ['band_id', 'artist_id', 'event_id'],
-    ),
-]
+#[ORM\UniqueConstraint(
+    name: 'uniq_bit_band_artist_event',
+    columns: ['band_id', 'artist_id', 'event_id'],
+),]
 class BandsintownConcert
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
@@ -27,6 +25,7 @@ class BandsintownConcert
     private string $artistId;
     #[ORM\Column(length: 30)]
     private string $eventId;
+    /** @var array<string, mixed> */
     #[ORM\Column(type: Types::JSON)]
     private array $snapshot;
     #[ORM\Column]
@@ -47,18 +46,22 @@ class BandsintownConcert
     {
         return $this->id;
     }
+
     public function getConcert(): Concert
     {
         return $this->concert;
     }
+
     public function getImportedAt(): \DateTimeImmutable
     {
         return $this->importedAt;
     }
+
     public function getEvent(): BandsintownEvent
     {
         return BandsintownEvent::fromArray($this->snapshot);
     }
+
     public function getArtistId(): string
     {
         return $this->artistId;

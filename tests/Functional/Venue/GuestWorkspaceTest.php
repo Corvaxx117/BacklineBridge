@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Venue;
 
 use App\Dto\Concert\ConcertConditionsInput;
-use App\Entity\{Concert, VenueInvitation, VenueReply};
+use App\Entity\VenueInvitation;
+use App\Entity\VenueReply;
 use App\Service\Concert\ConcertConditionsUpdater;
 use App\Service\Venue\PublicationBuilder;
 use App\Tests\VenueTestCase;
@@ -30,7 +31,7 @@ final class GuestWorkspaceTest extends VenueTestCase
             self::assertCount(
                 4,
                 $crawler->filter(
-                    'input[name="venue_reply[answers][gear_' . $item['id'] . '][status]"]',
+                    'input[name="venue_reply[answers][gear_'.$item['id'].'][status]"]',
                 ),
             );
         }
@@ -86,7 +87,7 @@ final class GuestWorkspaceTest extends VenueTestCase
             'no-store',
             $this->client->getResponse()->headers->get('Cache-Control'),
         );
-        $this->client->request('GET', '/concerts/' . $concert->getId());
+        $this->client->request('GET', '/concerts/'.$concert->getId());
         self::assertResponseRedirects();
         self::assertSame(
             '/connexion',
@@ -113,7 +114,7 @@ final class GuestWorkspaceTest extends VenueTestCase
         $firstLineKey = array_key_first(
             array_filter(
                 $values['venue_reply']['answers'],
-                static fn($key): bool => str_starts_with($key, 'line_'),
+                static fn ($key): bool => str_starts_with($key, 'line_'),
                 ARRAY_FILTER_USE_KEY,
             ),
         );
@@ -141,7 +142,7 @@ final class GuestWorkspaceTest extends VenueTestCase
         $this->client->loginUser(
             $this->entityManager()->find(\App\Entity\User::class, $this->userId),
         );
-        $this->client->request('GET', '/concerts/' . $concertId . '/reponses-salle');
+        $this->client->request('GET', '/concerts/'.$concertId.'/reponses-salle');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('main', 'Cab 2 × 12, 500 W / 4 Ω');
         self::assertSelectorNotExists('main script');
@@ -167,6 +168,7 @@ final class GuestWorkspaceTest extends VenueTestCase
                 'details' => '',
             ]),
             'too long' => ($values['venue_reply']['notes'] = str_repeat('é', 2001)),
+            default => throw new \InvalidArgumentException('Cas de test inconnu.'),
         };
         $this->client->request('POST', $this->guestUrl(), $values);
         self::assertResponseStatusCodeSame(422);
@@ -183,8 +185,7 @@ final class GuestWorkspaceTest extends VenueTestCase
                 'missing enum',
                 'other request',
                 'too long',
-            ]
-            as $case
+            ] as $case
         ) {
             yield [$case];
         }
@@ -222,7 +223,7 @@ final class GuestWorkspaceTest extends VenueTestCase
         self::assertResponseStatusCodeSame(404);
         self::assertSelectorTextContains('h1', 'Ce lien est indisponible');
         self::assertSame(0, $this->entityManager()->getRepository(VenueReply::class)->count([]));
-        $this->client->request('GET', '/invitation/' . $issued->token);
+        $this->client->request('GET', '/invitation/'.$issued->token);
         self::assertResponseStatusCodeSame(404);
     }
 
@@ -240,8 +241,7 @@ final class GuestWorkspaceTest extends VenueTestCase
         $this->entityManager()->flush();
         $this->client->getCookieJar()->clear();
         foreach (
-            ['/salle', '/invitation/' . $token, '/invitation/' . str_repeat('0', 64)]
-            as $uri
+            ['/salle', '/invitation/'.$token, '/invitation/'.str_repeat('0', 64)] as $uri
         ) {
             $this->client->request('GET', $uri);
             self::assertResponseStatusCodeSame(404);

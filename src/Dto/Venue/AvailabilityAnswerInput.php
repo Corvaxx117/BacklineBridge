@@ -18,7 +18,7 @@ final class AvailabilityAnswerInput
     #[Assert\Callback]
     public function alternativeNeedsDetails(ExecutionContextInterface $context): void
     {
-        if ($this->status === Availability::Alternative && trim($this->details ?? '') === '') {
+        if (Availability::Alternative === $this->status && '' === trim($this->details ?? '')) {
             $context
                 ->buildViolation('Précisez le matériel proposé en remplacement.')
                 ->atPath('details')

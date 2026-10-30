@@ -13,7 +13,7 @@ final class EditActionTest extends DatabaseTestCase
     public function testEditingASourcePersistsAfterAnotherRequest(): void
     {
         $id = $this->lineForChannel(17)->getId();
-        $this->submitLineForm('/sources/' . $id . '/edit', [
+        $this->submitLineForm('/sources/'.$id.'/edit', [
             'sourceName' => 'JU VOICE LEAD',
             'preferredMicrophone' => 'SM58',
         ]);
@@ -34,7 +34,7 @@ final class EditActionTest extends DatabaseTestCase
     {
         $id = $this->lineForChannel(17)->getId();
         $this->submitLineForm(
-            '/sources/' . $id . '/edit',
+            '/sources/'.$id.'/edit',
             [
                 'channelNumber' => '30',
                 'sourceName' => 'MODIFICATION SANS JETON',
@@ -53,7 +53,7 @@ final class EditActionTest extends DatabaseTestCase
     public function testChangingAChannelPreservesTheSourceIdentityAndReordersThePatch(): void
     {
         $id = $this->lineForChannel(17)->getId();
-        $this->submitLineForm('/sources/' . $id . '/edit', ['channelNumber' => '30']);
+        $this->submitLineForm('/sources/'.$id.'/edit', ['channelNumber' => '30']);
 
         self::assertResponseRedirects('/', 303);
         $crawler = $this->client->followRedirect();
@@ -73,7 +73,7 @@ final class EditActionTest extends DatabaseTestCase
         $lastRow = $crawler->filter('table tbody tr')->last();
         self::assertSame(30, (int) trim($lastRow->filter('td, th')->first()->text()));
         self::assertStringContainsString('JU VOICE', $lastRow->text());
-        self::assertCount(1, $lastRow->filter('a[href="/sources/' . $id . '/edit"]'));
+        self::assertCount(1, $lastRow->filter('a[href="/sources/'.$id.'/edit"]'));
     }
 
     public function testEditingToAnOccupiedChannelDoesNotMutateEitherSource(): void
@@ -83,7 +83,7 @@ final class EditActionTest extends DatabaseTestCase
         $otherId = $other->getId();
         $otherName = $other->getSourceName();
 
-        $this->submitLineForm('/sources/' . $id . '/edit', [
+        $this->submitLineForm('/sources/'.$id.'/edit', [
             'channelNumber' => '18',
             'sourceName' => 'MODIFICATION REFUSÉE',
         ]);

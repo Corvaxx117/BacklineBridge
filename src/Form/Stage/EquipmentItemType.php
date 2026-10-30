@@ -6,10 +6,14 @@ namespace App\Form\Stage;
 
 use App\Dto\Stage\EquipmentItemInput;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\{TextType, TextareaType, HiddenType, IntegerType};
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** @extends AbstractType<EquipmentItemInput> */
 final class EquipmentItemType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -6,10 +6,12 @@ namespace App\Form\Merch;
 
 use App\Dto\Merch\ProductInput;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\{TextType, ChoiceType};
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** @extends AbstractType<ProductInput> */
 final class ProductType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $b, array $o): void
@@ -27,8 +29,7 @@ final class ProductType extends AbstractType
                 'label' => 'Tailles ou variantes (facultatif)',
                 'required' => false,
                 'empty_data' => '',
-                'help' =>
-                    'Sépare les tailles par des virgules, par exemple S, M, L, XL. Laisse vide pour un stock unique.',
+                'help' => 'Sépare les tailles par des virgules, par exemple S, M, L, XL. Laisse vide pour un stock unique.',
             ]);
     }
 

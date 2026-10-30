@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Venue;
 
-use App\Entity\{VenueInvitation, VenueReply};
+use App\Entity\VenueInvitation;
+use App\Entity\VenueReply;
 use App\Tests\VenueTestCase;
 
 final class GuestIsolationTest extends VenueTestCase
@@ -22,7 +23,7 @@ final class GuestIsolationTest extends VenueTestCase
         $firstValues['venue_reply']['respondent'] = 'Première salle';
 
         // Même navigateur : conserver ses cookies et ouvrir le deuxième lien dans un autre onglet.
-        $this->client->request('GET', '/invitation/' . $second->token);
+        $this->client->request('GET', '/invitation/'.$second->token);
         $secondUri = $this->client->getResponse()->headers->get('Location');
         self::assertNotSame($firstUri, $secondUri);
         $secondForm = $this->client->followRedirect()->filter('form[name="venue_reply"]')->form();
@@ -68,7 +69,7 @@ final class GuestIsolationTest extends VenueTestCase
             ->selectLink('Télécharger la fiche PDF ↓')
             ->link()
             ->getUri();
-        $this->client->request('GET', '/invitation/' . $second->token);
+        $this->client->request('GET', '/invitation/'.$second->token);
         $secondPdf = $this->client
             ->followRedirect()
             ->selectLink('Télécharger la fiche PDF ↓')
@@ -96,7 +97,7 @@ final class GuestIsolationTest extends VenueTestCase
         $this->enter($first->token);
         $firstUri = $this->guestUrl();
         $exit = $this->client->getCrawler()->selectButton('Quitter cet accès')->form();
-        $this->client->request('GET', '/invitation/' . $second->token);
+        $this->client->request('GET', '/invitation/'.$second->token);
         $secondUri = $this->client->getResponse()->headers->get('Location');
         $secondExitUri = $this->client
             ->followRedirect()
@@ -125,7 +126,7 @@ final class GuestIsolationTest extends VenueTestCase
         }
         $this->client->request('POST', '/salle', $values);
         self::assertResponseStatusCodeSame(404);
-        $this->client->request('GET', '/salle?access=' . str_repeat('0', 32));
+        $this->client->request('GET', '/salle?access='.str_repeat('0', 32));
         self::assertResponseStatusCodeSame(404);
         $this->client->getCookieJar()->clear();
         $this->client->request('GET', $uri);
@@ -141,7 +142,7 @@ final class GuestIsolationTest extends VenueTestCase
         $this->enter($first->token);
         $firstUri = $this->guestUrl();
         $values = $this->replyValues();
-        $this->client->request('GET', '/invitation/' . $second->token);
+        $this->client->request('GET', '/invitation/'.$second->token);
         $secondUri = $this->client->getResponse()->headers->get('Location');
         $this->client->followRedirect();
         $this->entityManager()->find(VenueInvitation::class, $firstId)->revoke();

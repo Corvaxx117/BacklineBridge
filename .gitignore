@@ -63,3 +63,11 @@ Desktop.ini
 *.swp
 *.swo
 *~
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+
+# Réglages PHPStan personnels ; la configuration partagée reste versionnée.
+/phpstan.neon

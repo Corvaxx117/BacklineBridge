@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Security;
 
 use App\Entity\Band;
-use App\Entity\BandMembership;
 use App\Entity\Concert;
 use App\Entity\PatchLine;
 use App\Entity\TechnicalSheet;
-use App\Entity\User;
 use App\Enum\BandRole;
 use App\Service\Concert\ConcertCreator;
 use App\Service\Security\UserCreator;
@@ -44,8 +42,8 @@ final class AuthorizationTest extends DatabaseTestCase
                 'Lyon',
             );
         $source = $concert->getPatchSheet()->getLines()->first();
-        $uri = '/concerts/' . $concert->getId();
-        $lineUri = '/sources/' . $source->getId() . '/edit';
+        $uri = '/concerts/'.$concert->getId();
+        $lineUri = '/sources/'.$source->getId().'/edit';
         $ownReferenceLine = $otherSheet->getLines()->first()->getId();
 
         $this->client->request('GET', '/concerts');
@@ -58,12 +56,11 @@ final class AuthorizationTest extends DatabaseTestCase
             [
                 $uri,
                 $lineUri,
-                '/sources/' . $ownReferenceLine . '/edit',
-                $uri . '/sources/new',
-                $uri . '/edit',
-                $uri . '/conditions',
-            ]
-            as $path
+                '/sources/'.$ownReferenceLine.'/edit',
+                $uri.'/sources/new',
+                $uri.'/edit',
+                $uri.'/conditions',
+            ] as $path
         ) {
             $this->client->request('GET', $path);
             self::assertResponseStatusCodeSame(403);
@@ -100,7 +97,7 @@ final class AuthorizationTest extends DatabaseTestCase
         $sourceId = $concert->getPatchSheet()->getLines()->first()->getId();
         $referenceLineId = $this->lineForChannel(17)->getId();
         $this->client->loginUser($viewer);
-        foreach (['/', '/concerts', '/concerts/' . $concert->getId()] as $path) {
+        foreach (['/', '/concerts', '/concerts/'.$concert->getId()] as $path) {
             $this->client->request('GET', $path);
             self::assertResponseIsSuccessful();
             self::assertSelectorNotExists('a.hero-action');
@@ -111,11 +108,10 @@ final class AuthorizationTest extends DatabaseTestCase
             [
                 '/sources/new',
                 '/concerts/new',
-                '/sources/' . $referenceLineId . '/edit',
-                '/sources/' . $sourceId . '/edit',
-                '/concerts/' . $concert->getId() . '/sources/new',
-            ]
-            as $path
+                '/sources/'.$referenceLineId.'/edit',
+                '/sources/'.$sourceId.'/edit',
+                '/concerts/'.$concert->getId().'/sources/new',
+            ] as $path
         ) {
             foreach (['GET', 'POST'] as $method) {
                 $this->client->request($method, $path);
@@ -140,11 +136,11 @@ final class AuthorizationTest extends DatabaseTestCase
         $concert = $this->concert();
         $lineId = $concert->getPatchSheet()->getLines()->first()->getId();
         $this->client->loginUser($editor);
-        $this->submitLineForm('/sources/' . $lineId . '/edit', [
+        $this->submitLineForm('/sources/'.$lineId.'/edit', [
             'notes' => 'Préparation par l’éditeur',
         ]);
 
-        self::assertResponseRedirects('/concerts/' . $concert->getId(), 303);
+        self::assertResponseRedirects('/concerts/'.$concert->getId(), 303);
         $em = $this->entityManager();
         $em->clear();
         self::assertSame(
@@ -158,15 +154,15 @@ final class AuthorizationTest extends DatabaseTestCase
         $concert = $this->concert();
         $concertId = $concert->getId();
         $lineId = $concert->getPatchSheet()->getLines()->first()->getId();
-        $this->client->request('GET', '/concerts/' . $concertId);
+        $this->client->request('GET', '/concerts/'.$concertId);
         self::assertResponseIsSuccessful();
         $this->entityManager()
             ->getConnection()
             ->executeStatement('DELETE FROM band_membership WHERE user_id = ?', [$this->userId]);
 
-        $this->client->request('GET', '/concerts/' . $concertId);
+        $this->client->request('GET', '/concerts/'.$concertId);
         self::assertResponseStatusCodeSame(403);
-        $this->client->request('POST', '/sources/' . $lineId . '/edit');
+        $this->client->request('POST', '/sources/'.$lineId.'/edit');
         self::assertResponseStatusCodeSame(403);
         $this->client->request('GET', '/concerts');
         self::assertResponseIsSuccessful();

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration;
 
-use App\Entity\{Concert, User};
+use App\Entity\Concert;
+use App\Entity\User;
 use App\Service\Concert\ConcertCreator;
 use App\Tests\DatabaseTestCase;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;

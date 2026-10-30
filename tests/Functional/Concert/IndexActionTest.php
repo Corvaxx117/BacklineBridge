@@ -40,9 +40,9 @@ final class IndexActionTest extends DatabaseTestCase
         self::assertResponseIsSuccessful();
         self::assertSame(
             ['Première date', 'Plus tard'],
-            $crawler->filter('.concert-card h2')->each(static fn($node): string => $node->text()),
+            $crawler->filter('.concert-card h2')->each(static fn ($node): string => $node->text()),
         );
-        self::assertSelectorExists('a[href="/concerts/' . $earlier->getId() . '"]');
-        self::assertSelectorExists('a[href="/concerts/' . $later->getId() . '"]');
+        self::assertSelectorExists('a[href="/concerts/'.$earlier->getId().'"]');
+        self::assertSelectorExists('a[href="/concerts/'.$later->getId().'"]');
     }
 }

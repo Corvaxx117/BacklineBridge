@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Dto\Concert;
 
-use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\Concert;
 use App\Enum\ConcertStatus;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /** Données du formulaire de création ou de modification du concert. */
 final class CreateConcertInput
@@ -17,12 +17,10 @@ final class CreateConcertInput
     public ?\DateTimeImmutable $date = null;
 
     #[Assert\NotBlank(message: 'Indique le nom de la salle.')]
-    #[
-        Assert\Length(
-            max: 150,
-            maxMessage: 'Le nom de la salle ne peut pas dépasser {{ limit }} caractères.',
-        ),
-    ]
+    #[Assert\Length(
+        max: 150,
+        maxMessage: 'Le nom de la salle ne peut pas dépasser {{ limit }} caractères.',
+    ),]
     public string $venue = '';
 
     #[Assert\NotBlank(message: 'Indique la ville du concert.')]
@@ -32,12 +30,10 @@ final class CreateConcertInput
     #[Assert\NotNull(message: 'Choisissez un statut.')]
     public ?ConcertStatus $status = ConcertStatus::Pending;
 
-    #[
-        Assert\Length(
-            max: 2000,
-            maxMessage: 'Les notes ne peuvent pas dépasser {{ limit }} caractères.',
-        ),
-    ]
+    #[Assert\Length(
+        max: 2000,
+        maxMessage: 'Les notes ne peuvent pas dépasser {{ limit }} caractères.',
+    ),]
     public ?string $notes = null;
 
     public static function fromConcert(Concert $concert): self

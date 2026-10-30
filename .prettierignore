@@ -9,3 +9,8 @@
 /symfony.lock
 /package-lock.json
 *.md
+
+# Le PHP est présenté par PHP-CS-Fixer.
+*.php
+/bin/console
+/bin/phpunit

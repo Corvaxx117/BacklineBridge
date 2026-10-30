@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\{Band, BandsintownConcert, Concert};
+use App\Entity\Band;
+use App\Entity\BandsintownConcert;
+use App\Entity\Concert;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -15,6 +17,7 @@ final class BandsintownConcertRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, BandsintownConcert::class);
     }
+
     /** @return list<BandsintownConcert> */
     public function forBand(Band $band): array
     {
@@ -26,6 +29,7 @@ final class BandsintownConcertRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
     public function forConcert(Concert $concert): ?BandsintownConcert
     {
         return $this->findOneBy(['concert' => $concert]);

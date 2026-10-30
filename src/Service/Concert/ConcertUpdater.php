@@ -14,7 +14,8 @@ final readonly class ConcertUpdater
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ConcertAvailabilityManager $availability,
-    ) {}
+    ) {
+    }
 
     /** @return bool Si la date a changé et que les disponibilités doivent être redonnées. */
     public function update(Concert $concert, CreateConcertInput $input): bool
@@ -23,6 +24,7 @@ final readonly class ConcertUpdater
             throw new ConflictHttpException('Les informations du concert ont changé.');
         }
 
+        assert(null !== $input->date && null !== $input->status);
         $dateChanged = $concert->getDate()->format('Y-m-d') !== $input->date->format('Y-m-d');
         $concert->updateDetails(
             $input->date,

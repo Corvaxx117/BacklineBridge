@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** @extends AbstractType<ConcertConditionsInput> */
 final class ConcertConditionsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -32,21 +33,19 @@ final class ConcertConditionsType extends AbstractType
                     PaymentFramework::class,
                     'Cadre de rémunération de l’ingé son',
                 ],
-            ]
-            as $name => [$class, $label]
+            ] as $name => [$class, $label]
         ) {
             $builder->add($name, EnumType::class, [
                 'class' => $class,
                 'label' => $label,
-                'choice_label' => static fn($choice): string => $choice->label(),
+                'choice_label' => static fn ($choice): string => $choice->label(),
             ]);
         }
         foreach (
             [
                 'feeAmount' => 'Montant convenu pour le concert (EUR)',
                 'engineerFeeAmount' => 'Montant pour l’ingé son (EUR)',
-            ]
-            as $name => $label
+            ] as $name => $label
         ) {
             $builder->add($name, TextType::class, [
                 'label' => $label,

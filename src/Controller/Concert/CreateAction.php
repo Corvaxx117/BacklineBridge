@@ -34,6 +34,7 @@ final class CreateAction extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            assert(null !== $input->date && null !== $input->status);
             $concert = $creator->create(
                 $reference,
                 $input->date,

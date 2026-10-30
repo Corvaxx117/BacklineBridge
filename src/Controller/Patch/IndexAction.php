@@ -28,7 +28,7 @@ final class IndexAction extends AbstractController
         $this->denyAccessUnlessGranted(TechnicalSheetVoter::VIEW, $sheet);
         $patchLines = $lines->findForSheet($sheet);
         $sections = array_unique(
-            array_map(static fn(PatchLine $line): string => $line->getSection(), $patchLines),
+            array_map(static fn (PatchLine $line): string => $line->getSection(), $patchLines),
         );
 
         return $this->render('patch/index.html.twig', [

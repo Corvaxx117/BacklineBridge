@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final class StagePlanInput
 {
+    /** @var array<array-key, StageItemInput> */
     #[Assert\Valid, Assert\Count(max: 40, maxMessage: 'Le plan accepte au maximum 40 éléments.')]
     public array $items = [];
     public string $revision = '';

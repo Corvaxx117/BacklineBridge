@@ -13,6 +13,7 @@ final class TransferInput extends TreasuryEntryInput
     public ?TreasuryAccountKind $source = TreasuryAccountKind::Cash;
     #[Assert\NotNull]
     public ?TreasuryAccountKind $destination = TreasuryAccountKind::Bank;
+
     public function __construct()
     {
         parent::__construct();

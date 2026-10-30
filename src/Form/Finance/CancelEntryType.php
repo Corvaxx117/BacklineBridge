@@ -6,10 +6,12 @@ namespace App\Form\Finance;
 
 use App\Dto\Finance\CancelEntryInput;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\{HiddenType, TextareaType};
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** @extends AbstractType<CancelEntryInput> */
 final class CancelEntryType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $b, array $o): void

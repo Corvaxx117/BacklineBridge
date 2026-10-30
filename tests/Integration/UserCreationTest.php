@@ -70,8 +70,7 @@ final class UserCreationTest extends DatabaseTestCase
         $creator = static::getContainer()->get(UserCreator::class);
         $band = $this->entityManager()->find(Band::class, $this->bandId);
         foreach (
-            [['OWNER@EXAMPLE.TEST', 'Another password 2026!'], ['new@example.test', 'short']]
-            as [$email, $password]
+            [['OWNER@EXAMPLE.TEST', 'Another password 2026!'], ['new@example.test', 'short']] as [$email, $password]
         ) {
             try {
                 $creator->create($email, 'Test', $password, $band, BandRole::Manager);

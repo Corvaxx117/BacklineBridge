@@ -23,10 +23,9 @@ class MerchVariant
 
     #[ORM\Column(options: ['default' => false])]
     private bool $needsVerification = false;
+
     public function __construct(
-        #[ORM\ManyToOne(inversedBy: 'variants')] #[
-            ORM\JoinColumn(nullable: false),
-        ]
+        #[ORM\ManyToOne(inversedBy: 'variants')] #[ORM\JoinColumn(nullable: false),]
         private MerchProduct $product,
         #[ORM\Column(length: 30)] private string $label = 'Unique',
     ) {

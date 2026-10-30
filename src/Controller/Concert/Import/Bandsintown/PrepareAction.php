@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Controller\Concert\Import\Bandsintown;
 
 use App\Dto\Concert\BandsintownFetchInput;
-use App\Entity\{Band, User};
+use App\Entity\Band;
+use App\Entity\User;
 use App\Form\Concert\BandsintownFetchType;
-use App\Integration\Bandsintown\{BandsintownConfiguration, BandsintownGateway};
+use App\Integration\Bandsintown\BandsintownConfiguration;
+use App\Integration\Bandsintown\BandsintownGateway;
 use App\Integration\Bandsintown\Dto\BandsintownEvent;
 use App\Integration\Bandsintown\Exception\BandsintownUnavailable;
 use App\Security\Voter\BandVoter;
@@ -16,18 +18,17 @@ use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\{Request, Response};
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
-#[
-    Route(
-        '/groupes/{id}/concerts/import-bandsintown',
-        name: 'app_concert_bandsintown_prepare',
-        requirements: ['id' => '\d+'],
-        methods: ['GET', 'POST'],
-    ),
-]
+#[Route(
+    '/groupes/{id}/concerts/import-bandsintown',
+    name: 'app_concert_bandsintown_prepare',
+    requirements: ['id' => '\d+'],
+    methods: ['GET', 'POST'],
+),]
 final class PrepareAction extends AbstractController
 {
     public function __invoke(
@@ -54,7 +55,7 @@ final class PrepareAction extends AbstractController
                 $events = array_values(
                     array_filter(
                         $result->events,
-                        static fn(BandsintownEvent $event): bool => match ($input->period) {
+                        static fn (BandsintownEvent $event): bool => match ($input->period) {
                             'past' => $event->date < $today,
                             'upcoming' => $event->date >= $today,
                             default => true,
@@ -63,13 +64,14 @@ final class PrepareAction extends AbstractController
                 );
                 usort(
                     $events,
-                    static fn(BandsintownEvent $a, BandsintownEvent $b): int => [
+                    static fn (BandsintownEvent $a, BandsintownEvent $b): int => [
                         $a->date,
                         $a->localTime,
                         $a->id,
                     ] <=> [$b->date, $b->localTime, $b->id],
                 );
                 $token = $previews->save($band, $user, $result, $events);
+
                 return $this->redirectToRoute(
                     'app_concert_bandsintown_review',
                     ['id' => $band->getId(), 'token' => $token],
@@ -80,6 +82,7 @@ final class PrepareAction extends AbstractController
                 $status = 503;
             }
         }
+
         return $this->render(
             'concert/import/bandsintown/prepare.html.twig',
             ['band' => $band, 'configured' => $configured, 'form' => $form->createView()],

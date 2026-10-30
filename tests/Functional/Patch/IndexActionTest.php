@@ -18,7 +18,7 @@ final class IndexActionTest extends DatabaseTestCase
         $rows = $crawler->filter('table tbody tr');
         self::assertCount(22, $rows);
         $channels = $rows->each(
-            static fn(Crawler $row): int => (int) trim($row->filter('td, th')->first()->text()),
+            static fn (Crawler $row): int => (int) trim($row->filter('td, th')->first()->text()),
         );
         self::assertSame(range(1, 22), $channels);
 

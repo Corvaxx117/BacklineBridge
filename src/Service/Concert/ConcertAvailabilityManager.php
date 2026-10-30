@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace App\Service\Concert;
 
 use App\Dto\Concert\AvailabilityInput;
-use App\Entity\{Concert, ConcertAvailability, User};
-use App\Enum\{AvailabilityStatus, BandRole};
-use App\Repository\{BandMembershipRepository, ConcertAvailabilityRepository};
+use App\Entity\Concert;
+use App\Entity\ConcertAvailability;
+use App\Entity\User;
+use App\Enum\AvailabilityStatus;
+use App\Enum\BandRole;
+use App\Repository\BandMembershipRepository;
+use App\Repository\ConcertAvailabilityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -17,7 +21,8 @@ final readonly class ConcertAvailabilityManager
         private EntityManagerInterface $entityManager,
         private BandMembershipRepository $memberships,
         private ConcertAvailabilityRepository $availabilities,
-    ) {}
+    ) {
+    }
 
     /** Prépare les réponses dans la transaction de création du concert. */
     public function initialize(Concert $concert): void
@@ -29,6 +34,9 @@ final readonly class ConcertAvailabilityManager
         }
     }
 
+    /**
+     * @return array{rows: list<array{user: User, status: AvailabilityStatus, comment: ?string, answeredAt: ?\DateTimeImmutable, mine: bool}>, counts: array<string, int>, total: int}
+     */
     public function roster(Concert $concert, User $currentUser): array
     {
         $records = [];
@@ -67,7 +75,7 @@ final readonly class ConcertAvailabilityManager
 
     public function respond(Concert $concert, User $user, AvailabilityInput $input): void
     {
-        if ($this->memberships->roleFor($user, $concert->getBand()) !== BandRole::Manager) {
+        if (BandRole::Manager !== $this->memberships->roleFor($user, $concert->getBand())) {
             throw new AccessDeniedException('Seuls les responsables répondent pour eux-mêmes.');
         }
         if ($input->expectedDate !== $concert->getDate()->format('Y-m-d')) {
@@ -76,7 +84,8 @@ final readonly class ConcertAvailabilityManager
         $record =
             $this->availabilities->findOneBy(['concert' => $concert, 'user' => $user]) ??
             new ConcertAvailability($concert, $user);
-        $record->respond($input->status, $input->comment);
+        $status = $input->status ?? throw new \DomainException('Choisis une disponibilité.');
+        $record->respond($status, $input->comment);
         $this->entityManager->persist($record);
         $this->entityManager->flush();
     }

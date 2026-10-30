@@ -22,6 +22,11 @@ final class StagePlanLayout
         'other' => [130, '#fffefa', '#bacbc0'],
     ];
 
+    /**
+     * @param list<array<string, mixed>> $items
+     *
+     * @return array<string, mixed>
+     */
     public function prepare(array $items): array
     {
         $nodes = [];
@@ -37,10 +42,10 @@ final class StagePlanLayout
             [$width, $fill, $stroke] = self::STYLES[$kind];
             $label = $this->wrap($item['label'] ?? '', max(10, (int) (($width - 18) / 8)), 3);
             $notes = $this->wrap($item['notes'] ?? '', max(10, (int) (($width - 18) / 6)), 2);
-            $symbolWidth = $kind === 'drums' ? $width - 28 : 24;
-            $symbolHeight = $kind === 'drums' ? ($symbolWidth * 184) / 260 : 24;
+            $symbolWidth = 'drums' === $kind ? $width - 28 : 24;
+            $symbolHeight = 'drums' === $kind ? ($symbolWidth * 184) / 260 : 24;
             $height =
-                $kind === 'riser'
+                'riser' === $kind
                     ? 236
                     : max(74, $symbolHeight + 14 + count($label) * 17 + count($notes) * 13);
             $x = ($this->number($item['x'] ?? null, 50, 0, 100) / 100) * self::WIDTH;
@@ -56,7 +61,7 @@ final class StagePlanLayout
             $top = min($top, $y - $halfHeight - 10);
             $right = max($right, $x + $halfWidth + 10);
             $bottom = max($bottom, $y + $halfHeight + 10);
-            $labelY = -$height / 2 + ($kind === 'riser' ? 20 : $symbolHeight + 23);
+            $labelY = -$height / 2 + ('riser' === $kind ? 20 : $symbolHeight + 23);
             $nodes[] = compact(
                 'kind',
                 'width',
@@ -78,8 +83,8 @@ final class StagePlanLayout
         // Les praticables restent derrière les instruments, comme dans l'application.
         usort(
             $nodes,
-            static fn(array $a, array $b): int => ($a['kind'] !== 'riser') <=>
-                ($b['kind'] !== 'riser'),
+            static fn (array $a, array $b): int => ('riser' !== $a['kind']) <=>
+                ('riser' !== $b['kind']),
         );
 
         return [
@@ -103,7 +108,12 @@ final class StagePlanLayout
             : $default;
     }
 
-    /** @return list<string> */
+    /**
+     * @param positive-int $width
+     * @param positive-int $limit
+     *
+     * @return list<string>
+     */
     private function wrap(string $text, int $width, int $limit): array
     {
         $text =
@@ -117,21 +127,21 @@ final class StagePlanLayout
         $line = '';
         foreach ($words as $word) {
             foreach (mb_str_split($word, $width) as $part) {
-                if ($line !== '' && mb_strlen($line . ' ' . $part) > $width) {
+                if ('' !== $line && mb_strlen($line.' '.$part) > $width) {
                     $lines[] = $line;
                     $line = '';
                 }
-                $line = $line === '' ? $part : $line . ' ' . $part;
+                $line = '' === $line ? $part : $line.' '.$part;
             }
         }
-        if ($line !== '') {
+        if ('' !== $line) {
             $lines[] = $line;
         }
         if (count($lines) > $limit) {
             $lines = array_slice($lines, 0, $limit);
-            $lines[$limit - 1] = rtrim(mb_substr($lines[$limit - 1], 0, $width - 1)) . '…';
+            $lines[$limit - 1] = rtrim(mb_substr($lines[$limit - 1], 0, $width - 1)).'…';
         }
 
-        return $lines;
+        return array_values($lines);
     }
 }

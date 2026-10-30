@@ -22,12 +22,11 @@ class FinanceNote
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?User $resolvedBy = null;
+
     public function __construct(
         #[ORM\ManyToOne] #[ORM\JoinColumn(nullable: false)] private Band $band,
         #[ORM\Column(length: 2000)] private string $text,
-        #[ORM\ManyToOne] #[
-            ORM\JoinColumn(nullable: true, onDelete: 'SET NULL'),
-        ]
+        #[ORM\ManyToOne] #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL'),]
         private ?User $createdBy = null,
     ) {
         $this->createdAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
@@ -70,7 +69,7 @@ class FinanceNote
 
     public function resolve(User $user): void
     {
-        if ($this->resolvedAt !== null) {
+        if (null !== $this->resolvedAt) {
             throw new \DomainException('Cette note est déjà vérifiée.');
         }
         $this->resolvedAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));

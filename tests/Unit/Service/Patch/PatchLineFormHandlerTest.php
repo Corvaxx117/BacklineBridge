@@ -19,10 +19,8 @@ final class PatchLineFormHandlerTest extends TestCase
     public function testAConcurrentChannelCollisionIsReportedOnTheForm(): void
     {
         $line = new PatchLine();
-        $driverException = new class ('Duplicate channel') extends \RuntimeException implements
-            DriverException
-        {
-            public function getSQLState(): ?string
+        $driverException = new class('Duplicate channel') extends \RuntimeException implements DriverException {
+            public function getSQLState(): string
             {
                 return '23505';
             }
@@ -40,8 +38,10 @@ final class PatchLineFormHandlerTest extends TestCase
             ->method('addError')
             ->with(
                 self::callback(
-                    static fn(FormError $error): bool => $error->getMessage() ===
-                        'Ce numéro de canal vient d’être utilisé. Choisis-en un autre.',
+                    static fn (
+                        FormError $error,
+                    ): bool => 'Ce numéro de canal vient d’être utilisé. Choisis-en un autre.' ===
+                        $error->getMessage(),
                 ),
             )
             ->willReturnSelf();

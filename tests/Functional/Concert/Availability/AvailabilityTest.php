@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Concert\Availability;
 
-use App\Entity\{Band, Concert, ConcertAvailability, User};
-use App\Enum\{AvailabilityStatus, BandRole};
+use App\Entity\Band;
+use App\Entity\Concert;
+use App\Entity\ConcertAvailability;
+use App\Entity\User;
+use App\Enum\AvailabilityStatus;
+use App\Enum\BandRole;
 use App\Service\Concert\ConcertCreator;
 use App\Service\Security\UserCreator;
 use App\Tests\DatabaseTestCase;
@@ -22,7 +26,7 @@ final class AvailabilityTest extends DatabaseTestCase
     public function testCreationRecordsTheSignedInCreatorAndRequestsAllFiveManagersIncludingTheEngineer(): void
     {
         foreach (['Rémi', 'Franky', 'Sylou', 'Marty'] as $index => $name) {
-            $this->person('member' . $index, $name);
+            $this->person('member'.$index, $name);
         }
         $this->person('booker', 'Romain', BandRole::Booker);
         $crawler = $this->client->request('GET', '/concerts/new');
@@ -61,7 +65,7 @@ final class AvailabilityTest extends DatabaseTestCase
             'status' => 'available',
             'comment' => "  Prêt à 16 h.\n<script>privé</script>  ",
         ]);
-        self::assertResponseRedirects('/concerts/' . $concertId . '#disponibilites', 303);
+        self::assertResponseRedirects('/concerts/'.$concertId.'#disponibilites', 303);
         $this->client->followRedirect();
         self::assertSelectorTextContains('.availability-counter', '1 / 2');
         self::assertSelectorNotExists('.availability-roster script');
@@ -100,7 +104,7 @@ final class AvailabilityTest extends DatabaseTestCase
     {
         $id = $this->concert()->getId();
         $this->reply($id, ['status' => 'available', 'comment' => 'Ancienne précision.']);
-        $crawler = $this->client->request('GET', '/concerts/' . $id . '/edit');
+        $crawler = $this->client->request('GET', '/concerts/'.$id.'/edit');
         $this->client->submit($crawler->filter('form[name="concert"]')->form(), [
             'concert' => ['city' => 'Paris'],
         ]);
@@ -114,7 +118,7 @@ final class AvailabilityTest extends DatabaseTestCase
                 ->findOneBy(['concert' => $id])
                 ->getStatus(),
         );
-        $crawler = $this->client->request('GET', '/concerts/' . $id . '/edit');
+        $crawler = $this->client->request('GET', '/concerts/'.$id.'/edit');
         $this->client->submit($crawler->filter('form[name="concert"]')->form(), [
             'concert' => ['date' => '2026-12-13'],
         ]);
@@ -132,7 +136,7 @@ final class AvailabilityTest extends DatabaseTestCase
     public function testAnOldDateFormCannotConfirmAvailabilityForTheNewDate(): void
     {
         $id = $this->concert()->getId();
-        $crawler = $this->client->request('GET', '/concerts/' . $id);
+        $crawler = $this->client->request('GET', '/concerts/'.$id);
         $values = $crawler->filter('form[name="concert_availability"]')->form()->getPhpValues();
         $values['concert_availability']['status'] = 'available';
         $concert = $this->entityManager()->find(Concert::class, $id);
@@ -143,7 +147,7 @@ final class AvailabilityTest extends DatabaseTestCase
             $concert->getStatus(),
         );
         $this->entityManager()->flush();
-        $this->client->request('POST', '/concerts/' . $id . '/disponibilite', $values);
+        $this->client->request('POST', '/concerts/'.$id.'/disponibilite', $values);
         self::assertResponseStatusCodeSame(422);
         self::assertSelectorTextContains('form[name="concert_availability"]', 'La date a changé');
         self::assertSame(
@@ -161,11 +165,11 @@ final class AvailabilityTest extends DatabaseTestCase
         $id = $this->concert()->getId();
         $user = $this->person($role->value, $role->label(), $role);
         $this->client->loginUser($user);
-        $this->client->request('GET', '/concerts/' . $id);
+        $this->client->request('GET', '/concerts/'.$id);
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('.availability-roster');
         self::assertSelectorNotExists('form[name="concert_availability"]');
-        $this->client->request('POST', '/concerts/' . $id . '/disponibilite', [
+        $this->client->request('POST', '/concerts/'.$id.'/disponibilite', [
             'concert_availability' => ['status' => 'available', 'user' => $this->userId],
         ]);
         self::assertResponseStatusCodeSame(403);
@@ -181,13 +185,12 @@ final class AvailabilityTest extends DatabaseTestCase
     public function testMissingCsrfInvalidChoiceOverlongCommentAndForgedIdentityAreRejected(): void
     {
         $id = $this->concert()->getId();
-        $this->client->request('POST', '/concerts/' . $id . '/disponibilite', [
+        $this->client->request('POST', '/concerts/'.$id.'/disponibilite', [
             'concert_availability' => ['status' => 'available', 'expectedDate' => '2026-12-12'],
         ]);
         self::assertResponseStatusCodeSame(422);
         foreach (
-            [['status' => 'invented'], ['comment' => str_repeat('a', 501)], ['user' => 999]]
-            as $changes
+            [['status' => 'invented'], ['comment' => str_repeat('a', 501)], ['user' => 999]] as $changes
         ) {
             $this->reply($id, $changes);
             self::assertResponseStatusCodeSame(422);
@@ -221,9 +224,9 @@ final class AvailabilityTest extends DatabaseTestCase
                 BandRole::Manager,
             );
         $this->client->loginUser($user);
-        $this->client->request('GET', '/concerts/' . $id);
+        $this->client->request('GET', '/concerts/'.$id);
         self::assertResponseStatusCodeSame(403);
-        $this->client->request('POST', '/concerts/' . $id . '/disponibilite');
+        $this->client->request('POST', '/concerts/'.$id.'/disponibilite');
         self::assertResponseStatusCodeSame(403);
     }
 
@@ -232,7 +235,7 @@ final class AvailabilityTest extends DatabaseTestCase
         $id = $this->concert()->getId();
         $new = $this->person('new-engineer', 'Ingé son invité');
         $this->client->loginUser($new);
-        $this->client->request('GET', '/concerts/' . $id);
+        $this->client->request('GET', '/concerts/'.$id);
         self::assertSelectorTextContains('.availability-counter', '0 / 2');
         $this->reply($id, ['status' => 'available']);
         self::assertResponseStatusCodeSame(303);
@@ -287,7 +290,7 @@ final class AvailabilityTest extends DatabaseTestCase
         return static::getContainer()
             ->get(UserCreator::class)
             ->create(
-                $key . '@team.test',
+                $key.'@team.test',
                 $name,
                 'Team test password 2026!',
                 $this->entityManager()->find(Band::class, $this->bandId),
@@ -304,9 +307,9 @@ final class AvailabilityTest extends DatabaseTestCase
 
     private function reply(int $id, array $changes): void
     {
-        $crawler = $this->client->request('GET', '/concerts/' . $id);
+        $crawler = $this->client->request('GET', '/concerts/'.$id);
         $values = $crawler->filter('form[name="concert_availability"]')->form()->getPhpValues();
         $values['concert_availability'] = array_replace($values['concert_availability'], $changes);
-        $this->client->request('POST', '/concerts/' . $id . '/disponibilite', $values);
+        $this->client->request('POST', '/concerts/'.$id.'/disponibilite', $values);
     }
 }

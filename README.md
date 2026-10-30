@@ -41,11 +41,11 @@ composer start
 ## Avant de partager une modification
 
 ```bash
-composer test
+composer quality
 npm run format:check
 ```
 
-Les tests utilisent leurs propres bases et conservent les données de l'application. Pour installer l'outil de présentation du code : `npm ci --ignore-scripts`. Pour corriger la présentation : `npm run format`.
+Les tests utilisent leurs propres bases et conservent les données de l'application. Pour installer l'outil de présentation du code : `npm ci --ignore-scripts`. Pour corriger la présentation : `composer cs:fix` pour le PHP, `npm run format` pour les autres fichiers.
 
 **Envoyer sur GitHub ne met pas la démo à jour.** [Le guide alwaysdata](docs/deploiement-alwaysdata.md) explique l'envoi avec un exemple complet.
 
@@ -53,6 +53,7 @@ Les tests utilisent leurs propres bases et conservent les données de l'applicat
 
 | Besoin | Guide |
 | --- | --- |
+| Comprendre les contrôles automatiques et les commandes de qualité | [Qualité et CI](docs/qualite-et-ci.md) |
 | Comprendre la mise en ligne et envoyer une modification | [alwaysdata](docs/deploiement-alwaysdata.md) |
 | Se connecter ou changer son mot de passe | [Comptes et accès](docs/authentification.md) |
 | Savoir qui peut faire quoi | [Équipe et tournée](docs/equipe-et-tournee.md) |

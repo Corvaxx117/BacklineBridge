@@ -85,9 +85,9 @@ class ConcertAvailability
     {
         $this->concertDate = $this->concert->getDate();
         $this->status = $status;
-        $this->comment = $comment !== null && trim($comment) !== '' ? trim($comment) : null;
+        $this->comment = null !== $comment && '' !== trim($comment) ? trim($comment) : null;
         $this->answeredAt =
-            $status === AvailabilityStatus::Pending ? null : new \DateTimeImmutable();
+            AvailabilityStatus::Pending === $status ? null : new \DateTimeImmutable();
     }
 
     public function reset(): void

@@ -16,14 +16,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[
-    Route(
-        '/concerts/{id}/sources/new',
-        name: 'app_concert_patch_new',
-        requirements: ['id' => '\d+'],
-        methods: ['GET', 'POST'],
-    ),
-]
+#[Route(
+    '/concerts/{id}/sources/new',
+    name: 'app_concert_patch_new',
+    requirements: ['id' => '\d+'],
+    methods: ['GET', 'POST'],
+),]
 final class CreateAction extends AbstractController
 {
     public function __invoke(
@@ -38,7 +36,7 @@ final class CreateAction extends AbstractController
         $form->handleRequest($request);
         $result = $handler->handle($form, $line);
 
-        if ($result === FormSubmissionResult::Saved) {
+        if (FormSubmissionResult::Saved === $result) {
             $this->addFlash('success', 'La source a été ajoutée au patch de ce concert.');
 
             return $this->redirectToRoute(

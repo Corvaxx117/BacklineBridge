@@ -12,5 +12,6 @@ final readonly class EventsResult
         public array $events,
         public int $ignored,
         public \DateTimeImmutable $fetchedAt,
-    ) {}
+    ) {
+    }
 }

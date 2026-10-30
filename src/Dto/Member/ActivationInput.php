@@ -9,10 +9,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final class ActivationInput
 {
-    #[
-        Assert\NotBlank(message: 'Renseigne ton code d’activation personnel.'),
-        Assert\Length(max: 100),
-    ]
+    #[Assert\NotBlank(message: 'Renseigne ton code d’activation personnel.'),
+        Assert\Length(max: 100),]
     public string $code = '';
     #[AccountPassword]
     public string $password = '';

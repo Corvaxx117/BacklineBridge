@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Controller\Concert;
 
 use App\Entity\User;
+use App\Repository\ConcertAvailabilityRepository;
 use App\Repository\ConcertRepository;
 use App\Repository\TechnicalSheetRepository;
-use App\Repository\ConcertAvailabilityRepository;
 use App\Security\Voter\BandVoter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,9 +30,8 @@ final class IndexAction extends AbstractController
             'concerts' => $dates,
             'band' => $reference?->getBand(),
             'myAvailabilities' => $availability->forUserAndConcerts($user, $dates),
-            'canCreate' =>
-                $reference !== null &&
-                $this->isGranted(BandVoter::PLAN_CONCERT, $reference->getBand()),
+            'canCreate' => null !== $reference
+                && $this->isGranted(BandVoter::PLAN_CONCERT, $reference->getBand()),
         ]);
     }
 }

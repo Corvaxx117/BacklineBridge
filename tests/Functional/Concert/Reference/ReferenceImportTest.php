@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Concert\Reference;
 
-use App\Dto\Concert\{AvailabilityInput, ConcertConditionsInput};
-use App\Entity\{
-    Band,
-    Concert,
-    ConcertAvailability,
-    ConcertConditions,
-    PatchLine,
-    TechnicalPublication,
-    TechnicalSheet,
-};
-use App\Enum\{AvailabilityStatus, BandRole};
-use App\Service\Concert\{ConcertAvailabilityManager, ConcertConditionsUpdater, ConcertCreator};
+use App\Dto\Concert\ConcertConditionsInput;
+use App\Entity\Band;
+use App\Entity\Concert;
+use App\Entity\ConcertAvailability;
+use App\Entity\ConcertConditions;
+use App\Entity\PatchLine;
+use App\Entity\TechnicalPublication;
+use App\Entity\TechnicalSheet;
+use App\Enum\AvailabilityStatus;
+use App\Enum\BandRole;
+use App\Service\Concert\ConcertAvailabilityManager;
+use App\Service\Concert\ConcertConditionsUpdater;
 use App\Service\Security\UserCreator;
 use App\Service\Venue\PublicationBuilder;
 use App\Tests\VenueTestCase;
@@ -26,7 +26,7 @@ final class ReferenceImportTest extends VenueTestCase
     public function testAnIdenticalDossierNeedsNoImport(): void
     {
         $id = $this->concert()->getId();
-        $this->client->request('GET', '/concerts/' . $id . '/reference');
+        $this->client->request('GET', '/concerts/'.$id.'/reference');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.reference-import-notice', 'déjà identique');
         self::assertSelectorNotExists('form[name="reference_import"]');
@@ -67,6 +67,7 @@ final class ReferenceImportTest extends VenueTestCase
         $oldEquipment = $concert->getPatchSheet()->getEquipmentRequests();
         $reference = $this->sheet();
         $plan = $reference->getStagePlan();
+        self::assertNotEmpty($plan);
         $plan[0]['rotation'] = 30;
         $plan[0]['scale'] = 1.3;
         $reference->setStagePlan($plan)->setNotices(['Nouvelle note de référence']);
@@ -74,7 +75,7 @@ final class ReferenceImportTest extends VenueTestCase
         $reference->setEquipmentRequests([]);
         $this->entityManager()->flush();
         $this->import($id, ['stage']);
-        self::assertResponseRedirects('/concerts/' . $id, 303);
+        self::assertResponseRedirects('/concerts/'.$id, 303);
         $em = $this->entityManager();
         $em->clear();
         $concert = $em->find(Concert::class, $id);
@@ -157,9 +158,9 @@ final class ReferenceImportTest extends VenueTestCase
         self::assertCount(22, $active);
         self::assertSame(
             [1, ...range(3, 23)],
-            array_map(static fn(PatchLine $line): int => $line->getChannelNumber(), $active),
+            array_map(static fn (PatchLine $line): int => $line->getChannelNumber(), $active),
         );
-        $this->client->request('GET', '/concerts/' . $id . '/reference');
+        $this->client->request('GET', '/concerts/'.$id.'/reference');
         self::assertSelectorTextContains('.reference-import-notice', 'déjà identique');
     }
 
@@ -193,7 +194,7 @@ final class ReferenceImportTest extends VenueTestCase
         $id = $this->concert()->getId();
         $this->sheet()->setStagePlan([]);
         $this->entityManager()->flush();
-        $crawler = $this->client->request('GET', '/concerts/' . $id . '/reference');
+        $crawler = $this->client->request('GET', '/concerts/'.$id.'/reference');
         $values = $crawler->filter('form[name="reference_import"]')->form()->getPhpValues();
         $values['reference_import'] = array_replace(
             $values['reference_import'],
@@ -203,7 +204,7 @@ final class ReferenceImportTest extends VenueTestCase
         if (!$csrf) {
             unset($values['reference_import']['_token']);
         }
-        $this->client->request('POST', '/concerts/' . $id . '/reference', $values);
+        $this->client->request('POST', '/concerts/'.$id.'/reference', $values);
         self::assertResponseStatusCodeSame(422);
         $em = $this->entityManager();
         $em->clear();
@@ -227,7 +228,7 @@ final class ReferenceImportTest extends VenueTestCase
         $sheetId = $concert->getPatchSheet()->getId();
         $this->sheet()->setStagePlan([]);
         $this->entityManager()->flush();
-        $crawler = $this->client->request('GET', '/concerts/' . $id . '/reference');
+        $crawler = $this->client->request('GET', '/concerts/'.$id.'/reference');
         $values = $crawler->filter('form[name="reference_import"]')->form()->getPhpValues();
         $values['reference_import']['sections'] = ['stage'];
         $values['reference_import']['confirmReplacement'] = '1';
@@ -236,7 +237,7 @@ final class ReferenceImportTest extends VenueTestCase
             : $this->entityManager()->find(TechnicalSheet::class, $sheetId);
         $sheet->setNotices(['Changement depuis l’aperçu']);
         $this->entityManager()->flush();
-        $this->client->request('POST', '/concerts/' . $id . '/reference', $values);
+        $this->client->request('POST', '/concerts/'.$id.'/reference', $values);
         self::assertResponseStatusCodeSame(409);
         self::assertSelectorTextContains(
             'form[name="reference_import"]',
@@ -260,17 +261,17 @@ final class ReferenceImportTest extends VenueTestCase
         $user = static::getContainer()
             ->get(UserCreator::class)
             ->create(
-                $role->value . '@reference.test',
+                $role->value.'@reference.test',
                 'Autre rôle',
                 'Test password 2026!',
                 $this->entityManager()->find(Band::class, $this->bandId),
                 $role,
             );
         $this->client->loginUser($user);
-        $this->client->request('GET', '/concerts/' . $id);
-        self::assertSelectorNotExists('a[href="/concerts/' . $id . '/reference"]');
+        $this->client->request('GET', '/concerts/'.$id);
+        self::assertSelectorNotExists('a[href="/concerts/'.$id.'/reference"]');
         foreach (['GET', 'POST'] as $method) {
-            $this->client->request($method, '/concerts/' . $id . '/reference');
+            $this->client->request($method, '/concerts/'.$id.'/reference');
             self::assertResponseStatusCodeSame(403);
         }
     }
@@ -298,19 +299,19 @@ final class ReferenceImportTest extends VenueTestCase
                 BandRole::Manager,
             );
         $this->client->loginUser($user);
-        $this->client->request('GET', '/concerts/' . $id . '/reference');
+        $this->client->request('GET', '/concerts/'.$id.'/reference');
         self::assertResponseStatusCodeSame(403);
-        $this->client->request('POST', '/concerts/' . $id . '/reference');
+        $this->client->request('POST', '/concerts/'.$id.'/reference');
         self::assertResponseStatusCodeSame(403);
     }
 
     private function import(int $id, array $sections): void
     {
-        $crawler = $this->client->request('GET', '/concerts/' . $id . '/reference');
+        $crawler = $this->client->request('GET', '/concerts/'.$id.'/reference');
         self::assertResponseIsSuccessful();
         $values = $crawler->filter('form[name="reference_import"]')->form()->getPhpValues();
         $values['reference_import']['sections'] = $sections;
         $values['reference_import']['confirmReplacement'] = '1';
-        $this->client->request('POST', '/concerts/' . $id . '/reference', $values);
+        $this->client->request('POST', '/concerts/'.$id.'/reference', $values);
     }
 }

@@ -7,10 +7,14 @@ namespace App\Form\Finance;
 use App\Dto\Finance\TransferInput;
 use App\Enum\TreasuryAccountKind;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\{DateType, EnumType, HiddenType, TextType};
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** @extends AbstractType<TransferInput> */
 final class TransferType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $b, array $options): void
@@ -18,7 +22,7 @@ final class TransferType extends AbstractType
         foreach (['source' => 'Depuis', 'destination' => 'Vers'] as $name => $label) {
             $b->add($name, EnumType::class, [
                 'class' => TreasuryAccountKind::class,
-                'choice_label' => static fn($v): string => $v->label(),
+                'choice_label' => static fn ($v): string => $v->label(),
                 'label' => $label,
             ]);
         }

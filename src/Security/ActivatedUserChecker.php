@@ -7,7 +7,8 @@ namespace App\Security;
 use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\DisabledException;
-use Symfony\Component\Security\Core\User\{UserCheckerInterface, UserInterface};
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 final class ActivatedUserChecker implements UserCheckerInterface
 {
@@ -18,5 +19,7 @@ final class ActivatedUserChecker implements UserCheckerInterface
         }
     }
 
-    public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void {}
+    public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void
+    {
+    }
 }

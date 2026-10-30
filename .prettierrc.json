@@ -1,22 +1,14 @@
 {
-    "plugins": ["@prettier/plugin-php", "@zackad/prettier-plugin-twig"],
+    "plugins": ["@zackad/prettier-plugin-twig"],
     "printWidth": 100,
     "tabWidth": 4,
     "useTabs": false,
     "singleQuote": true,
     "trailingComma": "all",
-    "phpVersion": "8.4",
-    "braceStyle": "per-cs",
     "twigAlwaysBreakObjects": true,
     "twigFollowOfficialCodingStandards": true,
     "singleAttributePerLine": true,
     "overrides": [
-        {
-            "files": ["bin/console", "bin/phpunit"],
-            "options": {
-                "parser": "php"
-            }
-        },
         {
             "files": ["compose.yaml", "compose.*.yaml", ".github/**/*.yml"],
             "options": {

@@ -1,0 +1,27 @@
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-symfony/rules.neon
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+    - vendor/phpstan/phpstan-doctrine/rules.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
+
+parameters:
+    level: 8
+    tmpDir: var/phpstan
+    paths:
+        - src/
+        - migrations/
+        - config/
+        - public/
+        - deploy/
+        - tools/
+        - bin/console
+        - bin/phpunit
+    excludePaths:
+        - config/reference.php
+    symfony:
+        containerXmlPath: var/cache/test/App_KernelTestDebugContainer.xml
+    doctrine:
+        allowNullablePropertyForRequiredField: true
+        objectManagerLoader: tools/phpstan/object-manager.php

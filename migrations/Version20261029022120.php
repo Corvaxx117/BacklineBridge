@@ -17,10 +17,7 @@ final class Version20261029022120 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->abortIf(
-            !(
-                $this->connection->getDatabasePlatform() instanceof
-                \Doctrine\DBAL\Platforms\SQLitePlatform
-            ),
+            !$this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\SQLitePlatform,
             'Migration prévue pour SQLite.',
         );
         $this->addSql(

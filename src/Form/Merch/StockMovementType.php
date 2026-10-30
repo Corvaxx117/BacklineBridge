@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace App\Form\Merch;
 
 use App\Dto\Merch\StockMovementInput;
-use App\Enum\{StockMovementKind, TreasuryAccountKind};
+use App\Enum\StockMovementKind;
+use App\Enum\TreasuryAccountKind;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\{EnumType, HiddenType, IntegerType, TextType};
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** @extends AbstractType<StockMovementInput> */
 final class StockMovementType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $b, array $o): void
@@ -23,15 +28,14 @@ final class StockMovementType extends AbstractType
                 StockMovementKind::Count,
                 StockMovementKind::Gift,
             ],
-            'choice_label' => static fn($v): string => $v->label(),
+            'choice_label' => static fn ($v): string => $v->label(),
             'label' => 'Opération',
             'attr' => ['data-stock-action' => ''],
         ])
             ->add('quantity', IntegerType::class, [
                 'label' => 'Quantité',
                 'attr' => ['min' => 0, 'max' => 1000000],
-                'help' =>
-                    'Pour un inventaire, indique le nouveau total. Pour les autres opérations, indique la quantité ajoutée ou retirée.',
+                'help' => 'Pour un inventaire, indique le nouveau total. Pour les autres opérations, indique la quantité ajoutée ou retirée.',
             ])
             ->add('reason', TextType::class, [
                 'label' => 'Précision / motif',
@@ -50,7 +54,7 @@ final class StockMovementType extends AbstractType
             ->add('account', EnumType::class, [
                 'required' => false,
                 'class' => TreasuryAccountKind::class,
-                'choice_label' => static fn($v): string => $v->label(),
+                'choice_label' => static fn ($v): string => $v->label(),
                 'label' => 'Compte qui reçoit la vente',
             ])
             ->add('revision', HiddenType::class)

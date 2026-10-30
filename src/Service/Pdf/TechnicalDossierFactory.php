@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Service\Pdf;
 
 use App\Dto\Pdf\TechnicalDossier;
-use App\Entity\{PatchLine, TechnicalPublication, TechnicalSheet};
+use App\Entity\PatchLine;
+use App\Entity\TechnicalPublication;
+use App\Entity\TechnicalSheet;
 use App\Repository\PatchLineRepository;
 use App\Service\Venue\PublicationBuilder;
 
@@ -14,11 +16,12 @@ final readonly class TechnicalDossierFactory
     public function __construct(
         private PatchLineRepository $lines,
         private PublicationBuilder $publications,
-    ) {}
+    ) {
+    }
 
     public function forSheet(TechnicalSheet $sheet): TechnicalDossier
     {
-        if ($sheet->getConcert() !== null) {
+        if (null !== $sheet->getConcert()) {
             return $this->fromSnapshot(
                 $this->publications->snapshot($sheet->getConcert()),
                 'Dossier du concert',
@@ -35,7 +38,7 @@ final readonly class TechnicalDossierFactory
             notes: null,
             notices: $sheet->getNotices(),
             lines: array_map(
-                static fn(PatchLine $line): array => [
+                static fn (PatchLine $line): array => [
                     'channel' => $line->getChannelNumber(),
                     'source' => $line->getSourceName(),
                     'microphone' => $line->getPreferredMicrophone(),
@@ -55,11 +58,14 @@ final readonly class TechnicalDossierFactory
         // Ne jamais relire la fiche actuelle pour un invité : son document reste figé.
         return $this->fromSnapshot(
             $publication->getSnapshot(),
-            'Dossier publié #' . $publication->getId(),
+            'Dossier publié #'.$publication->getId(),
             $publication->getPublishedAt(),
         );
     }
 
+    /**
+     * @param array<string, mixed> $snapshot
+     */
     private function fromSnapshot(
         array $snapshot,
         string $label,

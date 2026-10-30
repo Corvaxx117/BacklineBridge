@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace App\Service\Venue;
 
 use App\Dto\Venue\VenueReplyInput;
-use App\Entity\{VenueInvitation, VenueReply};
+use App\Entity\VenueInvitation;
+use App\Entity\VenueReply;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 final readonly class ReplyRecorder
 {
-    public function __construct(private EntityManagerInterface $em) {}
+    public function __construct(private EntityManagerInterface $em)
+    {
+    }
 
     public function save(
         VenueInvitation $invitation,
@@ -26,8 +29,11 @@ final readonly class ReplyRecorder
         $reply ??= new VenueReply($invitation);
         $answers = [];
         foreach ($input->answers as $key => $answer) {
+            $status =
+                $answer->status ??
+                throw new \DomainException('Choisis une disponibilité pour chaque demande.');
             $answers[$key] = [
-                'status' => $answer->status->value,
+                'status' => $status->value,
                 'details' => trim($answer->details ?? '') ?: null,
             ];
         }

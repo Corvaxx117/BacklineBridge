@@ -14,17 +14,17 @@ final class AlwaysdataBackupTest extends TestCase
     protected function setUp(): void
     {
         $this->directory =
-            sys_get_temp_dir() . '/backlinebridge-backup-test-' . bin2hex(random_bytes(8));
-        mkdir($this->directory . '/deploy/alwaysdata', 0700, true);
-        mkdir($this->directory . '/public', 0700);
-        mkdir($this->directory . '/var/private', 0700, true);
+            sys_get_temp_dir().'/backlinebridge-backup-test-'.bin2hex(random_bytes(8));
+        mkdir($this->directory.'/deploy/alwaysdata', 0700, true);
+        mkdir($this->directory.'/public', 0700);
+        mkdir($this->directory.'/var/private', 0700, true);
         copy(
-            dirname(__DIR__, 3) . '/deploy/alwaysdata/backup.php',
-            $this->directory . '/deploy/alwaysdata/backup.php',
+            dirname(__DIR__, 3).'/deploy/alwaysdata/backup.php',
+            $this->directory.'/deploy/alwaysdata/backup.php',
         );
-        symlink(dirname(__DIR__, 3) . '/vendor', $this->directory . '/vendor');
+        symlink(dirname(__DIR__, 3).'/vendor', $this->directory.'/vendor');
         file_put_contents(
-            $this->directory . '/.env.local',
+            $this->directory.'/.env.local',
             "APP_ENV=prod\nAPP_DEMO_MODE=1\nDATABASE_URL=sqlite:///%kernel.project_dir%/var/demo.db\nAPP_SECRET=backup-test-only\n",
         );
         foreach (
@@ -33,10 +33,9 @@ final class AlwaysdataBackupTest extends TestCase
                 'var/private/.htpasswd',
                 'var/private/demo-access.json',
                 'var/private/activation-codes-test.json',
-            ]
-            as $file
+            ] as $file
         ) {
-            file_put_contents($this->directory . '/' . $file, 'private-backup-test');
+            file_put_contents($this->directory.'/'.$file, 'private-backup-test');
         }
     }
 
@@ -56,7 +55,7 @@ final class AlwaysdataBackupTest extends TestCase
 
     public function testBackupIncludesUncheckpointedDataAndSecretsWithoutChangingTheOriginal(): void
     {
-        $database = new \PDO('sqlite:' . $this->directory . '/var/demo.db');
+        $database = new \PDO('sqlite:'.$this->directory.'/var/demo.db');
         $database->exec('PRAGMA journal_mode = WAL');
         $database->exec('CREATE TABLE notes (value TEXT)');
         $database->exec("INSERT INTO notes VALUES ('saved-before-update')");
@@ -68,11 +67,11 @@ final class AlwaysdataBackupTest extends TestCase
             self::assertSame(0, $status, $output);
             self::assertStringNotContainsString('private-backup-test', $output);
             self::assertStringNotContainsString('backup-test-only', $output);
-            $folders = glob($this->directory . '/var/private/backups/*');
+            $folders = glob($this->directory.'/var/private/backups/*');
             self::assertCount($i, $folders);
             foreach ($folders as $folder) {
                 self::assertSame(0700, fileperms($folder) & 0777);
-                $copy = new \PDO('sqlite:' . $folder . '/demo.db');
+                $copy = new \PDO('sqlite:'.$folder.'/demo.db');
                 self::assertSame('ok', $copy->query('PRAGMA integrity_check')->fetchColumn());
                 self::assertSame(
                     'saved-before-update',
@@ -86,18 +85,17 @@ final class AlwaysdataBackupTest extends TestCase
                         '.htpasswd',
                         'demo-access.json',
                         'activation-codes-test.json',
-                    ]
-                    as $file
+                    ] as $file
                 ) {
-                    self::assertSame(0600, fileperms($folder . '/' . $file) & 0777);
+                    self::assertSame(0600, fileperms($folder.'/'.$file) & 0777);
                 }
                 self::assertSame(
-                    file_get_contents($this->directory . '/.env.local'),
-                    file_get_contents($folder . '/.env.local'),
+                    file_get_contents($this->directory.'/.env.local'),
+                    file_get_contents($folder.'/.env.local'),
                 );
                 self::assertSame(
                     'private-backup-test',
-                    file_get_contents($folder . '/activation-codes-test.json'),
+                    file_get_contents($folder.'/activation-codes-test.json'),
                 );
             }
         }
@@ -110,10 +108,10 @@ final class AlwaysdataBackupTest extends TestCase
     #[DataProvider('invalidConfigurations')]
     public function testBackupRefusesAnUnexpectedConfiguration(string $configuration): void
     {
-        file_put_contents($this->directory . '/.env.local', $configuration);
+        file_put_contents($this->directory.'/.env.local', $configuration);
         [$status] = $this->backup();
         self::assertSame(1, $status);
-        self::assertDirectoryDoesNotExist($this->directory . '/var/private/backups');
+        self::assertDirectoryDoesNotExist($this->directory.'/var/private/backups');
     }
 
     public static function invalidConfigurations(): iterable
@@ -132,14 +130,15 @@ final class AlwaysdataBackupTest extends TestCase
     private function backup(): array
     {
         $process = proc_open(
-            [PHP_BINARY, $this->directory . '/deploy/alwaysdata/backup.php'],
+            [PHP_BINARY, $this->directory.'/deploy/alwaysdata/backup.php'],
             [1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
             $pipes,
         );
         self::assertIsResource($process);
-        $output = stream_get_contents($pipes[1]) . stream_get_contents($pipes[2]);
+        $output = stream_get_contents($pipes[1]).stream_get_contents($pipes[2]);
         fclose($pipes[1]);
         fclose($pipes[2]);
+
         return [proc_close($process), $output];
     }
 }

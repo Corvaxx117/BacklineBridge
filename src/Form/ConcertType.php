@@ -8,14 +8,15 @@ use App\Dto\Concert\CreateConcertInput;
 use App\Enum\ConcertStatus;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/** @extends AbstractType<CreateConcertInput> */
 final class ConcertType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -51,19 +52,17 @@ final class ConcertType extends AbstractType
             ])
             ->add('status', EnumType::class, [
                 'class' => ConcertStatus::class,
-                'choice_label' => static fn(ConcertStatus $status): string => $status->label(),
+                'choice_label' => static fn (ConcertStatus $status): string => $status->label(),
                 'label' => 'Statut du concert',
             ])
             ->add('notes', TextareaType::class, [
                 'label' => 'Notes (facultatif)',
                 'required' => false,
-                'help' =>
-                    'Précisions pratiques visibles par toutes les personnes ayant accès au concert. Réservez les informations confidentielles aux conditions du concert. 2 000 caractères maximum.',
+                'help' => 'Précisions pratiques visibles par toutes les personnes ayant accès au concert. Réservez les informations confidentielles aux conditions du concert. 2 000 caractères maximum.',
                 'attr' => [
                     'maxlength' => 2000,
                     'rows' => 5,
-                    'placeholder' =>
-                        'Ex. : Accès artistes par la cour, repas sur place à 19 h, départ de l’hébergement avant 10 h.',
+                    'placeholder' => 'Ex. : Accès artistes par la cour, repas sur place à 19 h, départ de l’hébergement avant 10 h.',
                 ],
             ]);
     }

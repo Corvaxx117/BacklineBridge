@@ -10,8 +10,8 @@ use App\Entity\Concert;
 use App\Entity\ConcertConditions;
 use App\Enum\BandRole;
 use App\Enum\ConcertStatus;
-use App\Service\Concert\ConcertCreator;
 use App\Service\Concert\ConcertConditionsUpdater;
+use App\Service\Concert\ConcertCreator;
 use App\Service\Security\UserCreator;
 use App\Tests\DatabaseTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -49,11 +49,11 @@ final class BookingTest extends DatabaseTestCase
         $id = $concert->getId();
         $sheetId = $concert->getPatchSheet()->getId();
         $sourceId = $concert->getPatchSheet()->getLines()->first()->getId();
-        $crawler = $this->client->request('GET', '/concerts/' . $id . '/edit');
+        $crawler = $this->client->request('GET', '/concerts/'.$id.'/edit');
         $this->client->submit($crawler->filter('form[name="concert"]')->form(), [
             'concert' => ['city' => 'Marseille', 'status' => 'pending'],
         ]);
-        self::assertResponseRedirects('/concerts/' . $id, 303);
+        self::assertResponseRedirects('/concerts/'.$id, 303);
         $em = $this->entityManager();
         $em->clear();
         $concert = $em->find(Concert::class, $id);
@@ -61,11 +61,11 @@ final class BookingTest extends DatabaseTestCase
         self::assertSame('Marseille', $concert->getCity());
         self::assertSame('Repas prévu sur place.', $concert->getNotes());
         self::assertSame($sheetId, $concert->getPatchSheet()->getId());
-        $this->client->request('POST', '/sources/' . $sourceId . '/edit', [
+        $this->client->request('POST', '/sources/'.$sourceId.'/edit', [
             'patch_line' => ['notes' => 'Interdit'],
         ]);
         self::assertResponseStatusCodeSame(403);
-        $this->client->request('GET', '/concerts/' . $id . '/sources/new');
+        $this->client->request('GET', '/concerts/'.$id.'/sources/new');
         self::assertResponseStatusCodeSame(403);
     }
 
@@ -84,26 +84,26 @@ final class BookingTest extends DatabaseTestCase
                 notes: 'Repas à 18 h.',
             );
         $secondId = $second->getId();
-        if ($role === BandRole::Booker) {
+        if (BandRole::Booker === $role) {
             $this->loginAs($role);
         }
 
-        $crawler = $this->client->request('GET', '/concerts/' . $firstId . '/edit');
+        $crawler = $this->client->request('GET', '/concerts/'.$firstId.'/edit');
         $this->client->submit($crawler->filter('form[name="concert"]')->form(), [
             'concert' => ['notes' => "  Hébergement à proximité.\nDépart à 10 h.  "],
         ]);
-        self::assertResponseRedirects('/concerts/' . $firstId, 303);
+        self::assertResponseRedirects('/concerts/'.$firstId, 303);
         $this->client->followRedirect();
         self::assertSelectorTextContains('.concert-notes', 'Hébergement à proximité.');
 
-        $crawler = $this->client->request('GET', '/concerts/' . $firstId . '/edit');
+        $crawler = $this->client->request('GET', '/concerts/'.$firstId.'/edit');
         $form = $crawler->filter('form[name="concert"]')->form();
         self::assertSame(
             "Hébergement à proximité.\nDépart à 10 h.",
             $form->getPhpValues()['concert']['notes'],
         );
         $this->client->submit($form, ['concert' => ['notes' => "  \n  "]]);
-        self::assertResponseRedirects('/concerts/' . $firstId, 303);
+        self::assertResponseRedirects('/concerts/'.$firstId, 303);
         $this->client->followRedirect();
         self::assertSelectorNotExists('.concert-notes');
 
@@ -122,16 +122,16 @@ final class BookingTest extends DatabaseTestCase
     public function testOverlongNotesCannotOverwriteExistingNotes(): void
     {
         $id = $this->concert()->getId();
-        $crawler = $this->client->request('GET', '/concerts/' . $id . '/edit');
+        $crawler = $this->client->request('GET', '/concerts/'.$id.'/edit');
         $this->client->submit($crawler->filter('form[name="concert"]')->form(), [
             'concert' => ['notes' => 'Repas à 19 h.'],
         ]);
         self::assertResponseStatusCodeSame(303);
 
-        $crawler = $this->client->request('GET', '/concerts/' . $id . '/edit');
+        $crawler = $this->client->request('GET', '/concerts/'.$id.'/edit');
         $values = $crawler->filter('form[name="concert"]')->form()->getPhpValues();
         $values['concert']['notes'] = str_repeat('é', 2001);
-        $this->client->request('POST', '/concerts/' . $id . '/edit', $values);
+        $this->client->request('POST', '/concerts/'.$id.'/edit', $values);
         self::assertResponseStatusCodeSame(422);
         self::assertSelectorTextContains('#concert_notes_errors', '2000 caractères');
         $em = $this->entityManager();
@@ -155,7 +155,7 @@ final class BookingTest extends DatabaseTestCase
             'engineerFeeAmount' => '250.05',
             'notes' => 'Hébergement pour cinq personnes.',
         ]);
-        self::assertResponseRedirects('/concerts/' . $id, 303);
+        self::assertResponseRedirects('/concerts/'.$id, 303);
         $this->client->followRedirect();
         self::assertSelectorTextContains('.conditions-panel', '1 500,50 €');
         self::assertSelectorTextContains('.conditions-panel', '250,05 €');
@@ -172,7 +172,7 @@ final class BookingTest extends DatabaseTestCase
             'engineerFeeAmount' => '',
             'accommodation' => 'return_home',
         ]);
-        self::assertResponseRedirects('/concerts/' . $id, 303);
+        self::assertResponseRedirects('/concerts/'.$id, 303);
         $this->client->followRedirect();
         self::assertSelectorTextContains('.conditions-panel', 'Retour à la casa !');
         $em = $this->entityManager();
@@ -239,7 +239,7 @@ final class BookingTest extends DatabaseTestCase
         $input->notes = 'ACCORD FINANCIER CONFIDENTIEL';
         static::getContainer()->get(ConcertConditionsUpdater::class)->save($concert, $input);
         $this->loginAs($role);
-        $this->client->request('GET', '/concerts/' . $id);
+        $this->client->request('GET', '/concerts/'.$id);
         self::assertResponseIsSuccessful();
         self::assertSelectorNotExists('.conditions-panel');
         self::assertSelectorTextContains('.concert-notes', 'Repas à 19 h.');
@@ -247,12 +247,12 @@ final class BookingTest extends DatabaseTestCase
         self::assertSelectorTextNotContains('main', 'ACCORD FINANCIER CONFIDENTIEL');
         self::assertSelectorTextNotContains('main', '9 876,54');
         foreach (['GET', 'POST'] as $method) {
-            $this->client->request($method, '/concerts/' . $id . '/conditions');
+            $this->client->request($method, '/concerts/'.$id.'/conditions');
             self::assertResponseStatusCodeSame(403);
-            $this->client->request($method, '/concerts/' . $id . '/edit');
+            $this->client->request($method, '/concerts/'.$id.'/edit');
             self::assertResponseStatusCodeSame(403);
         }
-        $this->client->request('POST', '/concerts/' . $id . '/edit', [
+        $this->client->request('POST', '/concerts/'.$id.'/edit', [
             'concert' => ['notes' => 'MODIFICATION INTERDITE'],
         ]);
         self::assertResponseStatusCodeSame(403);
@@ -270,11 +270,11 @@ final class BookingTest extends DatabaseTestCase
     public function testConditionsAndConcertChangesRequireCsrf(): void
     {
         $id = $this->concert()->getId();
-        $this->client->request('POST', '/concerts/' . $id . '/conditions', [
+        $this->client->request('POST', '/concerts/'.$id.'/conditions', [
             'concert_conditions' => ['feeAmount' => '100'],
         ]);
         self::assertResponseStatusCodeSame(422);
-        $this->client->request('POST', '/concerts/' . $id . '/edit', [
+        $this->client->request('POST', '/concerts/'.$id.'/edit', [
             'concert' => [
                 'date' => '2026-12-12',
                 'venue' => 'Changé',
@@ -302,13 +302,13 @@ final class BookingTest extends DatabaseTestCase
     public function testMissingOrUnknownChoicesWithAValidCsrfReturnAValidationError(): void
     {
         $id = $this->concert()->getId();
-        $crawler = $this->client->request('GET', '/concerts/' . $id . '/conditions');
+        $crawler = $this->client->request('GET', '/concerts/'.$id.'/conditions');
         $values = $crawler->filter('form[name="concert_conditions"]')->form()->getPhpValues();
         $values['concert_conditions']['accommodation'] = 'not_an_option';
-        $this->client->request('POST', '/concerts/' . $id . '/conditions', $values);
+        $this->client->request('POST', '/concerts/'.$id.'/conditions', $values);
         self::assertResponseStatusCodeSame(422);
         unset($values['concert_conditions']['accommodation']);
-        $this->client->request('POST', '/concerts/' . $id . '/conditions', $values);
+        $this->client->request('POST', '/concerts/'.$id.'/conditions', $values);
         self::assertResponseStatusCodeSame(422);
         self::assertSame(
             0,
@@ -322,7 +322,7 @@ final class BookingTest extends DatabaseTestCase
             ->get(UserCreator::class)
             ->create(
                 'profile@example.test',
-                'Profil ' . $role->value,
+                'Profil '.$role->value,
                 'Profile test password 2026!',
                 $this->entityManager()->find(Band::class, $this->bandId),
                 $role,
@@ -332,7 +332,7 @@ final class BookingTest extends DatabaseTestCase
 
     private function submitConditions(int $id, array $changes): void
     {
-        $crawler = $this->client->request('GET', '/concerts/' . $id . '/conditions');
+        $crawler = $this->client->request('GET', '/concerts/'.$id.'/conditions');
         self::assertResponseIsSuccessful();
         $this->client->submit($crawler->filter('form[name="concert_conditions"]')->form(), [
             'concert_conditions' => $changes,

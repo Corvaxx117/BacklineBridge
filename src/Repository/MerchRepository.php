@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\{Band, MerchProduct, StockMovement};
+use App\Entity\Band;
+use App\Entity\MerchProduct;
+use App\Entity\StockMovement;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class MerchRepository
 {
-    public function __construct(private EntityManagerInterface $em) {}
+    public function __construct(private EntityManagerInterface $em)
+    {
+    }
+
     /** @return list<MerchProduct> */
     public function products(Band $band): array
     {
@@ -26,6 +31,7 @@ final readonly class MerchRepository
             ->getQuery()
             ->getResult();
     }
+
     /** @return list<StockMovement> */
     public function history(Band $band): array
     {

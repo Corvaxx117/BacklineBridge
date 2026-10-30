@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use App\Dto\Venue\{InvitationInput, IssuedInvitation};
+use App\Dto\Venue\InvitationInput;
+use App\Dto\Venue\IssuedInvitation;
 use App\Entity\Concert;
 use App\Service\Concert\ConcertCreator;
 use App\Service\Venue\InvitationIssuer;
@@ -18,7 +19,7 @@ abstract class VenueTestCase extends DatabaseTestCase
         parent::setUp();
         $this->client->catchExceptions(true);
         $data = json_decode(
-            file_get_contents(dirname(__DIR__) . '/data/avee-mana-stage.json'),
+            file_get_contents(dirname(__DIR__).'/data/avee-mana-stage.json'),
             true,
             flags: JSON_THROW_ON_ERROR,
         );
@@ -52,7 +53,7 @@ abstract class VenueTestCase extends DatabaseTestCase
     protected function enter(string $token): void
     {
         $this->client->getCookieJar()->clear();
-        $this->client->request('GET', '/invitation/' . $token);
+        $this->client->request('GET', '/invitation/'.$token);
         self::assertResponseStatusCodeSame(303);
         $location = $this->client->getResponse()->headers->get('Location');
         self::assertSame('/salle', parse_url($location, PHP_URL_PATH));
@@ -65,7 +66,7 @@ abstract class VenueTestCase extends DatabaseTestCase
 
     protected function guestUrl(string $path = '/salle'): string
     {
-        return $path . '?access=' . $this->guestAccess;
+        return $path.'?access='.$this->guestAccess;
     }
 
     protected function replyValues(): array

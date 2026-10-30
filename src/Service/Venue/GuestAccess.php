@@ -13,7 +13,9 @@ final readonly class GuestAccess
 {
     private const SESSION_KEY = 'venue_invitation_accesses';
 
-    public function __construct(private EntityManagerInterface $em) {}
+    public function __construct(private EntityManagerInterface $em)
+    {
+    }
 
     public function enter(Request $request, string $token): string
     {
@@ -66,9 +68,12 @@ final readonly class GuestAccess
         $request->getSession()->set(self::SESSION_KEY, $accesses);
     }
 
+    /**
+     * @phpstan-assert VenueInvitation $invitation
+     */
     private function assertUsable(?VenueInvitation $invitation): void
     {
-        if ($invitation === null || !$invitation->isUsable()) {
+        if (null === $invitation || !$invitation->isUsable()) {
             throw $this->unavailable();
         }
     }

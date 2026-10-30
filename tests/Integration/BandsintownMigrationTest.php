@@ -14,7 +14,7 @@ final class BandsintownMigrationTest extends TestCase
 {
     public function testMigrationPreservesConcertsAndEnforcesSourceUniqueness(): void
     {
-        require_once dirname(__DIR__, 2) . '/migrations/Version20261029022120.php';
+        require_once dirname(__DIR__, 2).'/migrations/Version20261029022120.php';
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
         foreach (
             [
@@ -23,8 +23,7 @@ final class BandsintownMigrationTest extends TestCase
                 'CREATE TABLE concert (id INTEGER PRIMARY KEY, band_id INTEGER REFERENCES band(id), notes TEXT)',
                 'INSERT INTO band VALUES (1)',
                 "INSERT INTO concert VALUES (1, 1, 'Internal note'), (2, 1, 'Another note')",
-            ]
-            as $sql
+            ] as $sql
         ) {
             $connection->executeStatement($sql);
         }

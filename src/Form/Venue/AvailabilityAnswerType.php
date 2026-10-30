@@ -7,10 +7,12 @@ namespace App\Form\Venue;
 use App\Dto\Venue\AvailabilityAnswerInput;
 use App\Enum\Availability;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\{EnumType, TextareaType};
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** @extends AbstractType<AvailabilityAnswerInput> */
 final class AvailabilityAnswerType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -18,7 +20,7 @@ final class AvailabilityAnswerType extends AbstractType
         $builder
             ->add('status', EnumType::class, [
                 'class' => Availability::class,
-                'choice_label' => static fn(Availability $status): string => $status->label(),
+                'choice_label' => static fn (Availability $status): string => $status->label(),
                 'expanded' => true,
                 'label' => 'Disponibilité',
             ])

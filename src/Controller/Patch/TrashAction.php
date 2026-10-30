@@ -12,14 +12,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[
-    Route(
-        '/patchs/{id}/corbeille',
-        name: 'app_patch_trash',
-        requirements: ['id' => '\d+'],
-        methods: ['GET'],
-    ),
-]
+#[Route(
+    '/patchs/{id}/corbeille',
+    name: 'app_patch_trash',
+    requirements: ['id' => '\d+'],
+    methods: ['GET'],
+),]
 final class TrashAction extends AbstractController
 {
     public function __invoke(

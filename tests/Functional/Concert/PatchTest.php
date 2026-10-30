@@ -21,11 +21,11 @@ final class PatchTest extends DatabaseTestCase
             ->findOneBy(['sheet' => $sheetId, 'channelNumber' => 17]);
         self::assertInstanceOf(PatchLine::class, $line);
         $lineId = $line->getId();
-        $this->submitLineForm('/sources/' . $lineId . '/edit', [
+        $this->submitLineForm('/sources/'.$lineId.'/edit', [
             'preferredMicrophone' => 'SM58 POUR CETTE DATE',
         ]);
 
-        self::assertResponseRedirects('/concerts/' . $concertId, 303);
+        self::assertResponseRedirects('/concerts/'.$concertId, 303);
         $this->client->followRedirect();
         self::assertSelectorTextContains('table', 'SM58 POUR CETTE DATE');
         $this->entityManager()->clear();
@@ -40,9 +40,9 @@ final class PatchTest extends DatabaseTestCase
         $concert = $this->createConcert();
         $concertId = $concert->getId();
         $sheetId = $concert->getPatchSheet()->getId();
-        $this->submitLineForm('/concerts/' . $concertId . '/sources/new', $this->newLineValues());
+        $this->submitLineForm('/concerts/'.$concertId.'/sources/new', $this->newLineValues());
 
-        self::assertResponseRedirects('/concerts/' . $concertId, 303);
+        self::assertResponseRedirects('/concerts/'.$concertId, 303);
         $em = $this->entityManager();
         $em->clear();
         self::assertSame(
@@ -58,13 +58,13 @@ final class PatchTest extends DatabaseTestCase
     {
         $concert = $this->createConcert();
         $this->submitLineForm(
-            '/concerts/' . $concert->getId() . '/sources/new',
+            '/concerts/'.$concert->getId().'/sources/new',
             array_replace($this->newLineValues(), ['channelNumber' => '17']),
         );
 
         self::assertResponseStatusCodeSame(422);
         self::assertSelectorTextContains('form[name="patch_line"]', 'déjà utilisé');
-        self::assertSelectorExists('a.cancel-link[href="/concerts/' . $concert->getId() . '"]');
+        self::assertSelectorExists('a.cancel-link[href="/concerts/'.$concert->getId().'"]');
         $this->assertLineCount(44);
     }
 

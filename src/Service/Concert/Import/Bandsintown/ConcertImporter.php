@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Service\Concert\Import\Bandsintown;
 
 use App\Dto\Concert\BandsintownImportInput;
-use App\Entity\{Band, BandsintownConcert, User};
+use App\Entity\Band;
+use App\Entity\BandsintownConcert;
+use App\Entity\User;
 use App\Integration\Bandsintown\BandsintownConfiguration;
 use App\Integration\Bandsintown\Dto\BandsintownEvent;
 use App\Repository\BandMembershipRepository;
@@ -23,7 +25,8 @@ final readonly class ConcertImporter
         private BandMembershipRepository $memberships,
         private BandsintownConfiguration $configuration,
         private ValidatorInterface $validator,
-    ) {}
+    ) {
+    }
 
     /** @param list<BandsintownEvent> $events */
     public function import(
@@ -33,12 +36,12 @@ final readonly class ConcertImporter
         BandsintownImportInput $input,
     ): ImportResult {
         if (
-            !($this->memberships->roleFor($user, $band)?->canPlanConcerts() ?? false) ||
-            !$this->configuration->isConfiguredFor($band)
+            !($this->memberships->roleFor($user, $band)?->canPlanConcerts() ?? false)
+            || !$this->configuration->isConfiguredFor($band)
         ) {
             throw new AccessDeniedException('Aucun accès à cet import.');
         }
-        if (count($this->validator->validate($input)) !== 0) {
+        if (0 !== count($this->validator->validate($input)) || null === $input->status) {
             throw new \DomainException('Sélectionne de 1 à 100 concerts et un statut valide.');
         }
         $indexed = [];
@@ -51,10 +54,11 @@ final readonly class ConcertImporter
             $indexed[$event->id] = $event;
         }
         foreach ($input->events as $id) {
-            if (!is_string($id) || !isset($indexed[$id])) {
+            if (!isset($indexed[$id])) {
                 throw new \DomainException('La sélection ne correspond pas à cet aperçu.');
             }
         }
+
         return $this->em->wrapInTransaction(function () use (
             $band,
             $user,
@@ -70,15 +74,15 @@ final readonly class ConcertImporter
                 $event = $row['event'];
                 $key = ConcertIdentity::key($event->date, $event->venue, $event->city);
                 if (
-                    !in_array($row['state'], ['new', 'link'], true) ||
-                    isset($identities[$key]) ||
-                    ($row['concert'] !== null && isset($occupied[$row['concert']->getId()]))
+                    !in_array($row['state'], ['new', 'link'], true)
+                    || isset($identities[$key])
+                    || (null !== $row['concert'] && isset($occupied[$row['concert']->getId()]))
                 ) {
                     ++$skipped;
                     continue;
                 }
                 $concert = $row['concert'];
-                if ($concert === null) {
+                if (null === $concert) {
                     $concert = $this->creator->prepare(
                         $band->getReferenceSheet(),
                         new \DateTimeImmutable($event->date, new \DateTimeZone('UTC')),
@@ -95,6 +99,7 @@ final readonly class ConcertImporter
                 $this->em->persist(new BandsintownConcert($concert, $event));
                 $identities[$key] = true;
             }
+
             return new ImportResult($created, $linked, $skipped);
         });
     }

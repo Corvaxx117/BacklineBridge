@@ -9,6 +9,7 @@ enum MemberKind: string
     case Musician = 'musician';
     case Engineer = 'engineer';
     case Booker = 'booker';
+
     public function label(): string
     {
         return match ($this) {

@@ -13,14 +13,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[
-    Route(
-        '/sources/{id}/delete',
-        name: 'app_patch_delete',
-        requirements: ['id' => '\d+'],
-        methods: ['POST'],
-    ),
-]
+#[Route(
+    '/sources/{id}/delete',
+    name: 'app_patch_delete',
+    requirements: ['id' => '\d+'],
+    methods: ['POST'],
+),]
 final class DeleteAction extends AbstractController
 {
     public function __invoke(
@@ -32,7 +30,7 @@ final class DeleteAction extends AbstractController
         $this->denyAccessUnlessGranted(TechnicalSheetVoter::DELETE, $sheet);
         if (
             !$this->isCsrfTokenValid(
-                'patch_delete_' . $line->getId(),
+                'patch_delete_'.$line->getId(),
                 $request->getPayload()->getString('_token'),
             )
         ) {
@@ -44,7 +42,7 @@ final class DeleteAction extends AbstractController
             'name' => $line->getSourceName(),
         ]);
 
-        return $sheet->getConcert() !== null
+        return null !== $sheet->getConcert()
             ? $this->redirectToRoute(
                 'app_concert_show',
                 ['id' => $sheet->getConcert()->getId()],

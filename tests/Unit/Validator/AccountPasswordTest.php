@@ -16,7 +16,7 @@ final class AccountPasswordTest extends TestCase
     {
         $violations = Validation::createValidator()->validate($password, new AccountPassword());
 
-        self::assertSame($accepted, count($violations) === 0);
+        self::assertSame($accepted, 0 === count($violations));
     }
 
     public static function passwords(): iterable
@@ -27,10 +27,10 @@ final class AccountPasswordTest extends TestCase
         yield 'accented uppercase' => ['étoile!9Éx', true];
         yield 'currency symbol' => ['Corail€94x', true];
         yield 'underscore' => ['Corail_94x', true];
-        yield 'maximum length' => ['A1!' . str_repeat('x', 125), true];
+        yield 'maximum length' => ['A1!'.str_repeat('x', 125), true];
         yield 'empty' => ['', false];
         yield 'nine characters' => ['Corai!94x', false];
-        yield 'too long' => ['A1!' . str_repeat('x', 126), false];
+        yield 'too long' => ['A1!'.str_repeat('x', 126), false];
         yield 'without uppercase' => ['corail!94x', false];
         yield 'without digit' => ['Corail!xxx', false];
         yield 'without symbol' => ['Corail194xx', false];

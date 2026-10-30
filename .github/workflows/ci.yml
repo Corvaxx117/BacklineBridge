@@ -1,37 +1,138 @@
-name: Tests BacklineBridge
+name: Continuous Integration
 
 on:
   push:
+    branches: [main, develop]
   pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  APP_ENV: test
+  APP_DEBUG: '1'
+  APP_SECRET: backlinebridge-ci-secret
+  DATABASE_URL: 'sqlite:///%kernel.project_dir%/var/ci.db'
+  PROFILE_DATA_KEY: abababababababababababababababababababababababababababababababab
+
 jobs:
   format:
+    name: Twig, JavaScript, CSS and configuration
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout source code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm
-      - run: npm ci --ignore-scripts
-      - run: npm run format:check
-  test:
+
+      - name: Install formatting tools
+        run: npm ci --ignore-scripts
+
+      - name: Check formatting
+        run: npm run format:check
+
+  quality:
+    name: PHP style and static analysis
     runs-on: ubuntu-latest
-    env:
-      APP_ENV: test
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
+      - name: Checkout source code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: pdo_sqlite, mbstring, intl, dom, xml
+          extensions: ctype, iconv, intl, mbstring, pdo_sqlite, sodium, dom, xml
+          tools: composer:v2
           coverage: none
-      - run: composer install --no-interaction --prefer-dist
-      - run: php bin/console doctrine:migrations:migrate --no-interaction
-      - run: php bin/console doctrine:schema:validate
-      - run: php bin/console lint:container
-      - run: php bin/console lint:twig templates
-      - run: composer test
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/composer/files
+          key: ${{ runner.os }}-php-8.4-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-8.4-composer-
+
+      - name: Validate Composer configuration
+        run: composer validate --strict
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Check dependency advisories
+        run: composer audit --locked --no-interaction
+
+      - name: Check PHP code style
+        run: composer cs:check
+
+      - name: Check Symfony configuration and templates
+        run: composer lint
+
+      - name: Run PHPStan
+        run: composer phpstan
+
+  test:
+    name: Tests, database and coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP with coverage
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, iconv, intl, mbstring, pdo_sqlite, sodium, dom, xml
+          tools: composer:v2
+          coverage: pcov
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/composer/files
+          key: ${{ runner.os }}-php-8.4-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-8.4-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Apply migrations to a fresh database
+        run: php bin/console doctrine:migrations:migrate --env=test --no-interaction
+
+      - name: Validate database mappings
+        run: php bin/console doctrine:schema:validate --env=test
+
+      - name: Run tests with coverage
+        run: composer test:coverage
+
+      - name: Upload coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: |
+            var/coverage/html/
+            var/coverage/clover.xml
+          retention-days: 7
+          if-no-files-found: warn

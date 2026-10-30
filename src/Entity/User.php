@@ -58,7 +58,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getUserIdentifier(): string
     {
-        return $this->email;
+        return $this->email ?:
+            throw new \LogicException('Un compte doit avoir une adresse e-mail.');
     }
 
     public function getPassword(): string
@@ -75,7 +76,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function isActivated(): bool
     {
-        return $this->password !== '';
+        return '' !== $this->password;
     }
 
     public function getRoles(): array
@@ -88,7 +89,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $data = (array) $this;
         // Symfony compare cette empreinte au hash rechargé, sans conserver le hash complet en session.
-        $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
+        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
 
         return $data;
     }

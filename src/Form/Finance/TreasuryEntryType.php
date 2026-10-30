@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Form\Finance;
 
 use App\Dto\Finance\TreasuryEntryInput;
-use App\Enum\{TreasuryEntryKind, TreasuryAccountKind};
+use App\Enum\TreasuryAccountKind;
+use App\Enum\TreasuryEntryKind;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\{
-    ChoiceType,
-    DateType,
-    EnumType,
-    HiddenType,
-    TextType,
-};
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** @extends AbstractType<TreasuryEntryInput> */
 final class TreasuryEntryType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $b, array $options): void
@@ -24,7 +24,7 @@ final class TreasuryEntryType extends AbstractType
         $b->add('kind', EnumType::class, [
             'class' => TreasuryEntryKind::class,
             'choices' => [TreasuryEntryKind::Income, TreasuryEntryKind::Expense],
-            'choice_label' => static fn($value): string => $value->label(),
+            'choice_label' => static fn ($value): string => $value->label(),
             'label' => 'Type de mouvement',
         ])
             ->add('label', TextType::class, [
@@ -39,7 +39,7 @@ final class TreasuryEntryType extends AbstractType
             ])
             ->add('account', EnumType::class, [
                 'class' => TreasuryAccountKind::class,
-                'choice_label' => static fn($value): string => $value->label(),
+                'choice_label' => static fn ($value): string => $value->label(),
                 'label' => 'Compte',
             ])
             ->add('category', ChoiceType::class, [

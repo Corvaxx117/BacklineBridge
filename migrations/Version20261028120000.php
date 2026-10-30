@@ -259,7 +259,7 @@ final class Version20261028120000 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->abortIf(
-            !($this->connection->getDatabasePlatform() instanceof SQLitePlatform),
+            !$this->connection->getDatabasePlatform() instanceof SQLitePlatform,
             'Cette migration utilise SQLite.',
         );
         $this->addSql(
@@ -295,7 +295,7 @@ final class Version20261028120000 extends AbstractMigration
     public function down(Schema $schema): void
     {
         $this->abortIf(
-            !($this->connection->getDatabasePlatform() instanceof SQLitePlatform),
+            !$this->connection->getDatabasePlatform() instanceof SQLitePlatform,
             'Cette migration utilise SQLite.',
         );
         $this->addSql('DROP TABLE venue_reply');

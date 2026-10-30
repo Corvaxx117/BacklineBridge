@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** @extends AbstractType<ActivationInput> */
 final class ActivationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $b, array $o): void

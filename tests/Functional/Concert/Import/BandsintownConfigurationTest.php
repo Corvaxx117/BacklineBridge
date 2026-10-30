@@ -14,7 +14,7 @@ final class BandsintownConfigurationTest extends DatabaseTestCase
         $gateway = $this->createMock(BandsintownGateway::class);
         $gateway->expects(self::never())->method('events');
         static::getContainer()->set(BandsintownGateway::class, $gateway);
-        $this->client->request('GET', '/groupes/' . $this->bandId . '/concerts/import-bandsintown');
+        $this->client->request('GET', '/groupes/'.$this->bandId.'/concerts/import-bandsintown');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h2', 'Relier le compte du groupe');
         self::assertSelectorNotExists('form[name="bandsintown_fetch"]');

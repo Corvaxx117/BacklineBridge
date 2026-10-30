@@ -13,14 +13,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[
-    Route(
-        '/concerts/{id}/reponses-salle',
-        name: 'app_concert_responses',
-        requirements: ['id' => '\d+'],
-        methods: ['GET'],
-    ),
-]
+#[Route(
+    '/concerts/{id}/reponses-salle',
+    name: 'app_concert_responses',
+    requirements: ['id' => '\d+'],
+    methods: ['GET'],
+),]
 final class IndexAction extends AbstractController
 {
     public function __invoke(
@@ -35,7 +33,7 @@ final class IndexAction extends AbstractController
             'statusLabels' => array_combine(
                 array_column(Availability::cases(), 'value'),
                 array_map(
-                    static fn(Availability $status): string => $status->label(),
+                    static fn (Availability $status): string => $status->label(),
                     Availability::cases(),
                 ),
             ),

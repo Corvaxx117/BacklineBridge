@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\{ArrayCollection, Collection};
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -17,6 +18,7 @@ class MerchProduct
     /** @var Collection<int, MerchVariant> */
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: MerchVariant::class, cascade: ['persist'])]
     private Collection $variants;
+
     public function __construct(
         #[ORM\ManyToOne] #[ORM\JoinColumn(nullable: false)] private Band $band,
         #[ORM\Column(length: 160)] private string $name,
@@ -45,6 +47,9 @@ class MerchProduct
         return $this->category;
     }
 
+    /**
+     * @return Collection<int, MerchVariant>
+     */
     public function getVariants(): Collection
     {
         return $this->variants;
@@ -59,7 +64,7 @@ class MerchProduct
     {
         return array_sum(
             array_map(
-                static fn(MerchVariant $variant): int => $variant->getQuantity() ?? 0,
+                static fn (MerchVariant $variant): int => $variant->getQuantity() ?? 0,
                 $this->variants->toArray(),
             ),
         );
@@ -68,7 +73,7 @@ class MerchProduct
     public function isQuantityComplete(): bool
     {
         return !$this->variants->exists(
-            static fn(int $key, MerchVariant $variant): bool => $variant->getQuantity() === null,
+            static fn (int $key, MerchVariant $variant): bool => null === $variant->getQuantity(),
         );
     }
 }

@@ -10,10 +10,9 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 final class EquipmentInput
 {
-    #[
-        Assert\Valid,
-        Assert\Count(max: 60, maxMessage: 'La liste accepte au maximum 60 équipements.'),
-    ]
+    /** @var array<array-key, EquipmentItemInput> */
+    #[Assert\Valid,
+        Assert\Count(max: 60, maxMessage: 'La liste accepte au maximum 60 équipements.'),]
     public array $items = [];
     public string $revision = '';
 
@@ -41,7 +40,7 @@ final class EquipmentInput
     public function uniqueIds(ExecutionContextInterface $context): void
     {
         $ids = array_filter(
-            array_map(static fn(EquipmentItemInput $item): ?string => $item->id, $this->items),
+            array_map(static fn (EquipmentItemInput $item): ?string => $item->id, $this->items),
         );
         if (count($ids) !== count(array_unique($ids))) {
             $context

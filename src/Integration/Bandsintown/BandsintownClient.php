@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Integration\Bandsintown;
 
-use App\Integration\Bandsintown\Dto\{BandsintownEvent, EventsResult};
+use App\Integration\Bandsintown\Dto\BandsintownEvent;
+use App\Integration\Bandsintown\Dto\EventsResult;
 use App\Integration\Bandsintown\Exception\BandsintownUnavailable;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpClient\Exception\TransportException;
-use Symfony\Contracts\Cache\{CacheInterface, ItemInterface};
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -22,11 +24,12 @@ final readonly class BandsintownClient implements BandsintownGateway
         #[Autowire(service: 'cache.bandsintown')] private CacheInterface $cache,
         private BandsintownConfiguration $configuration,
         private BandsintownEventNormalizer $normalizer,
-    ) {}
+    ) {
+    }
 
     public function events(): EventsResult
     {
-        if ($this->configuration->credentials() === '') {
+        if ('' === $this->configuration->credentials()) {
             throw new BandsintownUnavailable(
                 'La clé Bandsintown du groupe n’est pas encore configurée.',
             );
@@ -35,6 +38,7 @@ final readonly class BandsintownClient implements BandsintownGateway
         if (isset($data['error'])) {
             throw new BandsintownUnavailable($data['error']);
         }
+
         return new EventsResult(
             array_map(BandsintownEvent::fromArray(...), $data['events']),
             $data['ignored'],
@@ -49,7 +53,7 @@ final readonly class BandsintownClient implements BandsintownGateway
         try {
             $response = $this->http->request(
                 'GET',
-                'artists/id_' . $this->configuration->artistId . '/events/',
+                'artists/id_'.$this->configuration->artistId.'/events/',
                 [
                     'query' => [
                         'app_id' => $this->configuration->credentials(),
@@ -57,8 +61,8 @@ final readonly class BandsintownClient implements BandsintownGateway
                     ],
                     'on_progress' => static function (int $downloaded, int $total): void {
                         if (
-                            $downloaded > self::MAX_RESPONSE_BYTES ||
-                            $total > self::MAX_RESPONSE_BYTES
+                            $downloaded > self::MAX_RESPONSE_BYTES
+                            || $total > self::MAX_RESPONSE_BYTES
                         ) {
                             throw new TransportException('Réponse trop volumineuse.');
                         }
@@ -66,14 +70,14 @@ final readonly class BandsintownClient implements BandsintownGateway
                 ],
             );
             $status = $response->getStatusCode();
-            if ($status !== 200) {
+            if (200 !== $status) {
                 $response->cancel();
-                $item->expiresAfter($status === 404 ? 86400 : 60);
+                $item->expiresAfter(404 === $status ? 86400 : 60);
+
                 return [
                     'error' => match ($status) {
                         401,
-                        403
-                            => 'La clé Bandsintown est refusée. Vérifie qu’elle correspond à cet artiste.',
+                        403 => 'La clé Bandsintown est refusée. Vérifie qu’elle correspond à cet artiste.',
                         404 => 'L’artiste Bandsintown est introuvable. Vérifie son identifiant.',
                         429 => 'Bandsintown demande de patienter avant une nouvelle consultation.',
                         default => 'Bandsintown est temporairement indisponible.',
@@ -104,6 +108,7 @@ final readonly class BandsintownClient implements BandsintownGateway
                     ++$ignored;
                 }
             }
+
             return [
                 'events' => array_values($events),
                 'ignored' => $ignored,
@@ -111,9 +116,10 @@ final readonly class BandsintownClient implements BandsintownGateway
                     DATE_ATOM,
                 ),
             ];
-        } catch (TransportExceptionInterface | \JsonException | \UnexpectedValueException) {
+        } catch (TransportExceptionInterface|\JsonException|\UnexpectedValueException) {
             // Ne pas propager l'exception HTTP : son URL peut contenir la clé d'accès.
             $item->expiresAfter(60);
+
             return [
                 'error' => 'Impossible de lire les concerts Bandsintown. Réessaie dans une minute.',
             ];

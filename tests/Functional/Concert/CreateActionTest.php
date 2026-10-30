@@ -20,7 +20,7 @@ final class CreateActionTest extends DatabaseTestCase
         $em->clear();
         $concert = $em->getRepository(Concert::class)->findOneBy([]);
         self::assertInstanceOf(Concert::class, $concert);
-        self::assertResponseRedirects('/concerts/' . $concert->getId(), 303);
+        self::assertResponseRedirects('/concerts/'.$concert->getId(), 303);
         self::assertSame('2026-11-14', $concert->getDate()->format('Y-m-d'));
         self::assertSame('Salle de test', $concert->getVenue());
         self::assertSame('Marseille', $concert->getCity());
@@ -35,7 +35,7 @@ final class CreateActionTest extends DatabaseTestCase
         self::assertCount(22, $crawler->filter('table tbody tr'));
         self::assertSame(
             range(1, 22),
-            $crawler->filter('.channel-number')->each(static fn($node): int => (int) $node->text()),
+            $crawler->filter('.channel-number')->each(static fn ($node): int => (int) $node->text()),
         );
     }
 

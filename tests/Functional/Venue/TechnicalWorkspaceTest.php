@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Venue;
 
-use App\Entity\{Band, Concert, TechnicalSheet, User, VenueInvitation};
+use App\Entity\Band;
+use App\Entity\Concert;
+use App\Entity\TechnicalSheet;
+use App\Entity\VenueInvitation;
 use App\Enum\BandRole;
 use App\Service\Security\UserCreator;
 use App\Tests\VenueTestCase;
@@ -24,7 +27,7 @@ final class TechnicalWorkspaceTest extends VenueTestCase
         $issued = $this->issue($concert);
         $publicationId = $issued->invitation->getPublication()->getId();
         $sheetId = $sheet->getId();
-        $crawler = $this->client->request('GET', '/fiches/' . $sheetId . '/materiel');
+        $crawler = $this->client->request('GET', '/fiches/'.$sheetId.'/materiel');
         self::assertCount(1, $crawler->filter('[data-equipment-group][data-category="Autre"]'));
         self::assertCount(2, $crawler->filter('[data-category="Autre"] [data-collection-item]'));
         $this->client->submit($crawler->filter('form[name="equipment"]')->form());
@@ -46,18 +49,18 @@ final class TechnicalWorkspaceTest extends VenueTestCase
     public function testManagerCanCreateAndRevokeAnInvitationWithCsrf(): void
     {
         $id = $this->concert()->getId();
-        $crawler = $this->client->request('GET', '/concerts/' . $id . '/invitations');
+        $crawler = $this->client->request('GET', '/concerts/'.$id.'/invitations');
         $this->client->submit($crawler->filter('form[name="invitation"]')->form(), [
             'invitation' => ['label' => 'Régie du lieu', 'days' => '7'],
         ]);
-        self::assertResponseRedirects('/concerts/' . $id . '/invitations', 303);
+        self::assertResponseRedirects('/concerts/'.$id.'/invitations', 303);
         $crawler = $this->client->followRedirect();
         self::assertSelectorExists('#invitation-link');
         $invitation = $this->entityManager()->getRepository(VenueInvitation::class)->findOneBy([]);
         $revoke = $crawler
-            ->filter('form[action="/invitations/' . $invitation->getId() . '/revoquer"]')
+            ->filter('form[action="/invitations/'.$invitation->getId().'/revoquer"]')
             ->form();
-        $this->client->request('POST', '/invitations/' . $invitation->getId() . '/revoquer', [
+        $this->client->request('POST', '/invitations/'.$invitation->getId().'/revoquer', [
             '_token' => 'invalid',
         ]);
         self::assertResponseStatusCodeSame(403);
@@ -71,7 +74,7 @@ final class TechnicalWorkspaceTest extends VenueTestCase
     public function testPublishingRequiresCsrfAndDoesNotExposeTheTokenAgain(): void
     {
         $id = $this->concert()->getId();
-        $this->client->request('POST', '/concerts/' . $id . '/invitations/creer', [
+        $this->client->request('POST', '/concerts/'.$id.'/invitations/creer', [
             'invitation' => ['label' => 'Régie', 'days' => '30'],
         ]);
         self::assertResponseStatusCodeSame(422);
@@ -79,13 +82,13 @@ final class TechnicalWorkspaceTest extends VenueTestCase
             0,
             $this->entityManager()->getRepository(VenueInvitation::class)->count([]),
         );
-        $crawler = $this->client->request('GET', '/concerts/' . $id . '/invitations');
+        $crawler = $this->client->request('GET', '/concerts/'.$id.'/invitations');
         $this->client->submit($crawler->filter('form[name="invitation"]')->form(), [
             'invitation' => ['label' => 'Régie'],
         ]);
         $this->client->followRedirect();
         self::assertSelectorExists('#invitation-link');
-        $this->client->request('GET', '/concerts/' . $id . '/invitations');
+        $this->client->request('GET', '/concerts/'.$id.'/invitations');
         self::assertSelectorNotExists('#invitation-link');
     }
 
@@ -108,28 +111,26 @@ final class TechnicalWorkspaceTest extends VenueTestCase
         $this->client->loginUser($user);
         foreach (
             [
-                '/fiches/' . $sheetId . '/plan-de-scene',
-                '/fiches/' . $sheetId . '/materiel',
-                '/concerts/' . $concertId . '/invitations',
-            ]
-            as $uri
+                '/fiches/'.$sheetId.'/plan-de-scene',
+                '/fiches/'.$sheetId.'/materiel',
+                '/concerts/'.$concertId.'/invitations',
+            ] as $uri
         ) {
             $this->client->request('GET', $uri);
             self::assertResponseStatusCodeSame(403);
         }
         foreach (
             [
-                '/fiches/' . $sheetId . '/plan-de-scene',
-                '/fiches/' . $sheetId . '/materiel',
-                '/concerts/' . $concertId . '/invitations/creer',
-                '/invitations/' . $issued->invitation->getId() . '/revoquer',
-            ]
-            as $uri
+                '/fiches/'.$sheetId.'/plan-de-scene',
+                '/fiches/'.$sheetId.'/materiel',
+                '/concerts/'.$concertId.'/invitations/creer',
+                '/invitations/'.$issued->invitation->getId().'/revoquer',
+            ] as $uri
         ) {
             $this->client->request('POST', $uri);
             self::assertResponseStatusCodeSame(403);
         }
-        $this->client->request('GET', '/concerts/' . $concertId . '/reponses-salle');
+        $this->client->request('GET', '/concerts/'.$concertId.'/reponses-salle');
         self::assertResponseIsSuccessful();
     }
 
@@ -144,14 +145,14 @@ final class TechnicalWorkspaceTest extends VenueTestCase
     {
         $concert = $this->concert();
         $sheetId = $concert->getPatchSheet()->getId();
-        $crawler = $this->client->request('GET', '/fiches/' . $sheetId . '/plan-de-scene');
+        $crawler = $this->client->request('GET', '/fiches/'.$sheetId.'/plan-de-scene');
         $this->client->submit($crawler->filter('form[name="stage_plan"]')->form(), [
             'stage_plan' => [
                 'items' => [1 => ['x' => '60', 'notes' => 'IEM filaire stéréo pour cette date.']],
             ],
         ]);
         self::assertResponseStatusCodeSame(303);
-        $crawler = $this->client->request('GET', '/fiches/' . $sheetId . '/materiel');
+        $crawler = $this->client->request('GET', '/fiches/'.$sheetId.'/materiel');
         $values = $crawler->filter('form[name="equipment"]')->form()->getPhpValues();
         $values['equipment']['items'][0]['quantity'] = '2';
         $values['equipment']['items'][] = [
@@ -161,7 +162,7 @@ final class TechnicalWorkspaceTest extends VenueTestCase
             'quantity' => '1',
             'specification' => 'À convenir',
         ];
-        $this->client->request('POST', '/fiches/' . $sheetId . '/materiel', $values);
+        $this->client->request('POST', '/fiches/'.$sheetId.'/materiel', $values);
         self::assertResponseStatusCodeSame(303);
         $em = $this->entityManager();
         $em->clear();
@@ -175,7 +176,7 @@ final class TechnicalWorkspaceTest extends VenueTestCase
 
     public function testInvalidCoordinatesMissingTypeAndMissingCsrfCannotChangeThePlan(): void
     {
-        $uri = '/fiches/' . $this->sheetId . '/plan-de-scene';
+        $uri = '/fiches/'.$this->sheetId.'/plan-de-scene';
         $crawler = $this->client->request('GET', $uri);
         $original = $this->sheet()->getStagePlan();
         $values = $crawler->filter('form[name="stage_plan"]')->form()->getPhpValues();
@@ -201,11 +202,11 @@ final class TechnicalWorkspaceTest extends VenueTestCase
         $concert = $this->concert();
         $concertId = $concert->getId();
         $sheetId = $concert->getPatchSheet()->getId();
-        $crawler = $this->client->request('GET', '/fiches/' . $sheetId . '/plan-de-scene');
+        $crawler = $this->client->request('GET', '/fiches/'.$sheetId.'/plan-de-scene');
         $values = $crawler->filter('form[name="stage_plan"]')->form()->getPhpValues();
         $values['stage_plan']['items'][2]['rotation'] = '90';
         $values['stage_plan']['items'][2]['scale'] = '1.5';
-        $this->client->request('POST', '/fiches/' . $sheetId . '/plan-de-scene', $values);
+        $this->client->request('POST', '/fiches/'.$sheetId.'/plan-de-scene', $values);
         self::assertResponseStatusCodeSame(303);
 
         $em = $this->entityManager();
@@ -228,7 +229,7 @@ final class TechnicalWorkspaceTest extends VenueTestCase
         $issued = $this->issue($concert);
         $publicationId = $issued->invitation->getPublication()->getId();
         $sheetId = $concert->getPatchSheet()->getId();
-        $crawler = $this->client->request('GET', '/fiches/' . $sheetId . '/plan-de-scene');
+        $crawler = $this->client->request('GET', '/fiches/'.$sheetId.'/plan-de-scene');
         $this->client->submit($crawler->filter('form[name="stage_plan"]')->form());
         self::assertResponseStatusCodeSame(303);
         $em = $this->entityManager();
@@ -244,7 +245,7 @@ final class TechnicalWorkspaceTest extends VenueTestCase
     #[DataProvider('invalidTransforms')]
     public function testForgedTransformsCannotChangeThePlan(string $field, string $value): void
     {
-        $uri = '/fiches/' . $this->sheetId . '/plan-de-scene';
+        $uri = '/fiches/'.$this->sheetId.'/plan-de-scene';
         $crawler = $this->client->request('GET', $uri);
         $original = $this->sheet()->getStagePlan();
         $values = $crawler->filter('form[name="stage_plan"]')->form()->getPhpValues();
@@ -269,7 +270,7 @@ final class TechnicalWorkspaceTest extends VenueTestCase
 
     public function testStalePlanAndOtherGroupsSheetsAreProtected(): void
     {
-        $uri = '/fiches/' . $this->sheetId . '/plan-de-scene';
+        $uri = '/fiches/'.$this->sheetId.'/plan-de-scene';
         $crawler = $this->client->request('GET', $uri);
         $values = $crawler->filter('form[name="stage_plan"]')->form()->getPhpValues();
         $plan = $this->sheet()->getStagePlan();
@@ -284,7 +285,7 @@ final class TechnicalWorkspaceTest extends VenueTestCase
         $id = $sheet->getId();
         foreach (['plan-de-scene', 'materiel'] as $suffix) {
             foreach (['GET', 'POST'] as $method) {
-                $this->client->request($method, '/fiches/' . $id . '/' . $suffix);
+                $this->client->request($method, '/fiches/'.$id.'/'.$suffix);
                 self::assertResponseStatusCodeSame(403);
             }
         }

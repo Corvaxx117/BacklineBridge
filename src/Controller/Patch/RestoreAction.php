@@ -13,14 +13,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[
-    Route(
-        '/sources/{id}/restore',
-        name: 'app_patch_restore',
-        requirements: ['id' => '\d+'],
-        methods: ['POST'],
-    ),
-]
+#[Route(
+    '/sources/{id}/restore',
+    name: 'app_patch_restore',
+    requirements: ['id' => '\d+'],
+    methods: ['POST'],
+),]
 final class RestoreAction extends AbstractController
 {
     public function __invoke(
@@ -32,7 +30,7 @@ final class RestoreAction extends AbstractController
         $this->denyAccessUnlessGranted(TechnicalSheetVoter::DELETE, $sheet);
         if (
             !$this->isCsrfTokenValid(
-                'patch_restore_' . $line->getId(),
+                'patch_restore_'.$line->getId(),
                 $request->getPayload()->getString('_token'),
             )
         ) {
@@ -54,7 +52,7 @@ final class RestoreAction extends AbstractController
         }
         $this->addFlash('success', 'La source a été restaurée dans le patch.');
 
-        return $concertId !== null
+        return null !== $concertId
             ? $this->redirectToRoute(
                 'app_concert_show',
                 ['id' => $concertId],

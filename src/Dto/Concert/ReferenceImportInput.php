@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final class ReferenceImportInput
 {
+    /** @var list<string> */
     #[Assert\Count(min: 1, minMessage: 'Choisis au moins une section à récupérer.')]
     #[Assert\Choice(choices: ['patch', 'stage', 'equipment', 'notes'], multiple: true)]
     public array $sections = [];

@@ -10,7 +10,13 @@ use App\Repository\TreasuryRepository;
 
 final readonly class TreasuryView
 {
-    public function __construct(private TreasuryRepository $treasury) {}
+    public function __construct(private TreasuryRepository $treasury)
+    {
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
     public function summary(Band $band): array
     {
         $first = new \DateTimeImmutable(
@@ -19,7 +25,7 @@ final readonly class TreasuryView
         )->modify('-5 months');
         $months = [];
         for ($i = 0; $i < 6; ++$i) {
-            $date = $first->modify('+' . $i . ' months');
+            $date = $first->modify('+'.$i.' months');
             $months[$date->format('Y-m')] = [
                 'label' => $date->format('m/Y'),
                 'income' => 0,
@@ -30,16 +36,17 @@ final readonly class TreasuryView
             $key = $entry->getOccurredOn()->format('Y-m');
             if (isset($months[$key])) {
                 $months[$key][
-                    $entry->getKind() === TreasuryEntryKind::Income ? 'income' : 'expense'
+                    TreasuryEntryKind::Income === $entry->getKind() ? 'income' : 'expense'
                 ] += $entry->getAmountCents();
             }
         }
         $accounts = $this->treasury->accounts($band);
         $income = array_sum(array_column($months, 'income'));
         $expense = array_sum(array_column($months, 'expense'));
+
         return [
             'accounts' => $accounts,
-            'total' => array_sum(array_map(static fn($a): int => $a->getBalanceCents(), $accounts)),
+            'total' => array_sum(array_map(static fn ($a): int => $a->getBalanceCents(), $accounts)),
             'months' => array_values($months),
             'income' => $income,
             'expense' => $expense,

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Security\Voter;
 
 use App\Entity\TechnicalSheet;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 /** @extends Voter<string, TechnicalSheet> */
 final class TechnicalSheetVoter extends Voter
@@ -18,12 +18,14 @@ final class TechnicalSheetVoter extends Voter
     public const EDIT = 'SHEET_EDIT';
     public const DELETE = 'SHEET_DELETE';
 
-    public function __construct(private readonly AccessDecisionManagerInterface $decisions) {}
+    public function __construct(private readonly AccessDecisionManagerInterface $decisions)
+    {
+    }
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return $subject instanceof TechnicalSheet &&
-            in_array($attribute, [self::VIEW, self::EDIT, self::DELETE, self::MANAGE], true);
+        return $subject instanceof TechnicalSheet
+            && in_array($attribute, [self::VIEW, self::EDIT, self::DELETE, self::MANAGE], true);
     }
 
     protected function voteOnAttribute(
@@ -33,21 +35,18 @@ final class TechnicalSheetVoter extends Voter
         ?Vote $vote = null,
     ): bool {
         $band = $subject->getBand();
-        if ($band === null) {
+        if (null === $band) {
             return false;
         }
 
-        return $this->decisions->decide(
-            $token,
-            [
-                match ($attribute) {
-                    self::VIEW => BandVoter::VIEW,
-                    self::EDIT => BandVoter::EDIT_PATCH,
-                    self::DELETE => BandVoter::DELETE_PATCH,
-                    self::MANAGE => BandVoter::MANAGE_TECHNICAL,
-                },
-            ],
-            $band,
-        );
+        $bandAttribute = match ($attribute) {
+            self::VIEW => BandVoter::VIEW,
+            self::EDIT => BandVoter::EDIT_PATCH,
+            self::DELETE => BandVoter::DELETE_PATCH,
+            self::MANAGE => BandVoter::MANAGE_TECHNICAL,
+            default => null,
+        };
+
+        return null !== $bandAttribute && $this->decisions->decide($token, [$bandAttribute], $band);
     }
 }

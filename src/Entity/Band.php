@@ -36,13 +36,21 @@ class Band
         $referenceSheet->setReferenceBand($this);
     }
 
+    /** @var list<array{label: string, url: string}> */
     #[ORM\Column(type: 'json', options: ['default' => '[]'])]
     private array $usefulLinks = [];
 
+    /**
+     * @return list<array{label: string, url: string}>
+     */
     public function getUsefulLinks(): array
     {
         return $this->usefulLinks;
     }
+
+    /**
+     * @param list<array{label: string, url: string}> $links
+     */
     public function setUsefulLinks(array $links): void
     {
         $this->usefulLinks = $links;

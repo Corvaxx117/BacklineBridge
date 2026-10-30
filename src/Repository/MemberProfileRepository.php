@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\{Band, MemberProfile, User};
+use App\Entity\Band;
+use App\Entity\MemberProfile;
+use App\Entity\User;
 use App\Enum\MemberKind;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,6 +18,7 @@ final class MemberProfileRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, MemberProfile::class);
     }
+
     /** @return list<MemberProfile> */
     public function forBand(Band $band): array
     {
@@ -29,8 +32,9 @@ final class MemberProfileRepository extends ServiceEntityRepository
 
     public function isMusician(User $user, Band $band): bool
     {
-        return $this->forUser($user, $band)?->getKind() === MemberKind::Musician;
+        return MemberKind::Musician === $this->forUser($user, $band)?->getKind();
     }
+
     /** @return list<MemberProfile> */
     public function activationChoices(): array
     {

@@ -8,6 +8,9 @@ use App\Integration\Bandsintown\Dto\BandsintownEvent;
 
 final class BandsintownEventNormalizer
 {
+    /**
+     * @param array<string, mixed> $data
+     */
     public function normalize(array $data, string $artistId): BandsintownEvent
     {
         $rawId = $data['id'] ?? null;
@@ -16,35 +19,36 @@ final class BandsintownEventNormalizer
         }
         $id = (string) $rawId;
         if (
-            preg_match('/^[1-9][0-9]{0,29}$/D', $id) !== 1 ||
-            (isset($data['artist_id']) &&
-                ((!is_string($data['artist_id']) && !is_int($data['artist_id'])) ||
-                    (string) $data['artist_id'] !== $artistId))
+            1 !== preg_match('/^[1-9][0-9]{0,29}$/D', $id)
+            || (isset($data['artist_id'])
+                && ((!is_string($data['artist_id']) && !is_int($data['artist_id']))
+                    || (string) $data['artist_id'] !== $artistId))
         ) {
             throw new \UnexpectedValueException('Annonce ou artiste invalide.');
         }
         if (
-            ($data['cancelled'] ?? false) === true ||
-            ($data['canceled'] ?? false) === true ||
-            in_array($data['status'] ?? '', ['cancelled', 'canceled'], true) ||
-            ($data['streaming_event'] ?? false) === true
+            ($data['cancelled'] ?? false) === true
+            || ($data['canceled'] ?? false) === true
+            || in_array($data['status'] ?? '', ['cancelled', 'canceled'], true)
+            || ($data['streaming_event'] ?? false) === true
         ) {
             throw new \UnexpectedValueException('Annonce annulée ou diffusée en ligne.');
         }
         $datetime = $data['datetime'] ?? '';
         if (
-            !is_string($datetime) ||
-            preg_match(
-                '/^(\d{4}-\d{2}-\d{2})T([0-2][0-9]):([0-5][0-9]):([0-5][0-9])(?:\.\d{1,6})?(?:Z|[+-][0-2][0-9]:[0-5][0-9])?$/D',
-                $datetime,
-                $match,
-            ) !== 1 ||
-            (int) $match[2] > 23
+            !is_string($datetime)
+            || 1 !==
+                preg_match(
+                    '/^(\d{4}-\d{2}-\d{2})T([0-2][0-9]):([0-5][0-9]):([0-5][0-9])(?:\.\d{1,6})?(?:Z|[+-][0-2][0-9]:[0-5][0-9])?$/D',
+                    $datetime,
+                    $match,
+                )
+            || (int) $match[2] > 23
         ) {
             throw new \UnexpectedValueException('Date ou heure invalide.');
         }
         $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $match[1], new \DateTimeZone('UTC'));
-        if ($date === false || $date->format('Y-m-d') !== $match[1]) {
+        if (false === $date || $date->format('Y-m-d') !== $match[1]) {
             throw new \UnexpectedValueException('Date invalide.');
         }
         $venue = $data['venue'] ?? [];
@@ -53,7 +57,7 @@ final class BandsintownEventNormalizer
         }
         $name = $this->text($venue['name'] ?? '', 150);
         $city = $this->text($venue['city'] ?? '', 120);
-        if ($name === '' || $city === '') {
+        if ('' === $name || '' === $city) {
             throw new \UnexpectedValueException('Salle ou ville manquante.');
         }
         $lineup = [];
@@ -61,7 +65,7 @@ final class BandsintownEventNormalizer
             if (is_string($artist) && ($nameInLineup = $this->text($artist, 150)) !== '') {
                 $lineup[] = $nameInLineup;
             }
-            if (count($lineup) === 50) {
+            if (50 === count($lineup)) {
                 break;
             }
         }
@@ -73,15 +77,16 @@ final class BandsintownEventNormalizer
                     'url' => $url,
                 ];
             }
-            if (count($tickets) === 10) {
+            if (10 === count($tickets)) {
                 break;
             }
         }
+
         return new BandsintownEvent(
             $id,
             $artistId,
             $match[1],
-            $match[2] . ':' . $match[3],
+            $match[2].':'.$match[3],
             $name,
             $city,
             $this->text($venue['country'] ?? '', 100),
@@ -101,28 +106,30 @@ final class BandsintownEventNormalizer
     private function safeUrl(mixed $value): ?string
     {
         if (
-            !is_string($value) ||
-            strlen($value) > 2000 ||
-            !filter_var($value, FILTER_VALIDATE_URL)
+            !is_string($value)
+            || strlen($value) > 2000
+            || !filter_var($value, FILTER_VALIDATE_URL)
         ) {
             return null;
         }
         $parts = parse_url($value);
         if (
-            ($parts['scheme'] ?? '') !== 'https' ||
-            isset($parts['user']) ||
-            isset($parts['pass'])
+            ($parts['scheme'] ?? '') !== 'https'
+            || !isset($parts['host'])
+            || isset($parts['user'])
+            || isset($parts['pass'])
         ) {
             return null;
         }
         $query = [];
         parse_str($parts['query'] ?? '', $query);
         unset($query['app_id']);
-        return 'https://' .
-            $parts['host'] .
-            (isset($parts['port']) ? ':' . $parts['port'] : '') .
-            ($parts['path'] ?? '') .
-            ($query !== [] ? '?' . http_build_query($query) : '') .
-            (isset($parts['fragment']) ? '#' . $parts['fragment'] : '');
+
+        return 'https://'.
+            $parts['host'].
+            (isset($parts['port']) ? ':'.$parts['port'] : '').
+            ($parts['path'] ?? '').
+            ([] !== $query ? '?'.http_build_query($query) : '').
+            (isset($parts['fragment']) ? '#'.$parts['fragment'] : '');
     }
 }

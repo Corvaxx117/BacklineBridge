@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller\Merch;
 
-use App\Entity\{MerchVariant, User};
 use App\Dto\Merch\StockMovementInput;
+use App\Entity\MerchVariant;
+use App\Entity\User;
 use App\Enum\StockMovementKind;
 use App\Form\Merch\StockMovementType;
 use App\Security\Voter\BandVoter;
@@ -15,19 +16,18 @@ use Doctrine\ORM\OptimisticLockException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\{Request, Response};
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
-#[
-    Route(
-        '/stock/variantes/{id}/mouvement',
-        name: 'app_stock_movement',
-        requirements: ['id' => '\d+'],
-        methods: ['GET', 'POST'],
-    ),
-]
+#[Route(
+    '/stock/variantes/{id}/mouvement',
+    name: 'app_stock_movement',
+    requirements: ['id' => '\d+'],
+    methods: ['GET', 'POST'],
+),]
 final class MovementAction extends AbstractController
 {
     public function __invoke(
@@ -43,7 +43,7 @@ final class MovementAction extends AbstractController
         $input = new StockMovementInput();
         $input->revision = (string) $variant->getRevision();
         $input->treasuryRevision = $treasury->fingerprint($variant->getBand());
-        if ($variant->getQuantity() === null || $request->query->get('action') === 'count') {
+        if (null === $variant->getQuantity() || 'count' === $request->query->get('action')) {
             $input->kind = StockMovementKind::Count;
             $input->quantity = $variant->getQuantity();
         }
@@ -54,17 +54,18 @@ final class MovementAction extends AbstractController
                 $stock->record($variant, $user, $input);
                 $this->addFlash(
                     'success',
-                    'Le stock a été mis à jour' .
-                        ($input->kind === StockMovementKind::Sale
+                    'Le stock a été mis à jour'.
+                        (StockMovementKind::Sale === $input->kind
                             ? ' et la recette a été ajoutée.'
                             : '.'),
                 );
+
                 return $this->redirectToRoute(
                     'app_stock_index',
                     ['id' => $variant->getBand()->getId()],
                     303,
                 );
-            } catch (ConflictHttpException | OptimisticLockException) {
+            } catch (ConflictHttpException|OptimisticLockException) {
                 $form->addError(
                     new FormError(
                         'Le stock ou les soldes ont changé. Recharge le formulaire avant de réessayer.',
@@ -75,6 +76,7 @@ final class MovementAction extends AbstractController
                 $form->addError(new FormError($error->getMessage()));
             }
         }
+
         return $this->render(
             'merch/movement.html.twig',
             ['band' => $variant->getBand(), 'variant' => $variant, 'form' => $form->createView()],

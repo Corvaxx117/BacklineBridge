@@ -8,17 +8,20 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class ActivationCodeWriter
 {
-    public function __construct(#[Autowire('%kernel.project_dir%')] private string $projectDir) {}
+    public function __construct(#[Autowire('%kernel.project_dir%')] private string $projectDir)
+    {
+    }
+
     /** @param list<array{name: string, code: string, expires: string}> $codes */
     public function write(#[\SensitiveParameter] array $codes): string
     {
-        $directory = $this->projectDir . '/var/private';
+        $directory = $this->projectDir.'/var/private';
         if (!is_dir($directory) && !mkdir($directory, 0700, true) && !is_dir($directory)) {
             throw new \RuntimeException('Impossible de préparer les codes privés.');
         }
-        $path = $directory . '/activation-codes-' . bin2hex(random_bytes(8)) . '.json';
+        $path = $directory.'/activation-codes-'.bin2hex(random_bytes(8)).'.json';
         $handle = fopen($path, 'x');
-        if ($handle === false) {
+        if (false === $handle) {
             throw new \RuntimeException('Impossible de créer le fichier privé.');
         }
         try {
@@ -38,6 +41,7 @@ final readonly class ActivationCodeWriter
         } finally {
             fclose($handle);
         }
+
         return $path;
     }
 }

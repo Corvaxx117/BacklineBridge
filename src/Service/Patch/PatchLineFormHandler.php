@@ -12,9 +12,15 @@ use Symfony\Component\Form\FormInterface;
 
 final readonly class PatchLineFormHandler
 {
-    public function __construct(private EntityManagerInterface $entityManager) {}
+    public function __construct(private EntityManagerInterface $entityManager)
+    {
+    }
 
-    /** Le contrôleur a déjà appelé handleRequest() sur le formulaire. */
+    /**
+     * Le contrôleur a déjà appelé handleRequest() sur le formulaire.
+     *
+     * @param FormInterface<PatchLine> $form
+     */
     public function handle(FormInterface $form, PatchLine $line): FormSubmissionResult
     {
         if (!$form->isSubmitted()) {
@@ -26,7 +32,7 @@ final readonly class PatchLineFormHandler
         }
 
         try {
-            if ($line->getId() === null) {
+            if (null === $line->getId()) {
                 $this->entityManager->persist($line);
             }
 

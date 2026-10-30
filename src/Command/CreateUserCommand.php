@@ -19,12 +19,10 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 
-#[
-    AsCommand(
-        name: 'app:user:create',
-        description: 'Crée un compte et son accès à un groupe, avec saisie masquée du mot de passe.',
-    ),
-]
+#[AsCommand(
+    name: 'app:user:create',
+    description: 'Crée un compte et son accès à un groupe, avec saisie masquée du mot de passe.',
+),]
 final class CreateUserCommand extends Command
 {
     public function __construct(
@@ -61,7 +59,7 @@ final class CreateUserCommand extends Command
             return Command::INVALID;
         }
         $role = BandRole::tryFrom((string) $input->getOption('role'));
-        if ($role === null) {
+        if (null === $role) {
             $io->error('Choisis manager, booker, editor ou viewer.');
 
             return Command::INVALID;
@@ -69,12 +67,12 @@ final class CreateUserCommand extends Command
         $bands = $this->entityManager->getRepository(Band::class);
         $bandOption = $input->getOption('band');
         $band =
-            $bandOption !== null
+            null !== $bandOption
                 ? $bands->find($bandOption)
-                : ($bands->count([]) === 1
+                : (1 === $bands->count([])
                     ? $bands->findOneBy([])
                     : null);
-        if (!($band instanceof Band)) {
+        if (!$band instanceof Band) {
             $io->error(
                 'Précise un groupe existant avec --band. Sur une base vide, lance d’abord composer setup.',
             );
@@ -92,7 +90,7 @@ final class CreateUserCommand extends Command
         );
         $email = (string) $io->ask('Adresse e-mail');
         $name = (string) $io->ask('Nom affiché');
-        $passwordQuestion = new Question('Mot de passe — ' . AccountPassword::HELP)
+        $passwordQuestion = new Question('Mot de passe — '.AccountPassword::HELP)
             ->setHidden(true)
             ->setHiddenFallback(false);
         $confirmationQuestion = new Question('Confirmer le mot de passe')
@@ -110,7 +108,7 @@ final class CreateUserCommand extends Command
             $user = $this->creator->create($email, $name, $password, $band, $role);
         } catch (ValidationFailedException $exception) {
             foreach ($exception->getViolations() as $violation) {
-                $io->error($violation->getPropertyPath() . ': ' . $violation->getMessage());
+                $io->error($violation->getPropertyPath().': '.$violation->getMessage());
             }
 
             return Command::INVALID;

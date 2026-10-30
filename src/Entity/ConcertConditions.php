@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Enum\Accommodation;
-use App\Enum\TransportCoverage;
+use App\Enum\EngineerPayment;
 use App\Enum\PaymentFramework;
 use App\Enum\PaymentMethod;
-use App\Enum\EngineerPayment;
+use App\Enum\TransportCoverage;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -39,14 +39,12 @@ class ConcertConditions
     #[ORM\Column(length: 30, enumType: EngineerPayment::class, options: ['default' => 'unknown'])]
     private EngineerPayment $engineerPayment = EngineerPayment::Unknown;
 
-    #[
-        ORM\Column(
-            name: 'engineer_payment_framework',
-            length: 30,
-            enumType: PaymentFramework::class,
-            options: ['default' => 'unknown'],
-        ),
-    ]
+    #[ORM\Column(
+        name: 'engineer_payment_framework',
+        length: 30,
+        enumType: PaymentFramework::class,
+        options: ['default' => 'unknown'],
+    ),]
     private PaymentFramework $engineerPaymentFramework = PaymentFramework::Unknown;
 
     public function getEngineerPaymentFramework(): PaymentFramework

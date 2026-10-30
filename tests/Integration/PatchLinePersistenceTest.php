@@ -47,7 +47,7 @@ final class PatchLinePersistenceTest extends DatabaseTestCase
         $lines = $em->getRepository(PatchLine::class)->findBy(['channelNumber' => 17]);
         self::assertCount(2, $lines);
         $sheetIds = array_map(
-            static fn(PatchLine $line): ?int => $line->getSheet()?->getId(),
+            static fn (PatchLine $line): ?int => $line->getSheet()?->getId(),
             $lines,
         );
         self::assertContains($this->sheetId, $sheetIds);

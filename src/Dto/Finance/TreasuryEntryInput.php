@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Dto\Finance;
 
-use App\Enum\{TreasuryAccountKind, TreasuryEntryKind};
+use App\Enum\TreasuryAccountKind;
+use App\Enum\TreasuryEntryKind;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -26,13 +27,11 @@ class TreasuryEntryInput
     public ?TreasuryEntryKind $kind = TreasuryEntryKind::Income;
     #[Assert\NotNull]
     public ?TreasuryAccountKind $account = TreasuryAccountKind::Cash;
-    #[
-        Assert\NotBlank,
+    #[Assert\NotBlank,
         Assert\Regex(
             pattern: '/^\d{1,7}(?:[,.]\d{1,2})?$/D',
             message: 'Indique un montant en euros avec deux décimales maximum.',
-        ),
-    ]
+        ),]
     public string $amount = '';
     #[Assert\Choice(choices: self::CATEGORIES)]
     public string $category = 'Autre';
@@ -40,16 +39,18 @@ class TreasuryEntryInput
     public ?\DateTimeImmutable $occurredOn;
     #[Assert\NotBlank]
     public string $revision = '';
+
     public function __construct()
     {
         $this->occurredOn = new \DateTimeImmutable('today', new \DateTimeZone('Europe/Paris'));
     }
+
     #[Assert\Callback]
     public function checkDate(ExecutionContextInterface $context): void
     {
         if (
-            $this->occurredOn !== null &&
-            $this->occurredOn->format('Y-m-d') >
+            null !== $this->occurredOn
+            && $this->occurredOn->format('Y-m-d') >
                 new \DateTimeImmutable('today', new \DateTimeZone('Europe/Paris'))->format('Y-m-d')
         ) {
             $context

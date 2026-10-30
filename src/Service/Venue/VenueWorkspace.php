@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Service\Venue;
 
-use App\Entity\{Concert, VenueInvitation, VenueReply};
+use App\Entity\Concert;
+use App\Entity\VenueInvitation;
+use App\Entity\VenueReply;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class VenueWorkspace
@@ -12,8 +14,12 @@ final readonly class VenueWorkspace
     public function __construct(
         private EntityManagerInterface $em,
         private PublicationBuilder $builder,
-    ) {}
+    ) {
+    }
 
+    /**
+     * @return list<array{invitation: VenueInvitation, reply: ?VenueReply, outdated: bool, requests: array<string, array{category: string, label: string, specification: string}>}>
+     */
     public function invitations(Concert $concert): array
     {
         $invitations = $this->em

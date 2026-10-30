@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller\Member\Activation;
 
-use App\Entity\MemberProfile;
 use App\Dto\Member\ActivationInput;
+use App\Entity\MemberProfile;
 use App\Form\Member\ActivationType;
 use App\Service\Member\AccountActivator;
 use Doctrine\ORM\OptimisticLockException;
@@ -14,18 +14,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\{Request, Response};
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[
-    Route(
-        '/premiere-connexion/{publicId}',
-        name: 'app_activation_create_password',
-        requirements: ['publicId' => '[a-f0-9]{32}'],
-        methods: ['GET', 'POST'],
-    ),
-]
+#[Route(
+    '/premiere-connexion/{publicId}',
+    name: 'app_activation_create_password',
+    requirements: ['publicId' => '[a-f0-9]{32}'],
+    methods: ['GET', 'POST'],
+),]
 final class CreatePasswordAction extends AbstractController
 {
     public function __invoke(
@@ -35,7 +34,7 @@ final class CreatePasswordAction extends AbstractController
         Security $security,
         #[Autowire(service: 'limiter.member_activation')] RateLimiterFactory $limiter,
     ): Response {
-        if ($this->getUser() !== null) {
+        if (null !== $this->getUser()) {
             return $this->redirectToRoute('app_concert_index');
         }
         if (!$profile->canActivate()) {
@@ -43,7 +42,7 @@ final class CreatePasswordAction extends AbstractController
         }
         $input = new ActivationInput();
         $form = $this->createForm(ActivationType::class, $input, [
-            'csrf_token_id' => 'activation_' . $profile->getPublicId(),
+            'csrf_token_id' => 'activation_'.$profile->getPublicId(),
         ])->handleRequest($request);
         $status = $form->isSubmitted() ? 422 : 200;
         if ($form->isSubmitted()) {
@@ -55,9 +54,10 @@ final class CreatePasswordAction extends AbstractController
                 $status = 429;
             } elseif ($form->isValid()) {
                 try {
-                    $activator->activate($profile, $input->code, $input->password);
-                    $security->login($profile->getUser(), 'form_login', 'main');
+                    $user = $activator->activate($profile, $input->code, $input->password);
+                    $security->login($user, 'form_login', 'main');
                     $this->addFlash('success', 'Ton compte est activé. Bienvenue !');
+
                     return $this->redirectToRoute(
                         'app_profile_show',
                         ['publicId' => $profile->getPublicId()],
@@ -75,6 +75,7 @@ final class CreatePasswordAction extends AbstractController
                 }
             }
         }
+
         return $this->render(
             'member/activate.html.twig',
             ['profile' => $profile, 'form' => $form->createView()],

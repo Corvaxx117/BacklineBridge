@@ -13,14 +13,15 @@ final readonly class BandsintownConfiguration
         #[Autowire('%env(BANDSINTOWN_BAND_ID)%')] private string $bandId,
         #[Autowire('%env(BANDSINTOWN_ARTIST_ID)%')] public string $artistId,
         #[Autowire('%env(BANDSINTOWN_APP_ID)%')] #[\SensitiveParameter] private string $appId,
-    ) {}
+    ) {
+    }
 
     public function isConfiguredFor(Band $band): bool
     {
-        return $band->getId() !== null &&
-            (string) $band->getId() === $this->bandId &&
-            preg_match('/^[1-9][0-9]{0,29}$/D', $this->artistId) === 1 &&
-            trim($this->appId) !== '';
+        return null !== $band->getId()
+            && (string) $band->getId() === $this->bandId
+            && 1 === preg_match('/^[1-9][0-9]{0,29}$/D', $this->artistId)
+            && '' !== trim($this->appId);
     }
 
     public function credentials(): string
@@ -30,7 +31,7 @@ final readonly class BandsintownConfiguration
 
     public function cacheKey(): string
     {
-        return 'bandsintown.' .
-            hash('sha256', $this->bandId . ':' . $this->artistId . ':' . $this->appId);
+        return 'bandsintown.'.
+            hash('sha256', $this->bandId.':'.$this->artistId.':'.$this->appId);
     }
 }

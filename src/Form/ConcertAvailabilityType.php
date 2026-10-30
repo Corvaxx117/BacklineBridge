@@ -7,10 +7,13 @@ namespace App\Form;
 use App\Dto\Concert\AvailabilityInput;
 use App\Enum\AvailabilityStatus;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\{EnumType, HiddenType, TextareaType};
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** @extends AbstractType<AvailabilityInput> */
 final class ConcertAvailabilityType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -18,7 +21,7 @@ final class ConcertAvailabilityType extends AbstractType
         $builder
             ->add('status', EnumType::class, [
                 'class' => AvailabilityStatus::class,
-                'choice_label' => static fn(AvailabilityStatus $status): string => $status->label(),
+                'choice_label' => static fn (AvailabilityStatus $status): string => $status->label(),
                 'expanded' => true,
                 'label' => 'Ma disponibilité',
             ])

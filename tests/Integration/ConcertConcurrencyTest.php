@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Dto\Concert\CreateConcertInput;
-use App\Entity\{Concert, ConcertAvailability};
+use App\Entity\Concert;
+use App\Entity\ConcertAvailability;
 use App\Enum\AvailabilityStatus;
 use App\Service\Concert\ConcertUpdater;
 use App\Tests\VenueTestCase;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\ORM\{EntityManager, OptimisticLockException};
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\OptimisticLockException;
 
 final class ConcertConcurrencyTest extends VenueTestCase
 {

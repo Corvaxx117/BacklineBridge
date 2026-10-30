@@ -32,7 +32,7 @@ final class ArchiveActionTest extends DatabaseTestCase
         $this->entityManager()->clear();
         self::assertFalse($this->entityManager()->find(PatchLine::class, $lineId)->isActive());
         $this->client->submit(
-            $crawler->filter('form[action="/sources/' . $lineId . '/restore"]')->form(),
+            $crawler->filter('form[action="/sources/'.$lineId.'/restore"]')->form(),
         );
         self::assertResponseRedirects('/', 303);
         $this->client->followRedirect();
@@ -49,8 +49,8 @@ final class ArchiveActionTest extends DatabaseTestCase
             ->create($this->sheet(), new \DateTimeImmutable('2026-12-12'), 'Salle', 'Lyon');
         $id = $concert->getId();
         $lineId = $concert->getPatchSheet()->getLines()->first()->getId();
-        $this->removeFromPage('/concerts/' . $id, $lineId);
-        self::assertResponseRedirects('/concerts/' . $id, 303);
+        $this->removeFromPage('/concerts/'.$id, $lineId);
+        self::assertResponseRedirects('/concerts/'.$id, 303);
         $crawler = $this->client->followRedirect();
         self::assertCount(21, $crawler->filter('table tbody tr'));
         $this->entityManager()->clear();
@@ -71,11 +71,11 @@ final class ArchiveActionTest extends DatabaseTestCase
             array_replace($this->newLineValues(), ['channelNumber' => '17']),
         );
         self::assertResponseRedirects('/', 303);
-        $crawler = $this->client->request('GET', '/patchs/' . $this->sheetId . '/corbeille');
+        $crawler = $this->client->request('GET', '/patchs/'.$this->sheetId.'/corbeille');
         $this->client->submit(
-            $crawler->filter('form[action="/sources/' . $oldId . '/restore"]')->form(),
+            $crawler->filter('form[action="/sources/'.$oldId.'/restore"]')->form(),
         );
-        self::assertResponseRedirects('/patchs/' . $this->sheetId . '/corbeille', 303);
+        self::assertResponseRedirects('/patchs/'.$this->sheetId.'/corbeille', 303);
         $this->client->followRedirect();
         self::assertSelectorTextContains('[role="alert"]', 'canal est déjà utilisé');
         $em = $this->entityManager();
@@ -89,10 +89,10 @@ final class ArchiveActionTest extends DatabaseTestCase
         $replacementId = $replacement->getId();
         $this->removeFromPage('/', $replacementId);
         self::assertResponseRedirects('/', 303);
-        $crawler = $this->client->request('GET', '/patchs/' . $this->sheetId . '/corbeille');
+        $crawler = $this->client->request('GET', '/patchs/'.$this->sheetId.'/corbeille');
         self::assertCount(2, $crawler->filter('.trash-list li'));
         $this->client->submit(
-            $crawler->filter('form[action="/sources/' . $oldId . '/restore"]')->form(),
+            $crawler->filter('form[action="/sources/'.$oldId.'/restore"]')->form(),
         );
         self::assertResponseRedirects('/', 303);
         $this->entityManager()->clear();
@@ -106,7 +106,7 @@ final class ArchiveActionTest extends DatabaseTestCase
     {
         $id = $this->lineForChannel(17)->getId();
         $this->removeFromPage('/', $id);
-        $this->client->request('GET', '/sources/' . $id . '/edit');
+        $this->client->request('GET', '/sources/'.$id.'/edit');
         self::assertResponseStatusCodeSame(404);
         $em = $this->entityManager();
         $em->clear();
@@ -120,14 +120,14 @@ final class ArchiveActionTest extends DatabaseTestCase
     public function testDeleteAndRestoreRequirePostAndValidCsrf(): void
     {
         $id = $this->lineForChannel(17)->getId();
-        $this->client->request('GET', '/sources/' . $id . '/delete');
+        $this->client->request('GET', '/sources/'.$id.'/delete');
         self::assertResponseStatusCodeSame(405);
-        $this->client->request('POST', '/sources/' . $id . '/delete');
+        $this->client->request('POST', '/sources/'.$id.'/delete');
         self::assertResponseStatusCodeSame(403);
         $this->entityManager()->clear();
         self::assertTrue($this->lineForChannel(17)->isActive());
         $this->removeFromPage('/', $id);
-        $this->client->request('POST', '/sources/' . $id . '/restore');
+        $this->client->request('POST', '/sources/'.$id.'/restore');
         self::assertResponseStatusCodeSame(403);
         $this->entityManager()->clear();
         self::assertFalse($this->entityManager()->find(PatchLine::class, $id)->isActive());
@@ -150,11 +150,11 @@ final class ArchiveActionTest extends DatabaseTestCase
         $this->client->request('GET', '/');
         self::assertSelectorNotExists('.delete-source');
         self::assertSelectorNotExists('.trash-link');
-        foreach (['/sources/' . $id . '/delete', '/sources/' . $id . '/restore'] as $path) {
+        foreach (['/sources/'.$id.'/delete', '/sources/'.$id.'/restore'] as $path) {
             $this->client->request('POST', $path);
             self::assertResponseStatusCodeSame(403);
         }
-        $this->client->request('GET', '/patchs/' . $this->sheetId . '/corbeille');
+        $this->client->request('GET', '/patchs/'.$this->sheetId.'/corbeille');
         self::assertResponseStatusCodeSame(403);
         $this->entityManager()->clear();
         self::assertTrue($this->lineForChannel(17)->isActive());
@@ -175,7 +175,7 @@ final class ArchiveActionTest extends DatabaseTestCase
             $managers[] = static::getContainer()
                 ->get(UserCreator::class)
                 ->create(
-                    'manager' . $index . '@example.test',
+                    'manager'.$index.'@example.test',
                     $name,
                     'Manager test password 2026!',
                     $band,
@@ -198,7 +198,7 @@ final class ArchiveActionTest extends DatabaseTestCase
         $crawler = $this->client->request('GET', $uri);
         self::assertResponseIsSuccessful();
         $this->client->submit(
-            $crawler->filter('form[action="/sources/' . $id . '/delete"]')->form(),
+            $crawler->filter('form[action="/sources/'.$id.'/delete"]')->form(),
         );
     }
 }

@@ -18,7 +18,7 @@ final class Version20261027220000 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->abortIf(
-            !($this->connection->getDatabasePlatform() instanceof SQLitePlatform),
+            !$this->connection->getDatabasePlatform() instanceof SQLitePlatform,
             'Ce jalon utilise SQLite.',
         );
 
@@ -31,7 +31,7 @@ final class Version20261027220000 extends AbstractMigration
     public function down(Schema $schema): void
     {
         $this->abortIf(
-            !($this->connection->getDatabasePlatform() instanceof SQLitePlatform),
+            !$this->connection->getDatabasePlatform() instanceof SQLitePlatform,
             'Ce jalon utilise SQLite.',
         );
 

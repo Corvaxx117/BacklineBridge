@@ -12,6 +12,7 @@ enum StockMovementKind: string
     case Count = 'count';
     case Gift = 'gift';
     case Return = 'return';
+
     public function label(): string
     {
         return match ($this) {

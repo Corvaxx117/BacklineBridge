@@ -12,14 +12,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[
-    Route(
-        '/equipe/{publicId}',
-        name: 'app_profile_show',
-        requirements: ['publicId' => '[a-f0-9]{32}'],
-        methods: ['GET'],
-    ),
-]
+#[Route(
+    '/equipe/{publicId}',
+    name: 'app_profile_show',
+    requirements: ['publicId' => '[a-f0-9]{32}'],
+    methods: ['GET'],
+),]
 final class ProfileAction extends AbstractController
 {
     public function __invoke(
@@ -27,6 +25,7 @@ final class ProfileAction extends AbstractController
         ProfileCipher $cipher,
     ): Response {
         $this->denyAccessUnlessGranted(MemberProfileVoter::VIEW, $profile);
+
         return $this->render('member/profile.html.twig', [
             'band' => $profile->getBand(),
             'profile' => $profile,

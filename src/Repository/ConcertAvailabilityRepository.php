@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\{Concert, ConcertAvailability, User};
+use App\Entity\Concert;
+use App\Entity\ConcertAvailability;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -28,10 +30,14 @@ final class ConcertAvailabilityRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    /** @return array<int, ConcertAvailability> */
+    /**
+     * @param list<Concert> $concerts
+     *
+     * @return array<int, ConcertAvailability>
+     */
     public function forUserAndConcerts(User $user, array $concerts): array
     {
-        if ($concerts === []) {
+        if ([] === $concerts) {
             return [];
         }
 
@@ -44,7 +50,10 @@ final class ConcertAvailabilityRepository extends ServiceEntityRepository
             ->getResult();
         $indexed = [];
         foreach ($records as $record) {
-            $indexed[$record->getConcert()->getId()] = $record;
+            $id =
+                $record->getConcert()->getId() ??
+                throw new \LogicException('Un concert enregistré doit avoir un identifiant.');
+            $indexed[$id] = $record;
         }
 
         return $indexed;

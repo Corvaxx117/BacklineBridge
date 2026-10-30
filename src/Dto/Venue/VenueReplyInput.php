@@ -14,10 +14,14 @@ final class VenueReplyInput
     public string $respondent = '';
     #[Assert\Length(max: 2000)]
     public ?string $notes = null;
+    /** @var array<string, AvailabilityAnswerInput> */
     #[Assert\Valid]
     public array $answers = [];
     public string $revision = '0';
 
+    /**
+     * @param array<string, array{category: string, label: string, specification: string}> $requests
+     */
     public static function forRequests(array $requests, ?VenueReply $reply): self
     {
         $input = new self();
@@ -27,7 +31,7 @@ final class VenueReplyInput
         foreach ($requests as $key => $request) {
             $answer = new AvailabilityAnswerInput();
             $saved = $reply?->getAnswers()[$key] ?? null;
-            if ($saved !== null) {
+            if (null !== $saved) {
                 $answer->status = Availability::from($saved['status']);
                 $answer->details = $saved['details'];
             }

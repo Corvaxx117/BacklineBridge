@@ -18,7 +18,7 @@ final class Version20261028133311 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->abortIf(
-            !($this->connection->getDatabasePlatform() instanceof SQLitePlatform),
+            !$this->connection->getDatabasePlatform() instanceof SQLitePlatform,
             'Cette migration utilise SQLite.',
         );
         // Ajouts en place : aucune reconstruction de concert, référencé par les publications.
@@ -28,8 +28,7 @@ final class Version20261028133311 extends AbstractMigration
             <<<'SQL'
             ALTER TABLE concert ADD COLUMN created_by_id INTEGER DEFAULT NULL
                 REFERENCES app_user (id) ON DELETE SET NULL
-            SQL
-            ,
+            SQL,
         );
         $this->addSql('CREATE INDEX IDX_D57C02D2B03A8386 ON concert (created_by_id)');
         $this->addSql(
@@ -47,15 +46,13 @@ final class Version20261028133311 extends AbstractMigration
                 CONSTRAINT FK_D6B7D9DA76ED395 FOREIGN KEY (user_id)
                     REFERENCES app_user (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE
             )
-            SQL
-            ,
+            SQL,
         );
         $this->addSql(
             <<<'SQL'
             CREATE UNIQUE INDEX uniq_availability_concert_user
                 ON concert_availability (concert_id, user_id)
-            SQL
-            ,
+            SQL,
         );
         $this->addSql('CREATE INDEX IDX_D6B7D9D83C97B2E ON concert_availability (concert_id)');
         $this->addSql('CREATE INDEX IDX_D6B7D9DA76ED395 ON concert_availability (user_id)');
@@ -67,15 +64,14 @@ final class Version20261028133311 extends AbstractMigration
                 FROM concert
                 JOIN band_membership membership ON membership.band_id = concert.band_id
                 WHERE membership.role = 'manager'
-            SQL
-            ,
+            SQL,
         );
     }
 
     public function down(Schema $schema): void
     {
         $this->abortIf(
-            !($this->connection->getDatabasePlatform() instanceof SQLitePlatform),
+            !$this->connection->getDatabasePlatform() instanceof SQLitePlatform,
             'Cette migration utilise SQLite.',
         );
         $this->addSql('DROP TABLE concert_availability');

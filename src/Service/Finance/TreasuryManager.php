@@ -4,14 +4,21 @@ declare(strict_types=1);
 
 namespace App\Service\Finance;
 
-use App\Dto\Finance\{TreasuryEntryInput, TransferInput, CancelEntryInput};
-use App\Entity\{Band, User, TreasuryEntry, TreasuryAccount, StockMovement};
-use App\Enum\{TreasuryEntryKind, StockMovementKind};
+use App\Dto\Finance\CancelEntryInput;
+use App\Dto\Finance\TransferInput;
+use App\Dto\Finance\TreasuryEntryInput;
+use App\Entity\Band;
+use App\Entity\StockMovement;
+use App\Entity\TreasuryAccount;
+use App\Entity\TreasuryEntry;
+use App\Entity\User;
+use App\Enum\StockMovementKind;
+use App\Enum\TreasuryEntryKind;
 use App\Repository\TreasuryRepository;
 use App\Service\Money\EuroAmount;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final readonly class TreasuryManager
 {
@@ -20,7 +27,8 @@ final readonly class TreasuryManager
         private TreasuryRepository $treasury,
         private MusicianAccess $access,
         private ValidatorInterface $validator,
-    ) {}
+    ) {
+    }
 
     public function fingerprint(Band $band): string
     {
@@ -28,7 +36,7 @@ final readonly class TreasuryManager
             'sha256',
             json_encode(
                 array_map(
-                    static fn(TreasuryAccount $account): array => [
+                    static fn (TreasuryAccount $account): array => [
                         $account->getId(),
                         $account->getRevision(),
                     ],
@@ -53,6 +61,7 @@ final readonly class TreasuryManager
         $this->access->assert($actor, $band);
         $this->validate($input);
         $this->assertCurrent($band, $input->revision);
+        assert(null !== $input->occurredOn);
         if (
             !in_array($input->kind, [TreasuryEntryKind::Income, TreasuryEntryKind::Expense], true)
         ) {
@@ -62,8 +71,11 @@ final readonly class TreasuryManager
         if ($amount < 1) {
             throw new \DomainException('Le montant doit être supérieur à zéro.');
         }
-        $account = $this->treasury->account($band, $input->account);
-        if ($input->kind === TreasuryEntryKind::Income) {
+        $account = $this->treasury->account(
+            $band,
+            $input->account ?? throw new \DomainException('Choisis un compte.'),
+        );
+        if (TreasuryEntryKind::Income === $input->kind) {
             $account->credit($amount);
         } else {
             $account->debit($amount);
@@ -79,6 +91,7 @@ final readonly class TreasuryManager
         );
         $this->em->persist($entry);
         $this->em->flush();
+
         return $entry;
     }
 
@@ -87,12 +100,19 @@ final readonly class TreasuryManager
         $this->access->assert($actor, $band);
         $this->validate($input);
         $this->assertCurrent($band, $input->revision);
+        assert(null !== $input->occurredOn);
         if ($input->source === $input->destination) {
             throw new \DomainException('Choisis deux comptes différents.');
         }
         $amount = EuroAmount::toCents($input->amount) ?? 0;
-        $source = $this->treasury->account($band, $input->source);
-        $destination = $this->treasury->account($band, $input->destination);
+        $source = $this->treasury->account(
+            $band,
+            $input->source ?? throw new \DomainException('Choisis le compte de départ.'),
+        );
+        $destination = $this->treasury->account(
+            $band,
+            $input->destination ?? throw new \DomainException('Choisis le compte d’arrivée.'),
+        );
         $source->debit($amount);
         $destination->credit($amount);
         $this->em->persist(
@@ -118,20 +138,23 @@ final readonly class TreasuryManager
         if ($input->entryRevision !== (string) $entry->getRevision()) {
             throw new ConflictHttpException('Ce mouvement a changé. Recharge la page.');
         }
-        if ($entry->isCancelled() || $entry->getKind() === TreasuryEntryKind::Opening) {
+        if ($entry->isCancelled() || TreasuryEntryKind::Opening === $entry->getKind()) {
             throw new \DomainException('Ce mouvement ne peut pas être annulé.');
         }
         $amount = $entry->getAmountCents();
         // Effectuer tous les contrôles avant de modifier les objets ; flush reste atomique.
         if (
-            $entry->getKind() === TreasuryEntryKind::Income &&
-            $entry->getAccount()->getBalanceCents() < $amount
+            TreasuryEntryKind::Income === $entry->getKind()
+            && $entry->getAccount()->getBalanceCents() < $amount
         ) {
             throw new \DomainException('Le solde ne permet pas d’annuler cette recette.');
         }
         if (
-            $entry->getKind() === TreasuryEntryKind::Transfer &&
-            $entry->getDestination()->getBalanceCents() < $amount
+            TreasuryEntryKind::Transfer === $entry->getKind()
+            && (
+                $entry->getDestination() ??
+                throw new \DomainException('Le compte destinataire est absent.')
+            )->getBalanceCents() < $amount
         ) {
             throw new \DomainException(
                 'Le compte destinataire ne permet pas de restituer ce transfert.',
@@ -139,7 +162,7 @@ final readonly class TreasuryManager
         }
         if ($movement = $entry->getStockMovement()) {
             $variant = $movement->getVariant();
-            if ($variant->getQuantity() === null) {
+            if (null === $variant->getQuantity()) {
                 throw new \DomainException('Compte le stock avant d’annuler cette vente.');
             }
             $before = $variant->getQuantity();
@@ -151,7 +174,7 @@ final readonly class TreasuryManager
                     StockMovementKind::Return,
                     $before,
                     $after,
-                    mb_substr('Annulation : ' . trim($input->reason), 0, 250),
+                    mb_substr('Annulation : '.trim($input->reason), 0, 250),
                     $actor,
                 ),
             );
@@ -160,7 +183,6 @@ final readonly class TreasuryManager
             TreasuryEntryKind::Income => $entry->getAccount()->debit($amount),
             TreasuryEntryKind::Expense => $entry->getAccount()->credit($amount),
             TreasuryEntryKind::Transfer => $this->reverseTransfer($entry),
-            default => throw new \DomainException('Annulation impossible.'),
         };
         $entry->cancel($actor, trim($input->reason));
         $this->em->flush();
@@ -168,15 +190,18 @@ final readonly class TreasuryManager
 
     private function reverseTransfer(TreasuryEntry $entry): void
     {
-        $entry->getDestination()->debit($entry->getAmountCents());
+        (
+            $entry->getDestination() ??
+            throw new \DomainException('Le compte destinataire est absent.')
+        )->debit($entry->getAmountCents());
         $entry->getAccount()->credit($entry->getAmountCents());
     }
 
     private function validate(object $input): void
     {
         $errors = $this->validator->validate($input);
-        if (count($errors) > 0) {
-            throw new \DomainException((string) $errors[0]->getMessage());
+        foreach ($errors as $error) {
+            throw new \DomainException((string) $error->getMessage());
         }
     }
 }

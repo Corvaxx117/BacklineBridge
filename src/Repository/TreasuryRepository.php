@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\{Band, TreasuryAccount, TreasuryEntry, FinanceNote};
+use App\Entity\Band;
+use App\Entity\FinanceNote;
+use App\Entity\TreasuryAccount;
+use App\Entity\TreasuryEntry;
 use App\Enum\TreasuryAccountKind;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class TreasuryRepository
 {
-    public function __construct(private EntityManagerInterface $em) {}
+    public function __construct(private EntityManagerInterface $em)
+    {
+    }
+
     /** @return list<TreasuryAccount> */
     public function accounts(Band $band): array
     {
@@ -26,6 +32,7 @@ final readonly class TreasuryRepository
             ->findOneBy(['band' => $band, 'kind' => $kind]) ??
             throw new \DomainException('La trésorerie du groupe n’est pas encore initialisée.');
     }
+
     /** @return list<TreasuryEntry> */
     public function entries(Band $band, int $page = 1): array
     {
@@ -57,6 +64,7 @@ final readonly class TreasuryRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
     /** @return list<TreasuryEntry> */
     public function chartEntries(Band $band, \DateTimeImmutable $since): array
     {
@@ -75,6 +83,7 @@ final readonly class TreasuryRepository
             ->getQuery()
             ->getResult();
     }
+
     /** @return list<FinanceNote> */
     public function notes(Band $band): array
     {

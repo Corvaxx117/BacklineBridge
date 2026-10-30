@@ -7,6 +7,12 @@ namespace App\Dto\Pdf;
 /** Les seules données techniques autorisées dans un document partageable. */
 final readonly class TechnicalDossier
 {
+    /**
+     * @param list<string>               $notices
+     * @param list<array<string, mixed>> $lines
+     * @param list<array<string, mixed>> $stagePlan
+     * @param list<array<string, mixed>> $equipment
+     */
     public function __construct(
         public string $bandName,
         public string $label,
@@ -20,5 +26,6 @@ final readonly class TechnicalDossier
         public array $equipment,
         public ?\DateTimeImmutable $publishedAt = null,
         public ?string $documentLabel = null,
-    ) {}
+    ) {
+    }
 }

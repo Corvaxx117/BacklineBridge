@@ -18,7 +18,8 @@ final readonly class ConcertCreator
         private EntityManagerInterface $entityManager,
         private ConcertAvailabilityManager $availability,
         private BandMembershipRepository $memberships,
-    ) {}
+    ) {
+    }
 
     public function create(
         TechnicalSheet $reference,
@@ -45,7 +46,7 @@ final readonly class ConcertCreator
         ?string $notes = null,
         ?User $createdBy = null,
     ): Concert {
-        if ($reference->getConcert() !== null) {
+        if (null !== $reference->getConcert()) {
             throw new \InvalidArgumentException(
                 'Un concert doit partir de la fiche de référence du groupe.',
             );
@@ -80,8 +81,8 @@ final readonly class ConcertCreator
                 'La fiche de référence doit appartenir à un groupe.',
             );
         if (
-            $createdBy !== null &&
-            !($this->memberships->roleFor($createdBy, $band)?->canPlanConcerts() ?? false)
+            null !== $createdBy
+            && !($this->memberships->roleFor($createdBy, $band)?->canPlanConcerts() ?? false)
         ) {
             throw new \InvalidArgumentException(
                 'Le créateur doit pouvoir organiser les concerts de ce groupe.',
@@ -91,6 +92,7 @@ final readonly class ConcertCreator
         $concert->updateDetails($date, $venue, $city, $status, $notes);
         $this->entityManager->persist($concert);
         $this->availability->initialize($concert);
+
         return $concert;
     }
 }

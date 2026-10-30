@@ -12,20 +12,18 @@ use App\Service\Concert\ConcertUpdater;
 use Doctrine\ORM\OptimisticLockException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[
-    Route(
-        '/concerts/{id}/edit',
-        name: 'app_concert_edit',
-        requirements: ['id' => '\d+'],
-        methods: ['GET', 'POST'],
-    ),
-]
+#[Route(
+    '/concerts/{id}/edit',
+    name: 'app_concert_edit',
+    requirements: ['id' => '\d+'],
+    methods: ['GET', 'POST'],
+),]
 final class EditAction extends AbstractController
 {
     public function __invoke(
@@ -53,10 +51,10 @@ final class EditAction extends AbstractController
                     ['id' => $concert->getId()],
                     Response::HTTP_SEE_OTHER,
                 );
-            } catch (ConflictHttpException | OptimisticLockException) {
+            } catch (ConflictHttpException|OptimisticLockException) {
                 $form->addError(
                     new FormError(
-                        'Ce concert a été modifié depuis l’ouverture du formulaire. Rien n’a été enregistré. ' .
+                        'Ce concert a été modifié depuis l’ouverture du formulaire. Rien n’a été enregistré. '.
                             'Tes valeurs restent affichées : conserve-les si nécessaire, puis recharge la version actuelle.',
                     ),
                 );
@@ -71,7 +69,7 @@ final class EditAction extends AbstractController
                 'concert' => $concert,
                 'form' => $form->createView(),
                 'editing' => true,
-                'conflict' => $status === 409,
+                'conflict' => 409 === $status,
             ],
             new Response(status: $status),
         );

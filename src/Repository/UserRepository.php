@@ -13,9 +13,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /** @extends ServiceEntityRepository<User> */
-class UserRepository extends ServiceEntityRepository implements
-    UserLoaderInterface,
-    PasswordUpgraderInterface
+class UserRepository extends ServiceEntityRepository implements UserLoaderInterface, PasswordUpgraderInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -31,7 +29,7 @@ class UserRepository extends ServiceEntityRepository implements
         PasswordAuthenticatedUserInterface $user,
         string $newHashedPassword,
     ): void {
-        if (!($user instanceof User)) {
+        if (!$user instanceof User) {
             throw new UnsupportedUserException();
         }
 

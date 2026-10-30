@@ -11,7 +11,8 @@ final readonly class ProfileCipher
 {
     public function __construct(
         #[Autowire('%env(PROFILE_DATA_KEY)%')] #[\SensitiveParameter] private string $key,
-    ) {}
+    ) {
+    }
 
     private function decodedKey(): string
     {
@@ -20,14 +21,19 @@ final readonly class ProfileCipher
                 'Configurer une clé PROFILE_DATA_KEY de 32 octets et activer Sodium avant de lire ou importer les données administratives.',
             );
         }
-        return hex2bin($this->key);
+
+        return hex2bin($this->key) ?: throw new \RuntimeException('Clé de chiffrement invalide.');
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function encrypt(MemberProfile $profile, #[\SensitiveParameter] array $data): string
     {
         $nonce = random_bytes(SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
+
         return base64_encode(
-            $nonce .
+            $nonce.
                 sodium_crypto_aead_xchacha20poly1305_ietf_encrypt(
                     json_encode($data, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
                     $profile->getPublicId(),
@@ -37,16 +43,19 @@ final readonly class ProfileCipher
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function decrypt(MemberProfile $profile): array
     {
-        if ($profile->getAdministrativeCiphertext() === null) {
+        if (null === $profile->getAdministrativeCiphertext()) {
             return [];
         }
         $raw = base64_decode($profile->getAdministrativeCiphertext(), true);
         $size = SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES;
         if (
-            $raw === false ||
-            strlen($raw) < $size + SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_ABYTES
+            false === $raw
+            || strlen($raw) < $size + SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_ABYTES
         ) {
             throw new \RuntimeException('Données administratives illisibles.');
         }
@@ -56,11 +65,12 @@ final readonly class ProfileCipher
             substr($raw, 0, $size),
             $this->decodedKey(),
         );
-        if ($text === false) {
+        if (false === $text) {
             throw new \RuntimeException(
                 'La clé ne permet pas de lire ces données administratives.',
             );
         }
+
         return json_decode($text, true, flags: JSON_THROW_ON_ERROR);
     }
 }

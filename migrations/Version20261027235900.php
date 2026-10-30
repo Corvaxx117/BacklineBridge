@@ -18,7 +18,7 @@ final class Version20261027235900 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->abortIf(
-            !($this->connection->getDatabasePlatform() instanceof SQLitePlatform),
+            !$this->connection->getDatabasePlatform() instanceof SQLitePlatform,
             'Cette migration utilise SQLite.',
         );
         $this->addSql('ALTER TABLE patch_line ADD COLUMN active BOOLEAN DEFAULT 1');
@@ -41,7 +41,7 @@ final class Version20261027235900 extends AbstractMigration
     public function down(Schema $schema): void
     {
         $this->abortIf(
-            !($this->connection->getDatabasePlatform() instanceof SQLitePlatform),
+            !$this->connection->getDatabasePlatform() instanceof SQLitePlatform,
             'Cette migration utilise SQLite.',
         );
         $this->abortIf(

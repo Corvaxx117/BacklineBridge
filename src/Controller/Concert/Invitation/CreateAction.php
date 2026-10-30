@@ -8,20 +8,20 @@ use App\Dto\Venue\InvitationInput;
 use App\Entity\Concert;
 use App\Form\Venue\InvitationType;
 use App\Security\Voter\ConcertVoter;
-use App\Service\Venue\{InvitationIssuer, VenueWorkspace};
+use App\Service\Venue\InvitationIssuer;
+use App\Service\Venue\VenueWorkspace;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\{Request, Response};
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[
-    Route(
-        '/concerts/{id}/invitations/creer',
-        name: 'app_concert_invitation_create',
-        requirements: ['id' => '\d+'],
-        methods: ['POST'],
-    ),
-]
+#[Route(
+    '/concerts/{id}/invitations/creer',
+    name: 'app_concert_invitation_create',
+    requirements: ['id' => '\d+'],
+    methods: ['POST'],
+),]
 final class CreateAction extends AbstractController
 {
     public function __invoke(

@@ -8,9 +8,9 @@ use App\Entity\Band;
 use App\Entity\BandMembership;
 use App\Entity\User;
 use App\Enum\BandRole;
+use App\Validator\AccountPassword;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use App\Validator\AccountPassword;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -20,7 +20,8 @@ final readonly class UserCreator
         private EntityManagerInterface $entityManager,
         private UserPasswordHasherInterface $hasher,
         private ValidatorInterface $validator,
-    ) {}
+    ) {
+    }
 
     public function create(
         string $email,

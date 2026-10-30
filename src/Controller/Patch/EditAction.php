@@ -15,14 +15,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[
-    Route(
-        '/sources/{id}/edit',
-        name: 'app_patch_edit',
-        requirements: ['id' => '\\d+'],
-        methods: ['GET', 'POST'],
-    ),
-]
+#[Route(
+    '/sources/{id}/edit',
+    name: 'app_patch_edit',
+    requirements: ['id' => '\\d+'],
+    methods: ['GET', 'POST'],
+),]
 final class EditAction extends AbstractController
 {
     public function __invoke(
@@ -42,10 +40,10 @@ final class EditAction extends AbstractController
         $form->handleRequest($request);
         $result = $handler->handle($form, $line);
 
-        if ($result === FormSubmissionResult::Saved) {
+        if (FormSubmissionResult::Saved === $result) {
             $this->addFlash('success', 'La source a été mise à jour.');
 
-            if ($concert !== null) {
+            if (null !== $concert) {
                 return $this->redirectToRoute(
                     'app_concert_show',
                     ['id' => $concert->getId()],

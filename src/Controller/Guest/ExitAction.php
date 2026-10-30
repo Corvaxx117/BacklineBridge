@@ -6,7 +6,8 @@ namespace App\Controller\Guest;
 
 use App\Service\Venue\GuestAccess;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\{Request, Response};
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -18,7 +19,7 @@ final class ExitAction extends AbstractController
         $context = $access->context($request);
         if (
             !$this->isCsrfTokenValid(
-                'guest_exit_' . $context,
+                'guest_exit_'.$context,
                 $request->request->getString('_token'),
             )
         ) {

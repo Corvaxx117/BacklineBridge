@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Concert\Import;
 
-use App\Entity\{Band, BandsintownConcert, Concert, TechnicalSheet, User};
+use App\Entity\Band;
+use App\Entity\BandsintownConcert;
+use App\Entity\Concert;
+use App\Entity\TechnicalSheet;
+use App\Entity\User;
 use App\Enum\BandRole;
-use App\Integration\Bandsintown\{BandsintownConfiguration, BandsintownGateway};
-use App\Integration\Bandsintown\Dto\{BandsintownEvent, EventsResult};
+use App\Integration\Bandsintown\BandsintownConfiguration;
+use App\Integration\Bandsintown\BandsintownGateway;
+use App\Integration\Bandsintown\Dto\BandsintownEvent;
+use App\Integration\Bandsintown\Dto\EventsResult;
 use App\Service\Concert\ConcertCreator;
 use App\Service\Security\UserCreator;
 use App\Tests\DatabaseTestCase;
@@ -21,7 +27,7 @@ final class BandsintownImportTest extends DatabaseTestCase
     {
         parent::setUp();
         $this->client->disableReboot();
-        $this->prepareUri = '/groupes/' . $this->bandId . '/concerts/import-bandsintown';
+        $this->prepareUri = '/groupes/'.$this->bandId.'/concerts/import-bandsintown';
         $this->events = [
             $this->event('10001', '2026-12-12', 'Salle de test'),
             $this->event('10002', '2026-12-13', 'Autre salle'),
@@ -34,7 +40,7 @@ final class BandsintownImportTest extends DatabaseTestCase
         $gateway
             ->method('events')
             ->willReturnCallback(
-                fn(): EventsResult => new EventsResult(
+                fn (): EventsResult => new EventsResult(
                     $this->events,
                     0,
                     new \DateTimeImmutable('now'),
@@ -72,6 +78,7 @@ final class BandsintownImportTest extends DatabaseTestCase
         $uri = $this->client->getResponse()->headers->get('Location');
         $this->client->followRedirect();
         self::assertResponseIsSuccessful();
+
         return $uri;
     }
 
@@ -98,7 +105,7 @@ final class BandsintownImportTest extends DatabaseTestCase
             $em->getConnection()->fetchOne('SELECT COUNT(*) FROM concert_availability'),
         );
         self::assertSame(1, $em->getRepository(BandsintownConcert::class)->count([]));
-        $this->client->request('GET', '/concerts/' . $concert->getId());
+        $this->client->request('GET', '/concerts/'.$concert->getId());
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.bit-concert-source', '20:30');
         self::assertSelectorTextContains('.bit-concert-source', 'Description importée');
@@ -188,7 +195,7 @@ final class BandsintownImportTest extends DatabaseTestCase
         $this->client->loginUser($em->find(User::class, $this->userId));
         $this->client->request(
             'GET',
-            '/groupes/' . $other->getId() . '/concerts/import-bandsintown',
+            '/groupes/'.$other->getId().'/concerts/import-bandsintown',
         );
         self::assertResponseStatusCodeSame(403);
     }

@@ -27,12 +27,13 @@ final class BandVoter extends Voter
     public function __construct(
         private readonly BandMembershipRepository $memberships,
         private readonly MusicianAccess $musicians,
-    ) {}
+    ) {
+    }
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return $subject instanceof Band &&
-            in_array(
+        return $subject instanceof Band
+            && in_array(
                 $attribute,
                 [
                     self::VIEW,
@@ -55,8 +56,8 @@ final class BandVoter extends Voter
     ): bool {
         $user = $token->getUser();
         if (
-            !($user instanceof User) ||
-            ($role = $this->memberships->roleFor($user, $subject)) === null
+            !($user instanceof User)
+            || ($role = $this->memberships->roleFor($user, $subject)) === null
         ) {
             return false;
         }
@@ -65,8 +66,9 @@ final class BandVoter extends Voter
             self::VIEW => true,
             self::TREASURY => $this->musicians->allows($user, $subject),
             self::EDIT_PATCH => $role->canEdit(),
-            self::DELETE_PATCH, self::MANAGE_TECHNICAL => $role === BandRole::Manager,
+            self::DELETE_PATCH, self::MANAGE_TECHNICAL => BandRole::Manager === $role,
             self::PLAN_CONCERT, self::CONDITIONS => $role->canPlanConcerts(),
+            default => false,
         };
     }
 }

@@ -12,19 +12,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: PatchLineRepository::class)]
 #[ORM\Table(name: 'patch_line')]
 #[ORM\Index(name: 'idx_patch_line_sheet', columns: ['sheet_id'])]
-#[
-    ORM\UniqueConstraint(
-        name: 'uniq_patch_line_sheet_channel',
-        columns: ['sheet_id', 'channel_number', 'active'],
-    ),
-]
-#[
-    UniqueEntity(
-        fields: ['sheet', 'channelNumber', 'active'],
-        errorPath: 'channelNumber',
-        message: 'Ce numéro de canal est déjà utilisé dans cette fiche.',
-    ),
-]
+#[ORM\UniqueConstraint(
+    name: 'uniq_patch_line_sheet_channel',
+    columns: ['sheet_id', 'channel_number', 'active'],
+),]
+#[UniqueEntity(
+    fields: ['sheet', 'channelNumber', 'active'],
+    errorPath: 'channelNumber',
+    message: 'Ce numéro de canal est déjà utilisé dans cette fiche.',
+),]
 class PatchLine
 {
     public const SECTIONS = ['drums', 'bass', 'guitar', 'keys', 'vocals', 'utility', 'effects'];
@@ -55,21 +51,17 @@ class PatchLine
 
     #[ORM\Column(name: 'source_name', length: 150)]
     #[Assert\NotBlank(message: 'Indique le nom de la source.')]
-    #[
-        Assert\Length(
-            max: 150,
-            maxMessage: 'Le nom de la source ne peut pas dépasser {{ limit }} caractères.',
-        ),
-    ]
+    #[Assert\Length(
+        max: 150,
+        maxMessage: 'Le nom de la source ne peut pas dépasser {{ limit }} caractères.',
+    ),]
     private string $sourceName = '';
 
     #[ORM\Column(name: 'preferred_microphone', length: 120, nullable: true)]
-    #[
-        Assert\Length(
-            max: 120,
-            maxMessage: 'Le microphone ne peut pas dépasser {{ limit }} caractères.',
-        ),
-    ]
+    #[Assert\Length(
+        max: 120,
+        maxMessage: 'Le microphone ne peut pas dépasser {{ limit }} caractères.',
+    ),]
     private ?string $preferredMicrophone = null;
 
     #[ORM\Column(length: 80, nullable: true)]
@@ -77,12 +69,10 @@ class PatchLine
     private ?string $stand = null;
 
     #[ORM\Column(length: 2000, nullable: true)]
-    #[
-        Assert\Length(
-            max: 2000,
-            maxMessage: 'Les notes ne peuvent pas dépasser {{ limit }} caractères.',
-        ),
-    ]
+    #[Assert\Length(
+        max: 2000,
+        maxMessage: 'Les notes ne peuvent pas dépasser {{ limit }} caractères.',
+    ),]
     private ?string $notes = null;
 
     #[ORM\Column(length: 20, options: ['default' => 'utility'])]
@@ -103,7 +93,7 @@ class PatchLine
 
     public function isActive(): bool
     {
-        return $this->active === true;
+        return true === $this->active;
     }
 
     public function getDeletedAt(): ?\DateTimeImmutable

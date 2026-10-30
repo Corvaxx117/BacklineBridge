@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Concert;
 
-use App\Entity\{Concert, ConcertAvailability};
+use App\Entity\Concert;
+use App\Entity\ConcertAvailability;
 use App\Enum\AvailabilityStatus;
 use App\Tests\VenueTestCase;
-use Doctrine\DBAL\{Connection, DriverManager};
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\Events;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -17,7 +19,7 @@ final class ConcurrentEditTest extends VenueTestCase
     {
         $this->client->disableReboot();
         $id = $this->concert()->getId();
-        $uri = '/concerts/' . $id . '/edit';
+        $uri = '/concerts/'.$id.'/edit';
         $form = $this->client->request('GET', $uri)->filter('form[name="concert"]')->form();
         $em = $this->entityManager();
         $connection = $em->getConnection();
@@ -25,8 +27,10 @@ final class ConcurrentEditTest extends VenueTestCase
             $connection->getParams(),
             $connection->getConfiguration(),
         );
-        $listener = new class ($other, $id) {
-            public function __construct(private Connection $connection, private int $id) {}
+        $listener = new class($other, $id) {
+            public function __construct(private Connection $connection, private int $id)
+            {
+            }
 
             public function preFlush(): void
             {
@@ -55,7 +59,7 @@ final class ConcurrentEditTest extends VenueTestCase
     public function testStaleFormPreservesNewDateNotesAndAvailability(): void
     {
         $id = $this->concert()->getId();
-        $uri = '/concerts/' . $id . '/edit';
+        $uri = '/concerts/'.$id.'/edit';
         $first = $this->client->request('GET', $uri)->filter('form[name="concert"]')->form();
         $stale = $this->client->request('GET', $uri)->filter('form[name="concert"]')->form();
 
@@ -75,7 +79,7 @@ final class ConcurrentEditTest extends VenueTestCase
         $this->client->submit($stale, ['concert' => ['city' => 'Marseille']]);
         self::assertResponseStatusCodeSame(409);
         self::assertSelectorTextContains('.form-error-summary', 'Ce concert a été modifié');
-        self::assertSelectorExists('.form-error-summary a[href="' . $uri . '"]');
+        self::assertSelectorExists('.form-error-summary a[href="'.$uri.'"]');
         self::assertInputValueSame('concert[city]', 'Marseille');
 
         $em = $this->entityManager();
@@ -101,13 +105,13 @@ final class ConcurrentEditTest extends VenueTestCase
     public function testAnAbsentOrInvalidRevisionCannotBypassProtection(?string $revision): void
     {
         $id = $this->concert()->getId();
-        $uri = '/concerts/' . $id . '/edit';
+        $uri = '/concerts/'.$id.'/edit';
         $values = $this->client
             ->request('GET', $uri)
             ->filter('form[name="concert"]')
             ->form()
             ->getPhpValues();
-        if ($revision === null) {
+        if (null === $revision) {
             unset($values['concert']['revision']);
         } else {
             $values['concert']['revision'] = $revision;

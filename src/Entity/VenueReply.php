@@ -19,6 +19,7 @@ class VenueReply
     #[ORM\JoinColumn(nullable: false)]
     private VenueInvitation $invitation;
 
+    /** @var array<string, array{status: string, details: ?string}> */
     #[ORM\Column(type: Types::JSON)]
     private array $answers = [];
 
@@ -44,35 +45,47 @@ class VenueReply
     {
         return $this->id;
     }
+
     public function getInvitation(): VenueInvitation
     {
         return $this->invitation;
     }
+
+    /**
+     * @return array<string, array{status: string, details: ?string}>
+     */
     public function getAnswers(): array
     {
         return $this->answers;
     }
+
     public function getRespondent(): string
     {
         return $this->respondent;
     }
+
     public function getNotes(): ?string
     {
         return $this->notes;
     }
+
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
     }
+
     public function getRevision(): int
     {
         return $this->revision;
     }
 
+    /**
+     * @param array<string, array{status: string, details: ?string}> $answers
+     */
     public function update(string $respondent, ?string $notes, array $answers): void
     {
         $this->respondent = trim($respondent);
-        $this->notes = $notes !== null && trim($notes) !== '' ? trim($notes) : null;
+        $this->notes = null !== $notes && '' !== trim($notes) ? trim($notes) : null;
         $this->answers = $answers;
         $this->updatedAt = new \DateTimeImmutable();
     }

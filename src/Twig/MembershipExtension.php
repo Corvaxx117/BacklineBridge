@@ -17,12 +17,13 @@ final class MembershipExtension extends AbstractExtension
     public function __construct(
         private readonly Security $security,
         private readonly BandMembershipRepository $memberships,
-    ) {}
+    ) {
+    }
 
     public function band(?Band $band = null): ?Band
     {
         $user = $this->security->getUser();
-        if (!($user instanceof User)) {
+        if (!$user instanceof User) {
             return null;
         }
         // Charger le groupe via l'adhésion courante évite les proxys détachés après un conflit ORM.
@@ -34,9 +35,10 @@ final class MembershipExtension extends AbstractExtension
             ->setParameter('user', $user)
             ->orderBy('band.id', 'ASC')
             ->setMaxResults(1);
-        if ($band !== null) {
+        if (null !== $band) {
             $query->andWhere('membership.band = :band')->setParameter('band', $band);
         }
+
         return $query->getQuery()->getOneOrNullResult()?->getBand();
     }
 
@@ -51,11 +53,11 @@ final class MembershipExtension extends AbstractExtension
     public function role(?Band $band = null): ?BandRole
     {
         $user = $this->security->getUser();
-        if (!($user instanceof User)) {
+        if (!$user instanceof User) {
             return null;
         }
 
-        return $band === null
+        return null === $band
             ? $this->memberships->firstRoleFor($user)
             : $this->memberships->roleFor($user, $band);
     }

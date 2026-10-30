@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Pdf;
 
 use App\Dto\Concert\ConcertConditionsInput;
-use App\Entity\{Band, TechnicalSheet, VenueInvitation};
+use App\Entity\Band;
+use App\Entity\TechnicalSheet;
+use App\Entity\VenueInvitation;
 use App\Enum\BandRole;
 use App\Service\Concert\ConcertConditionsUpdater;
 use App\Service\Pdf\TechnicalDossierFactory;
@@ -27,7 +29,7 @@ final class TechnicalPdfTest extends VenueTestCase
         self::assertSame([1, ...range(3, 22)], array_column($dossier->lines, 'channel'));
         self::assertCount(14, $dossier->stagePlan);
         self::assertCount(19, $dossier->equipment);
-        $this->client->request('GET', '/fiches/' . $this->sheetId . '/fiche-technique.pdf');
+        $this->client->request('GET', '/fiches/'.$this->sheetId.'/fiche-technique.pdf');
         $this->assertPdf('fiche-technique-avee-mana-reference.pdf');
     }
 
@@ -49,7 +51,7 @@ final class TechnicalPdfTest extends VenueTestCase
         self::assertStringNotContainsString('9876', json_encode($dossier, JSON_THROW_ON_ERROR));
         $this->client->request(
             'GET',
-            '/fiches/' . $concert->getPatchSheet()->getId() . '/fiche-technique.pdf',
+            '/fiches/'.$concert->getPatchSheet()->getId().'/fiche-technique.pdf',
         );
         $this->assertPdf('fiche-technique-avee-mana-2026-12-12-salle-de-test.pdf');
     }
@@ -60,14 +62,14 @@ final class TechnicalPdfTest extends VenueTestCase
         $user = static::getContainer()
             ->get(UserCreator::class)
             ->create(
-                $role->value . '@pdf.example.test',
+                $role->value.'@pdf.example.test',
                 'Lecteur du dossier',
                 'Export PDF test password 2026!',
                 $this->entityManager()->find(Band::class, $this->bandId),
                 $role,
             );
         $this->client->loginUser($user);
-        $this->client->request('GET', '/fiches/' . $this->sheetId . '/fiche-technique.pdf');
+        $this->client->request('GET', '/fiches/'.$this->sheetId.'/fiche-technique.pdf');
         $this->assertPdf('fiche-technique-avee-mana-reference.pdf');
     }
 
@@ -83,10 +85,10 @@ final class TechnicalPdfTest extends VenueTestCase
         $other = new TechnicalSheet()->setBandName('Autre groupe');
         $this->entityManager()->persist(new Band('Autre groupe', $other));
         $this->entityManager()->flush();
-        $this->client->request('GET', '/fiches/' . $other->getId() . '/fiche-technique.pdf');
+        $this->client->request('GET', '/fiches/'.$other->getId().'/fiche-technique.pdf');
         self::assertResponseStatusCodeSame(403);
         $this->client->getCookieJar()->clear();
-        $this->client->request('GET', '/fiches/' . $this->sheetId . '/fiche-technique.pdf');
+        $this->client->request('GET', '/fiches/'.$this->sheetId.'/fiche-technique.pdf');
         self::assertResponseRedirects();
         self::assertSame(
             '/connexion',
@@ -119,7 +121,7 @@ final class TechnicalPdfTest extends VenueTestCase
         self::assertSame($snapshot['notes'], $dossier->notes);
         $this->enter($issued->token);
         self::assertSelectorExists(
-            'a[href="' . $this->guestUrl('/salle/fiche-technique.pdf') . '"]',
+            'a[href="'.$this->guestUrl('/salle/fiche-technique.pdf').'"]',
         );
         $this->client->request('GET', $this->guestUrl('/salle/fiche-technique.pdf'));
         $this->assertPdf('fiche-technique-avee-mana-2026-12-12-salle-de-test.pdf');
@@ -141,7 +143,7 @@ final class TechnicalPdfTest extends VenueTestCase
             str_repeat('Précisions techniques à conserver intégralement. ', 40),
         );
         $this->entityManager()->flush();
-        $this->client->request('GET', '/fiches/' . $this->sheetId . '/fiche-technique.pdf');
+        $this->client->request('GET', '/fiches/'.$this->sheetId.'/fiche-technique.pdf');
         $this->assertPdf('fiche-technique-avee-mana-reference.pdf');
     }
 
@@ -149,7 +151,7 @@ final class TechnicalPdfTest extends VenueTestCase
     {
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('Content-Type', 'application/pdf');
-        self::assertResponseHeaderSame('Content-Disposition', 'attachment; filename=' . $filename);
+        self::assertResponseHeaderSame('Content-Disposition', 'attachment; filename='.$filename);
         self::assertStringContainsString(
             'no-store',
             $this->client->getResponse()->headers->get('Cache-Control'),

@@ -4,35 +4,39 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Entity\{
-    Band,
-    BandMembership,
-    User,
-    MemberProfile,
-    TreasuryAccount,
-    TreasuryEntry,
-    MerchProduct,
-    MerchVariant,
-    StockMovement,
-    FinanceNote,
-};
-use App\Enum\{MemberKind, BandRole, TreasuryAccountKind, TreasuryEntryKind, StockMovementKind};
+use App\Entity\Band;
+use App\Entity\BandMembership;
+use App\Entity\FinanceNote;
+use App\Entity\MemberProfile;
+use App\Entity\MerchProduct;
+use App\Entity\MerchVariant;
+use App\Entity\StockMovement;
+use App\Entity\TreasuryAccount;
+use App\Entity\TreasuryEntry;
+use App\Entity\User;
+use App\Enum\BandRole;
+use App\Enum\MemberKind;
+use App\Enum\StockMovementKind;
+use App\Enum\TreasuryAccountKind;
+use App\Enum\TreasuryEntryKind;
 use App\Repository\MemberProfileRepository;
-use App\Service\Member\{ProfileCipher, AccountActivator, ActivationCodeWriter};
+use App\Service\Member\AccountActivator;
+use App\Service\Member\ActivationCodeWriter;
+use App\Service\Member\ProfileCipher;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\{InputInterface, InputArgument, InputOption};
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[
-    AsCommand(
-        name: 'app:band:import-private',
-        description: 'Importe un jeu privé de profils, soldes et stocks, sans écraser les données déjà importées.',
-    ),
-]
+#[AsCommand(
+    name: 'app:band:import-private',
+    description: 'Importe un jeu privé de profils, soldes et stocks, sans écraser les données déjà importées.',
+),]
 final class ImportPrivateBandCommand extends Command
 {
     public function __construct(
@@ -59,20 +63,27 @@ final class ImportPrivateBandCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $path = realpath((string) $input->getArgument('file'));
-        if ($path === false || !is_file($path)) {
+        if (false === $path || !is_file($path)) {
             $io->error('Fichier privé introuvable.');
+
             return Command::INVALID;
         }
-        $data = json_decode(file_get_contents($path), true, flags: JSON_THROW_ON_ERROR);
+        $data = json_decode(
+            file_get_contents($path) ?:
+            throw new \RuntimeException('Le fichier demandé est vide ou illisible.'),
+            true,
+            flags: JSON_THROW_ON_ERROR,
+        );
         $bands = $this->em->getRepository(Band::class);
         $band =
-            $input->getOption('band') !== null
+            null !== $input->getOption('band')
                 ? $bands->find((int) $input->getOption('band'))
-                : ($bands->count([]) === 1
+                : (1 === $bands->count([])
                     ? $bands->findOneBy([])
                     : null);
         if (!($band instanceof Band) || ($data['bandName'] ?? '') !== $band->getName()) {
             $io->error('Le fichier et le groupe sélectionné doivent correspondre.');
+
             return Command::INVALID;
         }
         $codes = [];
@@ -80,7 +91,7 @@ final class ImportPrivateBandCommand extends Command
         foreach ($data['members'] ?? [] as $row) {
             $kind = MemberKind::from($row['kind']);
             $profile = $this->profiles->findOneBy(['band' => $band, 'publicName' => $row['name']]);
-            if ($profile !== null && ($profile->getUser() !== null || empty($row['email']))) {
+            if (null !== $profile && (null !== $profile->getUser() || empty($row['email']))) {
                 continue;
             }
             $user = null;
@@ -91,17 +102,18 @@ final class ImportPrivateBandCommand extends Command
                         ->getRepository(User::class)
                         ->findOneBy(['email' => mb_strtolower(trim($row['email']))]);
                 if (
-                    isset($row['existingUserId']) &&
-                    (!($user instanceof User) ||
-                        $this->em
-                            ->getRepository(BandMembership::class)
-                            ->findOneBy(['band' => $band, 'user' => $user]) === null)
+                    isset($row['existingUserId'])
+                    && (!($user instanceof User)
+                        || null ===
+                            $this->em
+                                ->getRepository(BandMembership::class)
+                                ->findOneBy(['band' => $band, 'user' => $user]))
                 ) {
                     throw new \RuntimeException(
                         'Le rapprochement du compte existant doit appartenir au groupe.',
                     );
                 }
-                if ($user === null) {
+                if (null === $user) {
                     $user = new User($row['email'], $row['name']);
                     if (count($this->validator->validate($user)) > 0) {
                         throw new \RuntimeException('Une identité du fichier privé est invalide.');
@@ -109,23 +121,23 @@ final class ImportPrivateBandCommand extends Command
                     $this->em->persist($user);
                 }
                 $membership =
-                    $user->getId() === null
+                    null === $user->getId()
                         ? null
                         : $this->em
                             ->getRepository(BandMembership::class)
                             ->findOneBy(['band' => $band, 'user' => $user]);
-                $role = $kind === MemberKind::Booker ? BandRole::Booker : BandRole::Manager;
-                if ($membership === null) {
+                $role = MemberKind::Booker === $kind ? BandRole::Booker : BandRole::Manager;
+                if (null === $membership) {
                     $this->em->persist(new BandMembership($band, $user, $role));
                 } else {
                     $membership->setRole($role);
                 }
             }
-            if ($profile === null) {
+            if (null === $profile) {
                 $profile = new MemberProfile($band, $user, $row['name'], $row['function'], $kind);
                 $this->em->persist($profile);
                 ++$created;
-            } elseif ($user !== null) {
+            } elseif (null !== $user) {
                 $profile->attachUser($user);
             }
             if (!empty($row['administrative'])) {
@@ -133,11 +145,14 @@ final class ImportPrivateBandCommand extends Command
                     $this->cipher->encrypt($profile, $row['administrative']),
                 );
             }
-            if ($user !== null && !$user->isActivated()) {
+            if (null !== $user && !$user->isActivated()) {
                 $codes[] = [
                     'name' => $profile->getPublicName(),
                     'code' => $this->activator->issue($profile),
-                    'expires' => $profile->getActivationExpiresAt()->format('d/m/Y'),
+                    'expires' => (
+                        $profile->getActivationExpiresAt() ??
+                        throw new \LogicException('Le code doit avoir une date d’expiration.')
+                    )->format('d/m/Y'),
                 ];
             }
         }
@@ -145,9 +160,10 @@ final class ImportPrivateBandCommand extends Command
         foreach ($data['accounts'] ?? [] as $key => $cents) {
             $kind = TreasuryAccountKind::from($key);
             if (
+                null !==
                 $this->em
                     ->getRepository(TreasuryAccount::class)
-                    ->findOneBy(['band' => $band, 'kind' => $kind]) !== null
+                    ->findOneBy(['band' => $band, 'kind' => $kind])
             ) {
                 continue;
             }
@@ -174,16 +190,17 @@ final class ImportPrivateBandCommand extends Command
         }
         foreach ($data['products'] ?? [] as $row) {
             if (
+                null !==
                 $this->em
                     ->getRepository(MerchProduct::class)
-                    ->findOneBy(['band' => $band, 'name' => $row['name']]) !== null
+                    ->findOneBy(['band' => $band, 'name' => $row['name']])
             ) {
                 continue;
             }
             $product = new MerchProduct($band, $row['name'], $row['category']);
             foreach ($row['variants'] as $variantData) {
                 $variant = new MerchVariant($product, $variantData['label']);
-                if ($variantData['quantity'] !== null) {
+                if (null !== $variantData['quantity']) {
                     if (!is_int($variantData['quantity'])) {
                         throw new \RuntimeException('Stock entier attendu.');
                     }
@@ -204,28 +221,28 @@ final class ImportPrivateBandCommand extends Command
             }
             $this->em->persist($product);
         }
-        if ($this->em->getRepository(FinanceNote::class)->count(['band' => $band]) === 0) {
+        if (0 === $this->em->getRepository(FinanceNote::class)->count(['band' => $band])) {
             foreach ($data['notes'] ?? [] as $text) {
                 $this->em->persist(new FinanceNote($band, $text));
             }
         }
-        if ($band->getUsefulLinks() === []) {
+        if ([] === $band->getUsefulLinks()) {
             $links = $data['links'] ?? [];
             foreach ($links as $link) {
                 if (
-                    !filter_var($link['url'], FILTER_VALIDATE_URL) ||
-                    parse_url($link['url'], PHP_URL_SCHEME) !== 'https'
+                    !filter_var($link['url'], FILTER_VALIDATE_URL)
+                    || 'https' !== parse_url($link['url'], PHP_URL_SCHEME)
                 ) {
                     throw new \RuntimeException('Les liens du groupe doivent utiliser HTTPS.');
                 }
             }
             $band->setUsefulLinks($links);
         }
-        $codeFile = $codes !== [] ? $this->codeWriter->write($codes) : null;
+        $codeFile = [] !== $codes ? $this->codeWriter->write($codes) : null;
         try {
             $this->em->flush();
         } catch (\Throwable $error) {
-            if ($codeFile !== null) {
+            if (null !== $codeFile) {
                 unlink($codeFile);
             }
             throw $error;
@@ -236,9 +253,10 @@ final class ImportPrivateBandCommand extends Command
                 $created,
             ),
         );
-        if ($codeFile !== null) {
-            $io->text('Codes personnels disponibles uniquement dans : ' . $codeFile);
+        if (null !== $codeFile) {
+            $io->text('Codes personnels disponibles uniquement dans : '.$codeFile);
         }
+
         return Command::SUCCESS;
     }
 }

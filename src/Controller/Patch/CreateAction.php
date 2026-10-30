@@ -35,7 +35,7 @@ final class CreateAction extends AbstractController
         $form->handleRequest($request);
         $result = $handler->handle($form, $line);
 
-        if ($result === FormSubmissionResult::Saved) {
+        if (FormSubmissionResult::Saved === $result) {
             $this->addFlash('success', 'La source a été ajoutée au patch.');
 
             return $this->redirectToRoute('app_patch_index', [], Response::HTTP_SEE_OTHER);

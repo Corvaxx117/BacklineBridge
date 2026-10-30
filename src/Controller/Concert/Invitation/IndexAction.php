@@ -14,14 +14,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[
-    Route(
-        '/concerts/{id}/invitations',
-        name: 'app_concert_invitations',
-        requirements: ['id' => '\d+'],
-        methods: ['GET'],
-    ),
-]
+#[Route(
+    '/concerts/{id}/invitations',
+    name: 'app_concert_invitations',
+    requirements: ['id' => '\d+'],
+    methods: ['GET'],
+),]
 final class IndexAction extends AbstractController
 {
     public function __invoke(

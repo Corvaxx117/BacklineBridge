@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Service\Concert;
 
 use App\Dto\Concert\ReferenceImportInput;
-use App\Entity\{Concert, PatchLine, TechnicalSheet};
+use App\Entity\Concert;
+use App\Entity\PatchLine;
+use App\Entity\TechnicalSheet;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class ReferenceImporter
@@ -13,7 +15,8 @@ final readonly class ReferenceImporter
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ReferenceImportPreview $previews,
-    ) {}
+    ) {
+    }
 
     public function import(Concert $concert, ReferenceImportInput $input): void
     {
@@ -24,9 +27,9 @@ final readonly class ReferenceImporter
             );
         }
         if (
-            !$input->confirmReplacement ||
-            $input->sections === [] ||
-            array_diff($input->sections, array_keys(ReferenceImportPreview::LABELS)) !== []
+            !$input->confirmReplacement
+            || [] === $input->sections
+            || [] !== array_diff($input->sections, array_keys(ReferenceImportPreview::LABELS))
         ) {
             throw new \InvalidArgumentException('Choix d’import invalides.');
         }
@@ -50,6 +53,7 @@ final readonly class ReferenceImporter
                         ->setBandName($reference->getBandName())
                         ->setDocumentLabel($reference->getDocumentLabel())
                         ->setNotices($reference->getNotices()),
+                    default => throw new \DomainException('Section de référence inconnue.'),
                 };
             }
         });

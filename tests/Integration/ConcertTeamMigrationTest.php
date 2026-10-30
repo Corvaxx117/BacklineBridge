@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration;
 
-use Doctrine\DBAL\{Connection, DriverManager};
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Schema;
 use DoctrineMigrations\Version20261028133311;
 use PHPUnit\Framework\TestCase;
@@ -14,7 +15,7 @@ final class ConcertTeamMigrationTest extends TestCase
 {
     public function testMigrationPreservesExistingConcertsAndTheirGuestDataInBothDirections(): void
     {
-        require_once dirname(__DIR__, 2) . '/migrations/Version20261028133311.php';
+        require_once dirname(__DIR__, 2).'/migrations/Version20261028133311.php';
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
         $connection->executeStatement('PRAGMA foreign_keys = ON');
         foreach (
@@ -33,8 +34,7 @@ final class ConcertTeamMigrationTest extends TestCase
                 "INSERT INTO technical_publication VALUES (11, 10, '{\"frozen\":true}')",
                 'INSERT INTO venue_invitation VALUES (12, 11)',
                 "INSERT INTO venue_reply VALUES (13, 12, '{\"gear\":\"available\"}')",
-            ]
-            as $sql
+            ] as $sql
         ) {
             $connection->executeStatement($sql);
         }
@@ -50,7 +50,7 @@ final class ConcertTeamMigrationTest extends TestCase
         $before = [];
         foreach ($tables as $table) {
             $before[$table] = $connection->fetchAllAssociative(
-                'SELECT * FROM ' . $table . ' ORDER BY rowid',
+                'SELECT * FROM '.$table.' ORDER BY rowid',
             );
         }
         $this->migrate($connection, 'up');
@@ -91,7 +91,7 @@ final class ConcertTeamMigrationTest extends TestCase
             self::assertSame(
                 $rows,
                 $connection->fetchAllAssociative(
-                    'SELECT ' . $columns . ' FROM ' . $table . ' ORDER BY rowid',
+                    'SELECT '.$columns.' FROM '.$table.' ORDER BY rowid',
                 ),
             );
         }
@@ -113,7 +113,7 @@ final class ConcertTeamMigrationTest extends TestCase
         foreach (['technical_publication', 'venue_invitation', 'venue_reply'] as $table) {
             self::assertSame(
                 $before[$table],
-                $connection->fetchAllAssociative('SELECT * FROM ' . $table . ' ORDER BY rowid'),
+                $connection->fetchAllAssociative('SELECT * FROM '.$table.' ORDER BY rowid'),
             );
         }
         self::assertSame([], $connection->fetchAllAssociative('PRAGMA foreign_key_check'));

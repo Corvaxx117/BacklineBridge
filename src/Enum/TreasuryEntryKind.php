@@ -10,6 +10,7 @@ enum TreasuryEntryKind: string
     case Income = 'income';
     case Expense = 'expense';
     case Transfer = 'transfer';
+
     public function label(): string
     {
         return match ($this) {

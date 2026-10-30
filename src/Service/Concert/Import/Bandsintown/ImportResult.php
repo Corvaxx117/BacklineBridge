@@ -6,5 +6,7 @@ namespace App\Service\Concert\Import\Bandsintown;
 
 final readonly class ImportResult
 {
-    public function __construct(public int $created, public int $linked, public int $skipped) {}
+    public function __construct(public int $created, public int $linked, public int $skipped)
+    {
+    }
 }

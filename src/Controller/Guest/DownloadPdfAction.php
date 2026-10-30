@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Guest;
 
-use App\Service\Pdf\{TechnicalDossierFactory, TechnicalPdfResponseFactory};
+use App\Service\Pdf\TechnicalDossierFactory;
+use App\Service\Pdf\TechnicalPdfResponseFactory;
 use App\Service\Venue\GuestAccess;
-use Symfony\Component\HttpFoundation\{Request, Response};
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/salle/fiche-technique.pdf', name: 'app_guest_pdf', methods: ['GET'])]

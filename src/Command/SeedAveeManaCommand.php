@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Entity\PatchLine;
 use App\Entity\Band;
+use App\Entity\PatchLine;
 use App\Entity\TechnicalSheet;
 use App\Repository\TechnicalSheetRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,12 +17,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[
-    AsCommand(
-        name: 'app:seed-avee-mana',
-        description: 'Charge la fiche de départ une seule fois, sans écraser les modifications.',
-    ),
-]
+#[AsCommand(
+    name: 'app:seed-avee-mana',
+    description: 'Charge la fiche de départ une seule fois, sans écraser les modifications.',
+),]
 final class SeedAveeManaCommand extends Command
 {
     public function __construct(
@@ -38,14 +36,15 @@ final class SeedAveeManaCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        if ($this->sheets->findReference() !== null) {
+        if (null !== $this->sheets->findReference()) {
             $io->note('Une fiche existe déjà : les données et vos modifications sont conservées.');
 
             return Command::SUCCESS;
         }
 
         $data = json_decode(
-            file_get_contents($this->projectDir . '/data/avee-mana-patch.json'),
+            file_get_contents($this->projectDir.'/data/avee-mana-patch.json') ?:
+            throw new \RuntimeException('Le fichier demandé est vide ou illisible.'),
             true,
             flags: JSON_THROW_ON_ERROR,
         );
@@ -56,7 +55,8 @@ final class SeedAveeManaCommand extends Command
         $seen = [];
 
         $setup = json_decode(
-            file_get_contents($this->projectDir . '/data/avee-mana-stage.json'),
+            file_get_contents($this->projectDir.'/data/avee-mana-stage.json') ?:
+            throw new \RuntimeException('Le fichier demandé est vide ou illisible.'),
             true,
             flags: JSON_THROW_ON_ERROR,
         );

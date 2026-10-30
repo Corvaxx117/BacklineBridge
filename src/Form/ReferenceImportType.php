@@ -7,10 +7,13 @@ namespace App\Form;
 use App\Dto\Concert\ReferenceImportInput;
 use App\Service\Concert\ReferenceImportPreview;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\{CheckboxType, ChoiceType, HiddenType};
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** @extends AbstractType<ReferenceImportInput> */
 final class ReferenceImportType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -28,8 +31,7 @@ final class ReferenceImportType extends AbstractType
             ])
             ->add('fingerprint', HiddenType::class)
             ->add('confirmReplacement', CheckboxType::class, [
-                'label' =>
-                    'Je confirme le remplacement des sections choisies par la référence actuelle.',
+                'label' => 'Je confirme le remplacement des sections choisies par la référence actuelle.',
                 'required' => false,
                 'false_values' => [null, '0', false],
             ]);

@@ -29,6 +29,11 @@
         "symfony/yaml": "8.1.*"
     },
     "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpstan/phpstan": "^2.2",
+        "phpstan/phpstan-doctrine": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "^11.5.57",
         "symfony/browser-kit": "8.1.*",
         "symfony/css-selector": "8.1.*"
@@ -81,6 +86,30 @@
         "setup": [
             "@php bin/console doctrine:migrations:migrate --no-interaction",
             "@php bin/console app:seed-avee-mana"
+        ],
+        "test:coverage": "@php -d pcov.enabled=1 vendor/bin/phpunit --coverage-html var/coverage/html --coverage-clover var/coverage/clover.xml --coverage-text --only-summary-for-coverage-text",
+        "cs:check": "@php vendor/bin/php-cs-fixer check --config=.php-cs-fixer.dist.php --diff",
+        "cs:fix": "@php vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php",
+        "lint": [
+            "@php bin/console lint:container --env=test",
+            "@php bin/console lint:twig templates --env=test",
+            "@php bin/console lint:yaml config .github --parse-tags"
+        ],
+        "quality": [
+            "@composer validate --strict",
+            "@cs:check",
+            "@lint",
+            "@phpstan",
+            "@test"
+        ],
+        "phpstan:app": [
+            "@php bin/console cache:warmup --env=test",
+            "@php -d memory_limit=1G vendor/bin/phpstan analyse --configuration=phpstan.dist.neon --no-progress"
+        ],
+        "phpstan:tests": "@php -d memory_limit=1G vendor/bin/phpstan analyse --configuration=phpstan.dist.neon --level=5 tests --no-progress",
+        "phpstan": [
+            "@phpstan:app",
+            "@phpstan:tests"
         ]
     },
     "conflict": {

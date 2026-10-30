@@ -1,17 +1,23 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Tests\Integration;
+
 use App\Command\ImportPrivateBandCommand;
-use App\Entity\{User, MemberProfile, TreasuryAccount, MerchProduct};
+use App\Entity\MemberProfile;
+use App\Entity\MerchProduct;
+use App\Entity\TreasuryAccount;
+use App\Entity\User;
 use App\Tests\DatabaseTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+
 final class PrivateBandImportTest extends DatabaseTestCase
 {
     public function testImportIsIdempotentAndPreservesExistingPasswordAndOpeningBalances(): void
     {
         $file = tempnam(sys_get_temp_dir(), 'backlinebridge-private-import-');
-        $filesBefore = glob(dirname(__DIR__, 2) . '/var/private/activation-codes-*.json') ?: [];
+        $filesBefore = glob(dirname(__DIR__, 2).'/var/private/activation-codes-*.json') ?: [];
         $password = $this->entityManager()->find(User::class, $this->userId)->getPassword();
         $data = [
             'bandName' => $this->fixture['bandName'],
@@ -87,7 +93,7 @@ final class PrivateBandImportTest extends DatabaseTestCase
             );
             $newFiles = array_values(
                 array_diff(
-                    glob(dirname(__DIR__, 2) . '/var/private/activation-codes-*.json') ?: [],
+                    glob(dirname(__DIR__, 2).'/var/private/activation-codes-*.json') ?: [],
                     $filesBefore,
                 ),
             );
@@ -111,10 +117,9 @@ final class PrivateBandImportTest extends DatabaseTestCase
             unlink($file);
             foreach (
                 array_diff(
-                    glob(dirname(__DIR__, 2) . '/var/private/activation-codes-*.json') ?: [],
+                    glob(dirname(__DIR__, 2).'/var/private/activation-codes-*.json') ?: [],
                     $filesBefore,
-                )
-                as $path
+                ) as $path
             ) {
                 unlink($path);
             }

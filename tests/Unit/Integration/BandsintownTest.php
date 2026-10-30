@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Integration;
 
-use App\Integration\Bandsintown\{
-    BandsintownClient,
-    BandsintownConfiguration,
-    BandsintownEventNormalizer,
-};
+use App\Integration\Bandsintown\BandsintownClient;
+use App\Integration\Bandsintown\BandsintownConfiguration;
+use App\Integration\Bandsintown\BandsintownEventNormalizer;
 use App\Integration\Bandsintown\Exception\BandsintownUnavailable;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\{MockResponse, JsonMockResponse};
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
+use Symfony\Component\HttpClient\Response\MockResponse;
 
 final class BandsintownTest extends TestCase
 {
@@ -96,6 +95,7 @@ final class BandsintownTest extends TestCase
             );
             self::assertStringContainsString('app_id=private-test-key', $url);
             self::assertStringContainsString('date=all', $url);
+
             return new JsonMockResponse($response);
         }, 'https://rest.bandsintown.com/');
         $client = new BandsintownClient(

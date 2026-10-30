@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Service\Concert;
 
-use App\Entity\{Concert, PatchLine, TechnicalSheet};
+use App\Entity\Concert;
+use App\Entity\PatchLine;
+use App\Entity\TechnicalSheet;
 
 final class ReferenceImportPreview
 {
@@ -15,6 +17,9 @@ final class ReferenceImportPreview
         'notes' => 'Version et notes techniques',
     ];
 
+    /**
+     * @return array<string, mixed>
+     */
     public function forConcert(Concert $concert): array
     {
         $current = $this->snapshot($concert->getPatchSheet());
@@ -33,7 +38,7 @@ final class ReferenceImportPreview
             'sections' => $sections,
             'hasChanges' => (bool) array_filter(
                 $sections,
-                static fn(array $section): bool => $section['changed'],
+                static fn (array $section): bool => $section['changed'],
             ),
             'fingerprint' => hash(
                 'sha256',
@@ -42,21 +47,24 @@ final class ReferenceImportPreview
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function snapshot(TechnicalSheet $sheet): array
     {
         $active = $sheet
             ->getLines()
-            ->filter(static fn(PatchLine $line): bool => $line->isActive())
+            ->filter(static fn (PatchLine $line): bool => $line->isActive())
             ->getValues();
         usort(
             $active,
-            static fn(PatchLine $a, PatchLine $b): int => $a->getChannelNumber() <=>
+            static fn (PatchLine $a, PatchLine $b): int => $a->getChannelNumber() <=>
                 $b->getChannelNumber(),
         );
 
         return [
             'patch' => array_map(
-                static fn(PatchLine $line): array => [
+                static fn (PatchLine $line): array => [
                     'channel' => $line->getChannelNumber(),
                     'source' => $line->getSourceName(),
                     'microphone' => $line->getPreferredMicrophone(),
@@ -67,7 +75,7 @@ final class ReferenceImportPreview
                 $active,
             ),
             'stage' => array_map(
-                static fn(array $item): array => [
+                static fn (array $item): array => [
                     'label' => $item['label'],
                     'kind' => $item['kind'],
                     'x' => (float) $item['x'],

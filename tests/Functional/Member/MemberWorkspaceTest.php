@@ -1,13 +1,20 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Tests\Functional\Member;
-use App\Entity\{Band, User, MemberProfile};
-use App\Enum\{BandRole, MemberKind};
-use App\Service\Member\{ProfileCipher, AccountActivator};
+
+use App\Entity\Band;
+use App\Entity\MemberProfile;
+use App\Entity\User;
+use App\Enum\BandRole;
+use App\Enum\MemberKind;
+use App\Service\Member\AccountActivator;
+use App\Service\Member\ProfileCipher;
 use App\Service\Security\UserCreator;
 use App\Tests\DatabaseTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+
 final class MemberWorkspaceTest extends DatabaseTestCase
 {
     private function profile(User $user, MemberKind $kind): MemberProfile
@@ -30,8 +37,10 @@ final class MemberWorkspaceTest extends DatabaseTestCase
         );
         $em->persist($profile);
         $em->flush();
+
         return $profile;
     }
+
     private function pending(): array
     {
         $em = $this->entityManager();
@@ -48,9 +57,11 @@ final class MemberWorkspaceTest extends DatabaseTestCase
         $code = static::getContainer()->get(AccountActivator::class)->issue($profile);
         $em->flush();
         $this->client->restart();
-        $this->client->setServerParameter('REMOTE_ADDR', '198.51.100.' . random_int(1, 254));
+        $this->client->setServerParameter('REMOTE_ADDR', '198.51.100.'.random_int(1, 254));
+
         return [$profile, $code];
     }
+
     public function testEncryptedProfilesDoNotLeakInTeamPageOrDatabase(): void
     {
         $profile = $this->profile(
@@ -63,13 +74,13 @@ final class MemberWorkspaceTest extends DatabaseTestCase
                 $profile->getId(),
             ]);
         self::assertStringNotContainsString('SECRET-ADMIN-TEST', $raw);
-        $this->client->request('GET', '/groupes/' . $this->bandId . '/equipe');
+        $this->client->request('GET', '/groupes/'.$this->bandId.'/equipe');
         self::assertResponseIsSuccessful();
         self::assertStringNotContainsString(
             'SECRET-ADMIN-TEST',
             $this->client->getResponse()->getContent(),
         );
-        $this->client->request('GET', '/equipe/' . $profile->getPublicId());
+        $this->client->request('GET', '/equipe/'.$profile->getPublicId());
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.profile-fields', 'SECRET-ADMIN-TEST');
         self::assertStringContainsString(
@@ -77,6 +88,7 @@ final class MemberWorkspaceTest extends DatabaseTestCase
             $this->client->getResponse()->headers->get('Cache-Control'),
         );
     }
+
     #[DataProvider('visibility')]
     public function testAdministrativeVisibility(
         MemberKind $kind,
@@ -100,23 +112,25 @@ final class MemberWorkspaceTest extends DatabaseTestCase
         $own = $this->profile($user, $kind);
         $this->client->loginUser($user);
         $this->client->catchExceptions(true);
-        $this->client->request('GET', '/equipe/' . $profile->getPublicId());
+        $this->client->request('GET', '/equipe/'.$profile->getPublicId());
         self::assertResponseStatusCodeSame($expected);
-        $this->client->request('GET', '/equipe/' . $own->getPublicId());
+        $this->client->request('GET', '/equipe/'.$own->getPublicId());
         self::assertResponseIsSuccessful();
     }
+
     public static function visibility(): iterable
     {
         yield 'Marty own only' => [MemberKind::Engineer, BandRole::Manager, 403];
         yield 'Romain can read' => [MemberKind::Booker, BandRole::Booker, 200];
         yield 'Musician can read' => [MemberKind::Musician, BandRole::Manager, 200];
     }
+
     #[DataProvider('acceptedPasswords')]
     public function testActivationConsumesCodeAndLogsInWithMatchingSecurePassword(
         string $password,
     ): void {
         [$profile, $code] = $this->pending();
-        $uri = '/premiere-connexion/' . $profile->getPublicId();
+        $uri = '/premiere-connexion/'.$profile->getPublicId();
         $this->client->request('GET', '/premiere-connexion');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('select', 'Membre à activer');
@@ -156,16 +170,18 @@ final class MemberWorkspaceTest extends DatabaseTestCase
         $this->client->request('GET', $uri);
         self::assertResponseStatusCodeSame(404);
     }
+
     public static function acceptedPasswords(): iterable
     {
         yield 'exactly ten characters' => ['Corail!94x'];
         yield 'longer password' => ['Une longue phrase Corail!94 lune?'];
     }
+
     #[DataProvider('badActivation')]
     public function testInvalidActivationDoesNotSetPassword(string $mode): void
     {
         [$profile, $code] = $this->pending();
-        $uri = '/premiere-connexion/' . $profile->getPublicId();
+        $uri = '/premiere-connexion/'.$profile->getPublicId();
         $form = $this->client->request('GET', $uri)->filter('form[name="activation"]')->form();
         $values = $form->getPhpValues();
         $password = match ($mode) {
@@ -176,17 +192,16 @@ final class MemberWorkspaceTest extends DatabaseTestCase
             'whitespace' => 'Corail194 x',
             default => 'Une longue phrase Corail!94 lune?',
         };
-        $values['activation']['code'] = $mode === 'code' ? 'INVALID' : $code;
+        $values['activation']['code'] = 'code' === $mode ? 'INVALID' : $code;
         $values['activation']['password'] = [
-            'first' => $mode === 'weak' ? 'password' : $password,
-            'second' =>
-                $mode === 'mismatch'
+            'first' => 'weak' === $mode ? 'password' : $password,
+            'second' => 'mismatch' === $mode
                     ? 'Different Password 2026!!!'
-                    : ($mode === 'weak'
+                    : ('weak' === $mode
                         ? 'password'
                         : $password),
         ];
-        if ($mode === 'csrf') {
+        if ('csrf' === $mode) {
             unset($values['activation']['_token']);
         }
         $this->client->request('POST', $uri, $values);
@@ -200,6 +215,7 @@ final class MemberWorkspaceTest extends DatabaseTestCase
                 ]),
         );
     }
+
     public static function badActivation(): iterable
     {
         yield ['code'];
@@ -212,11 +228,12 @@ final class MemberWorkspaceTest extends DatabaseTestCase
         yield ['symbol'];
         yield ['whitespace'];
     }
+
     #[DataProvider('incompleteActivation')]
     public function testIncompleteActivationShowsErrorsAndPreservesTheCode(array $missing): void
     {
         [$profile, $code] = $this->pending();
-        $uri = '/premiere-connexion/' . $profile->getPublicId();
+        $uri = '/premiere-connexion/'.$profile->getPublicId();
         $form = $this->client->request('GET', $uri)->filter('form[name="activation"]')->form();
         $values = $form->getPhpValues();
         $values['activation']['code'] = $code;
@@ -254,7 +271,7 @@ final class MemberWorkspaceTest extends DatabaseTestCase
     public function testActivationCanBeRetriedAfterAValidationError(): void
     {
         [$profile, $code] = $this->pending();
-        $uri = '/premiere-connexion/' . $profile->getPublicId();
+        $uri = '/premiere-connexion/'.$profile->getPublicId();
         $form = $this->client->request('GET', $uri)->filter('form[name="activation"]')->form();
         $values = $form->getPhpValues();
         $values['activation']['code'] = $code;
@@ -284,7 +301,7 @@ final class MemberWorkspaceTest extends DatabaseTestCase
     public function testExpiredCodeAndRateLimitAreEnforced(): void
     {
         [$profile, $code] = $this->pending();
-        $uri = '/premiere-connexion/' . $profile->getPublicId();
+        $uri = '/premiere-connexion/'.$profile->getPublicId();
         $form = $this->client->request('GET', $uri)->filter('form[name="activation"]')->form();
         $values = $form->getPhpValues();
         $values['activation']['code'] = 'INVALID';
@@ -306,6 +323,7 @@ final class MemberWorkspaceTest extends DatabaseTestCase
         $this->client->request('GET', $uri);
         self::assertResponseStatusCodeSame(404);
     }
+
     public function testBookerFromAnotherBandCannotReadAnAdministrativeProfile(): void
     {
         $target = $this->profile(
@@ -329,7 +347,7 @@ final class MemberWorkspaceTest extends DatabaseTestCase
         $em->flush();
         $this->client->loginUser($user);
         $this->client->catchExceptions(true);
-        $this->client->request('GET', '/equipe/' . $target->getPublicId());
+        $this->client->request('GET', '/equipe/'.$target->getPublicId());
         self::assertResponseStatusCodeSame(403);
         self::assertSelectorNotExists('.administrative-profile');
     }

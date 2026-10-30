@@ -9,17 +9,16 @@ use App\Security\Voter\ConcertVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\{Request, Response};
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[
-    Route(
-        '/invitations/{id}/revoquer',
-        name: 'app_invitation_revoke',
-        requirements: ['id' => '\d+'],
-        methods: ['POST'],
-    ),
-]
+#[Route(
+    '/invitations/{id}/revoquer',
+    name: 'app_invitation_revoke',
+    requirements: ['id' => '\d+'],
+    methods: ['POST'],
+),]
 final class RevokeAction extends AbstractController
 {
     public function __invoke(
@@ -31,7 +30,7 @@ final class RevokeAction extends AbstractController
         $this->denyAccessUnlessGranted(ConcertVoter::SHARE, $concert);
         if (
             !$this->isCsrfTokenValid(
-                'invitation_revoke_' . $invitation->getId(),
+                'invitation_revoke_'.$invitation->getId(),
                 $request->request->getString('_token'),
             )
         ) {

@@ -51,30 +51,37 @@ class VenueInvitation
     {
         return $this->id;
     }
+
     public function getPublication(): TechnicalPublication
     {
         return $this->publication;
     }
+
     public function getLabel(): string
     {
         return $this->label;
     }
+
     public function getTokenHash(): string
     {
         return $this->tokenHash;
     }
+
     public function getExpiresAt(): \DateTimeImmutable
     {
         return $this->expiresAt;
     }
+
     public function getRevokedAt(): ?\DateTimeImmutable
     {
         return $this->revokedAt;
     }
+
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
+
     public function revoke(): void
     {
         $this->revokedAt = new \DateTimeImmutable();
@@ -82,6 +89,6 @@ class VenueInvitation
 
     public function isUsable(): bool
     {
-        return $this->revokedAt === null && $this->expiresAt > new \DateTimeImmutable();
+        return null === $this->revokedAt && $this->expiresAt > new \DateTimeImmutable();
     }
 }

@@ -7,7 +7,8 @@ namespace App\Integration\Bandsintown\Dto;
 /** Données publiques normalisées. Le jour et l'heure restent ceux annoncés sur place. */
 final readonly class BandsintownEvent
 {
-    /** @param list<string> $lineup @param list<array{label: string, url: string}> $tickets */
+    /** @param list<string> $lineup
+     * @param list<array{label: string, url: string}> $tickets */
     public function __construct(
         public string $id,
         public string $artistId,
@@ -21,18 +22,25 @@ final readonly class BandsintownEvent
         public string $description,
         public array $lineup,
         public array $tickets,
-    ) {}
+    ) {
+    }
 
     public function sourceUrl(): string
     {
-        return 'https://www.bandsintown.com/e/' . $this->id;
+        return 'https://www.bandsintown.com/e/'.$this->id;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return get_object_vars($this);
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public static function fromArray(array $data): self
     {
         return new self(...$data);

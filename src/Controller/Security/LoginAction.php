@@ -14,7 +14,7 @@ final class LoginAction extends AbstractController
 {
     public function __invoke(AuthenticationUtils $authentication): Response
     {
-        if ($this->getUser() !== null) {
+        if (null !== $this->getUser()) {
             return $this->redirectToRoute('app_concert_index');
         }
 

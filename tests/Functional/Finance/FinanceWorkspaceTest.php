@@ -1,28 +1,32 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Tests\Functional\Finance;
-use App\Entity\{
-    Band,
-    User,
-    BandMembership,
-    MemberProfile,
-    TreasuryAccount,
-    TreasuryEntry,
-    MerchProduct,
-    MerchVariant,
-    StockMovement,
-};
-use App\Enum\{BandRole, MemberKind, TreasuryAccountKind, TreasuryEntryKind};
-use App\Tests\DatabaseTestCase;
+
+use App\Entity\Band;
+use App\Entity\MemberProfile;
+use App\Entity\MerchProduct;
+use App\Entity\MerchVariant;
+use App\Entity\StockMovement;
+use App\Entity\TreasuryAccount;
+use App\Entity\TreasuryEntry;
+use App\Entity\User;
+use App\Enum\BandRole;
+use App\Enum\MemberKind;
+use App\Enum\TreasuryAccountKind;
+use App\Enum\TreasuryEntryKind;
 use App\Service\Finance\TreasuryView;
 use App\Service\Security\UserCreator;
+use App\Tests\DatabaseTestCase;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\Events;
 use PHPUnit\Framework\Attributes\DataProvider;
+
 final class FinanceWorkspaceTest extends DatabaseTestCase
 {
     private int $variantId;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -38,8 +42,7 @@ final class FinanceWorkspaceTest extends DatabaseTestCase
             ),
         );
         foreach (
-            [[TreasuryAccountKind::Cash, 120000], [TreasuryAccountKind::Bank, 80000]]
-            as [$kind, $amount]
+            [[TreasuryAccountKind::Cash, 120000], [TreasuryAccountKind::Bank, 80000]] as [$kind, $amount]
         ) {
             $account = new TreasuryAccount($band, $kind);
             $account->credit($amount);
@@ -63,36 +66,40 @@ final class FinanceWorkspaceTest extends DatabaseTestCase
         $this->variantId = $variant->getId();
         $em->clear();
     }
+
     private function balances(): array
     {
         return $this->entityManager()
             ->getConnection()
             ->fetchAllKeyValue('SELECT kind, balance_cents FROM treasury_account ORDER BY kind');
     }
+
     private function submitForm(string $uri, string $name, array $changes): void
     {
         $form = $this->client
             ->request('GET', $uri)
-            ->filter('form[name="' . $name . '"]')
+            ->filter('form[name="'.$name.'"]')
             ->form();
         $values = $form->getPhpValues();
         $values[$name] = array_replace($values[$name], $changes);
         $this->client->request('POST', $uri, $values);
     }
+
     public function testOverviewAndStockRenderWithoutCountingOpeningBalancesAsIncome(): void
     {
-        $this->client->request('GET', '/groupes/' . $this->bandId . '/tresorerie');
+        $this->client->request('GET', '/groupes/'.$this->bandId.'/tresorerie');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.balance-grid', '2 000,00');
         self::assertSelectorTextContains('.chart-legend', 'Recettes : 0,00');
         self::assertResponseHeaderSame('Referrer-Policy', 'no-referrer');
-        $this->client->request('GET', '/groupes/' . $this->bandId . '/stock');
+        $this->client->request('GET', '/groupes/'.$this->bandId.'/stock');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.merch-grid', 'Vinyle de test');
     }
+
     public function testSaleAndCancellationUpdateMoneyAndStockTogether(): void
     {
-        $this->submitForm('/stock/variantes/' . $this->variantId . '/mouvement', 'stock_movement', [
+        $this->submitForm('/stock/variantes/'.$this->variantId.'/mouvement', 'stock_movement', [
             'kind' => 'sale',
             'quantity' => '2',
             'reason' => 'Concert test',
@@ -110,7 +117,7 @@ final class FinanceWorkspaceTest extends DatabaseTestCase
         $id = $this->entityManager()
             ->getConnection()
             ->fetchOne("SELECT id FROM treasury_entry WHERE kind = 'income'");
-        $this->submitForm('/tresorerie/mouvements/' . $id . '/annuler', 'cancel_entry', [
+        $this->submitForm('/tresorerie/mouvements/'.$id.'/annuler', 'cancel_entry', [
             'reason' => 'Vente saisie deux fois',
         ]);
         self::assertResponseStatusCodeSame(303);
@@ -121,16 +128,17 @@ final class FinanceWorkspaceTest extends DatabaseTestCase
                 ->getConnection()
                 ->fetchOne('SELECT quantity FROM merch_variant WHERE id = ?', [$this->variantId]),
         );
-        $this->submitForm('/tresorerie/mouvements/' . $id . '/annuler', 'cancel_entry', [
+        $this->submitForm('/tresorerie/mouvements/'.$id.'/annuler', 'cancel_entry', [
             'reason' => 'Encore',
         ]);
         self::assertResponseStatusCodeSame(422);
         self::assertSame(120000, $this->balances()['cash']);
         self::assertSame(2, $this->entityManager()->getRepository(StockMovement::class)->count([]));
     }
+
     public function testTransferPreservesTotalAndIsExcludedFromIncomeAndExpense(): void
     {
-        $this->submitForm('/groupes/' . $this->bandId . '/tresorerie/transfert', 'transfer', [
+        $this->submitForm('/groupes/'.$this->bandId.'/tresorerie/transfert', 'transfer', [
             'source' => 'cash',
             'destination' => 'bank',
             'amount' => '100,25',
@@ -145,9 +153,10 @@ final class FinanceWorkspaceTest extends DatabaseTestCase
         self::assertSame(0, $summary['income']);
         self::assertSame(0, $summary['expense']);
     }
+
     public function testExpenseAndOverdraftValidation(): void
     {
-        $uri = '/groupes/' . $this->bandId . '/tresorerie/mouvement';
+        $uri = '/groupes/'.$this->bandId.'/tresorerie/mouvement';
         $this->submitForm($uri, 'treasury_entry', [
             'kind' => 'expense',
             'amount' => '8,73',
@@ -165,9 +174,10 @@ final class FinanceWorkspaceTest extends DatabaseTestCase
         self::assertResponseStatusCodeSame(422);
         self::assertSame(119127, $this->balances()['cash']);
     }
+
     public function testInvalidStockAndUnknownQuantityCannotProduceIncome(): void
     {
-        $uri = '/stock/variantes/' . $this->variantId . '/mouvement';
+        $uri = '/stock/variantes/'.$this->variantId.'/mouvement';
         $this->submitForm($uri, 'stock_movement', [
             'kind' => 'sale',
             'quantity' => '10',
@@ -202,9 +212,10 @@ final class FinanceWorkspaceTest extends DatabaseTestCase
         );
         self::assertSame(120000, $this->balances()['cash']);
     }
+
     public function testStaleSaleAndMissingCsrfDoNotChangeAnyBalance(): void
     {
-        $uri = '/stock/variantes/' . $this->variantId . '/mouvement';
+        $uri = '/stock/variantes/'.$this->variantId.'/mouvement';
         $form = $this->client->request('GET', $uri)->filter('form[name="stock_movement"]')->form();
         $this->entityManager()
             ->getConnection()
@@ -232,18 +243,22 @@ final class FinanceWorkspaceTest extends DatabaseTestCase
                 ->fetchOne('SELECT quantity FROM merch_variant WHERE id = ?', [$this->variantId]),
         );
     }
+
     public function testStockRaceRollsBackBothLedgerAndInventory(): void
     {
         $this->client->disableReboot();
-        $uri = '/stock/variantes/' . $this->variantId . '/mouvement';
+        $uri = '/stock/variantes/'.$this->variantId.'/mouvement';
         $form = $this->client->request('GET', $uri)->filter('form[name="stock_movement"]')->form();
         $em = $this->entityManager();
         $other = DriverManager::getConnection(
             $em->getConnection()->getParams(),
             $em->getConnection()->getConfiguration(),
         );
-        $listener = new class ($other, $this->variantId) {
-            public function __construct(private $connection, private int $id) {}
+        $listener = new class($other, $this->variantId) {
+            public function __construct(private $connection, private int $id)
+            {
+            }
+
             public function preFlush(): void
             {
                 $this->connection->executeStatement(
@@ -283,6 +298,7 @@ final class FinanceWorkspaceTest extends DatabaseTestCase
             $other->close();
         }
     }
+
     #[DataProvider('nonMusicians')]
     public function testAllFinanceAndStockRoutesDenyOtherRoles(
         BandRole $role,
@@ -299,7 +315,7 @@ final class FinanceWorkspaceTest extends DatabaseTestCase
                 $band,
                 $role,
             );
-        if ($kind !== null) {
+        if (null !== $kind) {
             $em->persist(new MemberProfile($band, $user, 'Autre', 'Test', $kind));
             $em->flush();
         }
@@ -307,14 +323,13 @@ final class FinanceWorkspaceTest extends DatabaseTestCase
         $this->client->catchExceptions(true);
         foreach (
             [
-                '/groupes/' . $this->bandId . '/tresorerie',
-                '/groupes/' . $this->bandId . '/stock',
-                '/stock/variantes/' . $this->variantId . '/mouvement',
-                '/groupes/' . $this->bandId . '/tresorerie/mouvement',
-                '/groupes/' . $this->bandId . '/tresorerie/transfert',
-                '/groupes/' . $this->bandId . '/stock/nouveau',
-            ]
-            as $uri
+                '/groupes/'.$this->bandId.'/tresorerie',
+                '/groupes/'.$this->bandId.'/stock',
+                '/stock/variantes/'.$this->variantId.'/mouvement',
+                '/groupes/'.$this->bandId.'/tresorerie/mouvement',
+                '/groupes/'.$this->bandId.'/tresorerie/transfert',
+                '/groupes/'.$this->bandId.'/stock/nouveau',
+            ] as $uri
         ) {
             $this->client->request('GET', $uri);
             self::assertResponseStatusCodeSame(403);
@@ -323,8 +338,9 @@ final class FinanceWorkspaceTest extends DatabaseTestCase
         }
         $this->client->request('GET', '/concerts');
         self::assertResponseIsSuccessful();
-        self::assertSelectorNotExists('a[href="/groupes/' . $this->bandId . '/tresorerie"]');
+        self::assertSelectorNotExists('a[href="/groupes/'.$this->bandId.'/tresorerie"]');
     }
+
     public static function nonMusicians(): iterable
     {
         yield 'Marty' => [BandRole::Manager, MemberKind::Engineer];
@@ -332,6 +348,7 @@ final class FinanceWorkspaceTest extends DatabaseTestCase
         yield 'Manager without a musician profile' => [BandRole::Manager, null];
         yield 'Reader' => [BandRole::Viewer, MemberKind::Musician];
     }
+
     public function testMusicianFromAnotherBandCannotReadOrWriteThisInventory(): void
     {
         $em = $this->entityManager();
@@ -354,24 +371,24 @@ final class FinanceWorkspaceTest extends DatabaseTestCase
         $em->flush();
         $this->client->loginUser($user);
         $this->client->catchExceptions(true);
-        $this->client->request('GET', '/groupes/' . $this->bandId . '/tresorerie');
+        $this->client->request('GET', '/groupes/'.$this->bandId.'/tresorerie');
         self::assertResponseStatusCodeSame(403);
-        $this->client->request('GET', '/groupes/' . $this->bandId . '/stock');
+        $this->client->request('GET', '/groupes/'.$this->bandId.'/stock');
         self::assertResponseStatusCodeSame(403);
-        $this->client->request('POST', '/stock/variantes/' . $this->variantId . '/mouvement', []);
+        $this->client->request('POST', '/stock/variantes/'.$this->variantId.'/mouvement', []);
         self::assertResponseStatusCodeSame(403);
         self::assertSame(120000, $this->balances()['cash']);
     }
 
     public function testRevokedMembershipImmediatelyRemovesFinanceAccess(): void
     {
-        $this->client->request('GET', '/groupes/' . $this->bandId . '/tresorerie');
+        $this->client->request('GET', '/groupes/'.$this->bandId.'/tresorerie');
         self::assertResponseIsSuccessful();
         $this->entityManager()
             ->getConnection()
             ->executeStatement('DELETE FROM band_membership WHERE user_id = ?', [$this->userId]);
         $this->client->catchExceptions(true);
-        $this->client->request('GET', '/groupes/' . $this->bandId . '/tresorerie');
+        $this->client->request('GET', '/groupes/'.$this->bandId.'/tresorerie');
         self::assertResponseStatusCodeSame(403);
     }
 }

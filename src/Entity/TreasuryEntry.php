@@ -30,27 +30,20 @@ class TreasuryEntry
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?User $cancelledBy = null;
+
     public function __construct(
         #[ORM\ManyToOne] #[ORM\JoinColumn(nullable: false)] private TreasuryAccount $account,
-        #[
-            ORM\Column(length: 15, enumType: TreasuryEntryKind::class),
-        ]
+        #[ORM\Column(length: 15, enumType: TreasuryEntryKind::class),]
         private TreasuryEntryKind $kind,
         #[ORM\Column] private int $amountCents,
         #[ORM\Column(length: 160)] private string $label,
         #[ORM\Column(length: 30)] private string $category,
         #[ORM\Column(type: Types::DATE_IMMUTABLE)] private \DateTimeImmutable $occurredOn,
-        #[ORM\ManyToOne] #[
-            ORM\JoinColumn(nullable: true, onDelete: 'SET NULL'),
-        ]
+        #[ORM\ManyToOne] #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL'),]
         private ?User $createdBy = null,
-        #[ORM\ManyToOne] #[
-            ORM\JoinColumn(nullable: true),
-        ]
+        #[ORM\ManyToOne] #[ORM\JoinColumn(nullable: true),]
         private ?TreasuryAccount $destination = null,
-        #[ORM\OneToOne(cascade: ['persist'])] #[
-            ORM\JoinColumn(nullable: true),
-        ]
+        #[ORM\OneToOne(cascade: ['persist'])] #[ORM\JoinColumn(nullable: true),]
         private ?StockMovement $stockMovement = null,
     ) {
         if ($amountCents < 1) {
@@ -126,7 +119,7 @@ class TreasuryEntry
 
     public function isCancelled(): bool
     {
-        return $this->cancelledAt !== null;
+        return null !== $this->cancelledAt;
     }
 
     public function getCancelReason(): ?string
@@ -146,7 +139,7 @@ class TreasuryEntry
 
     public function cancel(User $actor, string $reason): void
     {
-        if ($this->isCancelled() || $this->kind === TreasuryEntryKind::Opening) {
+        if ($this->isCancelled() || TreasuryEntryKind::Opening === $this->kind) {
             throw new \DomainException('Ce mouvement ne peut pas être annulé.');
         }
         $this->cancelledAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));

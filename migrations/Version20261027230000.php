@@ -18,7 +18,7 @@ final class Version20261027230000 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->abortIf(
-            !($this->connection->getDatabasePlatform() instanceof SQLitePlatform),
+            !$this->connection->getDatabasePlatform() instanceof SQLitePlatform,
             'Cette migration utilise SQLite.',
         );
         $references = (int) $this->connection->fetchOne(
@@ -61,7 +61,7 @@ final class Version20261027230000 extends AbstractMigration
     public function down(Schema $schema): void
     {
         $this->abortIf(
-            !($this->connection->getDatabasePlatform() instanceof SQLitePlatform),
+            !$this->connection->getDatabasePlatform() instanceof SQLitePlatform,
             'Cette migration utilise SQLite.',
         );
         $this->addSql('DROP TABLE band_membership');

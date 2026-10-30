@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use App\Entity\PatchLine;
 use App\Entity\Band;
+use App\Entity\PatchLine;
+use App\Entity\TechnicalSheet;
 use App\Enum\BandRole;
 use App\Service\Security\UserCreator;
-use App\Entity\TechnicalSheet;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -33,13 +33,13 @@ abstract class DatabaseTestCase extends WebTestCase
 
         // A file survives KernelBrowser's kernel reboot between HTTP requests.
         $this->databasePath =
-            sys_get_temp_dir() .
-            '/backlinebridge-phpunit-' .
-            getmypid() .
-            '-' .
-            bin2hex(random_bytes(8)) .
+            sys_get_temp_dir().
+            '/backlinebridge-phpunit-'.
+            getmypid().
+            '-'.
+            bin2hex(random_bytes(8)).
             '.db';
-        $url = 'sqlite:///' . $this->databasePath;
+        $url = 'sqlite:///'.$this->databasePath;
         $_ENV['DATABASE_URL'] = $_SERVER['DATABASE_URL'] = $url;
         $this->client = static::createClient(['environment' => 'test']);
         $this->client->catchExceptions(false);
@@ -54,7 +54,7 @@ abstract class DatabaseTestCase extends WebTestCase
         $schema = new SchemaTool($em);
         $schema->createSchema($metadata);
 
-        $contents = file_get_contents(dirname(__DIR__) . '/data/avee-mana-patch.json');
+        $contents = file_get_contents(dirname(__DIR__).'/data/avee-mana-patch.json');
         self::assertNotFalse($contents);
         $this->fixture = json_decode($contents, true, flags: JSON_THROW_ON_ERROR);
         $sheet = new TechnicalSheet()
@@ -97,12 +97,13 @@ abstract class DatabaseTestCase extends WebTestCase
         $em->clear();
     }
 
+    // @phpstan-ignore phpunit.callParent (L’appel parent est dans try pour garantir le nettoyage dans finally.)
     protected function tearDown(): void
     {
         try {
             parent::tearDown();
         } finally {
-            if ($this->databasePath !== null && is_file($this->databasePath)) {
+            if (null !== $this->databasePath && is_file($this->databasePath)) {
                 unlink($this->databasePath);
             }
         }

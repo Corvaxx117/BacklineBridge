@@ -21,13 +21,13 @@ class TreasuryAccount
 
     #[ORM\Column]
     private int $balanceCents = 0;
+
     public function __construct(
         #[ORM\ManyToOne] #[ORM\JoinColumn(nullable: false)] private Band $band,
-        #[
-            ORM\Column(length: 10, enumType: TreasuryAccountKind::class),
-        ]
+        #[ORM\Column(length: 10, enumType: TreasuryAccountKind::class),]
         private TreasuryAccountKind $kind,
-    ) {}
+    ) {
+    }
 
     public function getId(): ?int
     {

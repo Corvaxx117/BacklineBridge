@@ -20,6 +20,7 @@ class TechnicalPublication
     #[ORM\JoinColumn(nullable: false)]
     private Concert $concert;
 
+    /** @var array<string, mixed> */
     #[ORM\Column(type: Types::JSON)]
     private array $snapshot;
 
@@ -29,6 +30,9 @@ class TechnicalPublication
     #[ORM\Column]
     private \DateTimeImmutable $publishedAt;
 
+    /**
+     * @param array<string, mixed> $snapshot
+     */
     public function __construct(Concert $concert, array $snapshot, string $fingerprint)
     {
         $this->concert = $concert;
@@ -41,18 +45,25 @@ class TechnicalPublication
     {
         return $this->id;
     }
+
     public function getConcert(): Concert
     {
         return $this->concert;
     }
+
+    /**
+     * @return array<string, mixed>
+     */
     public function getSnapshot(): array
     {
         return $this->snapshot;
     }
+
     public function getFingerprint(): string
     {
         return $this->fingerprint;
     }
+
     public function getPublishedAt(): \DateTimeImmutable
     {
         return $this->publishedAt;
