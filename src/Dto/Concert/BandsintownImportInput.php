@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Dto\Concert;
 
-use App\Enum\ConcertStatus;
 use Symfony\Component\Validator\Constraints as Assert;
 
 final class BandsintownImportInput
@@ -17,6 +16,4 @@ final class BandsintownImportInput
         maxMessage: 'Importe au maximum 100 concerts à la fois.',
     ),]
     public array $events = [];
-    #[Assert\NotNull]
-    public ?ConcertStatus $status = ConcertStatus::Pending;
 }

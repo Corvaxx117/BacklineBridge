@@ -60,6 +60,11 @@ class Concert
         return $this->status;
     }
 
+    public function confirm(): void
+    {
+        $this->status = ConcertStatus::Validated;
+    }
+
     public function getNotes(): ?string
     {
         return $this->notes;

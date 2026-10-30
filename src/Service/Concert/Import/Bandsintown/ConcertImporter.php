@@ -8,6 +8,7 @@ use App\Dto\Concert\BandsintownImportInput;
 use App\Entity\Band;
 use App\Entity\BandsintownConcert;
 use App\Entity\User;
+use App\Enum\ConcertStatus;
 use App\Integration\Bandsintown\BandsintownConfiguration;
 use App\Integration\Bandsintown\Dto\BandsintownEvent;
 use App\Repository\BandMembershipRepository;
@@ -41,8 +42,8 @@ final readonly class ConcertImporter
         ) {
             throw new AccessDeniedException('Aucun accès à cet import.');
         }
-        if (0 !== count($this->validator->validate($input)) || null === $input->status) {
-            throw new \DomainException('Sélectionne de 1 à 100 concerts et un statut valide.');
+        if (0 !== count($this->validator->validate($input))) {
+            throw new \DomainException('Sélectionne de 1 à 100 concerts.');
         }
         $indexed = [];
         foreach ($events as $event) {
@@ -88,11 +89,12 @@ final readonly class ConcertImporter
                         new \DateTimeImmutable($event->date, new \DateTimeZone('UTC')),
                         $event->venue,
                         $event->city,
-                        $input->status,
+                        ConcertStatus::Validated,
                         createdBy: $user,
                     );
                     ++$created;
                 } else {
+                    $concert->confirm();
                     ++$linked;
                     $occupied[$concert->getId()] = true;
                 }

@@ -102,7 +102,9 @@
                             }}"
                         >
                             Ouvrir le concert existant →
-                        </a>{% if row.state == 'link' %} · Ses informations et son statut seront conservés.{% endif %}
+                        </a>{% if row.state == 'link' %}
+                            · Il sera validé. Ses autres informations seront conservées.
+                        {% endif %}
                     </p>
                 {% elseif row.state == 'ambiguous' %}
                     <p class="workspace-hint">
@@ -150,9 +152,11 @@
     </div>
     {% if hasChoices %}
         <div class="workspace-panel workspace-form">
-            <div class="workspace-fields">
-                {{ form_row(form.status) }}
-            </div>
+            <p>
+                Les concerts sélectionnés seront validés, y compris ceux rattachés à une date
+                existante. Les disponibilités des membres et le matériel restent à confirmer
+                séparément.
+            </p>
             <p class="workspace-hint">
                 Les nouveaux dossiers techniques partiront de la référence actuelle du groupe. Rien
                 n’est publié ou envoyé aux salles par cet import.
@@ -160,7 +164,6 @@
         </div>
     {% else %}
         {% do form.events.setRendered %}
-        {% do form.status.setRendered %}
     {% endif %}
     {{ form_end(form) }}<script src="/scripts/bandsintown-import.js" defer></script>
 {% endblock %}

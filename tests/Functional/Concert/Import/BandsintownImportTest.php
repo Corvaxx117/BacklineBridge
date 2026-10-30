@@ -7,8 +7,10 @@ namespace App\Tests\Functional\Concert\Import;
 use App\Entity\Band;
 use App\Entity\BandsintownConcert;
 use App\Entity\Concert;
+use App\Entity\ConcertAvailability;
 use App\Entity\TechnicalSheet;
 use App\Entity\User;
+use App\Enum\AvailabilityStatus;
 use App\Enum\BandRole;
 use App\Integration\Bandsintown\BandsintownConfiguration;
 use App\Integration\Bandsintown\BandsintownGateway;
@@ -87,9 +89,10 @@ final class BandsintownImportTest extends DatabaseTestCase
         $uri = $this->preview();
         self::assertSame(0, $this->entityManager()->getRepository(Concert::class)->count([]));
         self::assertSelectorCount(2, '.import-event-choice input');
+        self::assertSelectorNotExists('select[name="bandsintown_import[status]"]');
         $form = $this->client->getCrawler()->filter('form[name="bandsintown_import"]')->form();
         $this->client->submit($form, [
-            'bandsintown_import' => ['events' => ['10001'], 'status' => 'validated'],
+            'bandsintown_import' => ['events' => ['10001']],
         ]);
         self::assertResponseStatusCodeSame(303);
         $em = $this->entityManager();
@@ -105,6 +108,10 @@ final class BandsintownImportTest extends DatabaseTestCase
             $em->getConnection()->fetchOne('SELECT COUNT(*) FROM concert_availability'),
         );
         self::assertSame(1, $em->getRepository(BandsintownConcert::class)->count([]));
+        self::assertSame('pending', $em->getConnection()->fetchOne(
+            'SELECT status FROM concert_availability WHERE concert_id = ?',
+            [$concert->getId()],
+        ));
         $this->client->request('GET', '/concerts/'.$concert->getId());
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.bit-concert-source', '20:30');
@@ -127,11 +134,17 @@ final class BandsintownImportTest extends DatabaseTestCase
                 createdBy: $this->entityManager()->find(User::class, $this->userId),
             );
         $id = $existing->getId();
+        $availability = $this->entityManager()->getRepository(ConcertAvailability::class)->findOneBy([
+            'concert' => $existing,
+        ]);
+        self::assertInstanceOf(ConcertAvailability::class, $availability);
+        $availability->respond(AvailabilityStatus::Available, 'Réponse à conserver');
+        $this->entityManager()->flush();
         $this->preview();
         self::assertSelectorTextContains('.bit-preview-list', 'Rattacher cette annonce');
         $form = $this->client->getCrawler()->filter('form[name="bandsintown_import"]')->form();
         $this->client->submit($form, [
-            'bandsintown_import' => ['events' => ['10001'], 'status' => 'validated'],
+            'bandsintown_import' => ['events' => ['10001']],
         ]);
         self::assertResponseStatusCodeSame(303);
         $em = $this->entityManager();
@@ -139,7 +152,13 @@ final class BandsintownImportTest extends DatabaseTestCase
         self::assertSame(1, $em->getRepository(Concert::class)->count([]));
         $saved = $em->find(Concert::class, $id);
         self::assertSame('Note privée à conserver', $saved->getNotes());
-        self::assertSame('pending', $saved->getStatus()->value);
+        self::assertSame('validated', $saved->getStatus()->value);
+        $savedAvailability = $em->getRepository(ConcertAvailability::class)->findOneBy([
+            'concert' => $saved,
+        ]);
+        self::assertInstanceOf(ConcertAvailability::class, $savedAvailability);
+        self::assertSame(AvailabilityStatus::Available, $savedAvailability->getStatus());
+        self::assertSame('Réponse à conserver', $savedAvailability->getComment());
         $this->preview();
         self::assertSelectorTextContains('.bit-preview-list', 'Déjà importé');
         self::assertSelectorCount(1, '.import-event-choice input');
@@ -156,6 +175,19 @@ final class BandsintownImportTest extends DatabaseTestCase
         $this->client->submit($form, ['bandsintown_import' => ['events' => ['10001', '10002']]]);
         self::assertResponseStatusCodeSame(303);
         self::assertSame(1, $this->entityManager()->getRepository(Concert::class)->count([]));
+    }
+
+    public function testSubmittedStatusCannotOverrideAutomaticValidation(): void
+    {
+        $uri = $this->preview();
+        $form = $this->client->getCrawler()->filter('form[name="bandsintown_import"]')->form();
+        $values = $form->getPhpValues();
+        $values['bandsintown_import']['events'] = ['10001'];
+        $values['bandsintown_import']['status'] = 'pending';
+        $this->client->request('POST', $uri, $values);
+
+        self::assertResponseStatusCodeSame(422);
+        self::assertSame(0, $this->entityManager()->getRepository(Concert::class)->count([]));
     }
 
     public function testCsrfAndInjectedEventCannotBypassThePreview(): void

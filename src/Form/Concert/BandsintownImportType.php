@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace App\Form\Concert;
 
 use App\Dto\Concert\BandsintownImportInput;
-use App\Enum\ConcertStatus;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -23,12 +21,6 @@ final class BandsintownImportType extends AbstractType
                 'choices' => $options['event_choices'],
                 'multiple' => true,
                 'expanded' => true,
-            ])
-            ->add('status', EnumType::class, [
-                'class' => ConcertStatus::class,
-                'label' => 'Statut des nouveaux concerts',
-                'choice_label' => static fn (ConcertStatus $status): string => $status->label(),
-                'help' => 'Le statut des concerts existants reste conservé.',
             ]);
     }
 
