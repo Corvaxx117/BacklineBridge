@@ -105,6 +105,52 @@ final class AlwaysdataBackupTest extends TestCase
         );
     }
 
+    public function testOfficialBackupWorksWithoutDemoAccountsAndIncludesEncryptionSettings(): void
+    {
+        unlink($this->directory.'/var/private/.htpasswd');
+        unlink($this->directory.'/var/private/demo-access.json');
+        file_put_contents(
+            $this->directory.'/.env.local',
+            "APP_ENV=prod\nAPP_DEMO_MODE=0\nDATABASE_URL=sqlite:///%kernel.project_dir%/var/production.db\nPROFILE_DATA_KEY=".
+                str_repeat('cd', 32)."\n",
+        );
+        file_put_contents($this->directory.'/var/private/deployment.json', '{"commit":"test"}');
+        $database = new \PDO('sqlite:'.$this->directory.'/var/production.db');
+        $database->exec('PRAGMA journal_mode = WAL');
+        $database->exec('CREATE TABLE notes (value TEXT)');
+        $database->exec("INSERT INTO notes VALUES ('official-data')");
+        $database->beginTransaction();
+        $database->query('SELECT * FROM notes')->fetchAll();
+
+        [$status, $output] = $this->backup();
+        self::assertSame(0, $status, $output);
+        self::assertStringNotContainsString(str_repeat('cd', 32), $output);
+        $folders = glob($this->directory.'/var/private/backups/*');
+        self::assertCount(1, $folders);
+        $folder = $folders[0];
+        $copy = new \PDO('sqlite:'.$folder.'/production.db');
+        self::assertSame('official-data', $copy->query('SELECT value FROM notes')->fetchColumn());
+        self::assertSame(0600, fileperms($folder.'/production.db') & 0777);
+        self::assertSame(
+            file_get_contents($this->directory.'/.env.local'),
+            file_get_contents($folder.'/.env.local'),
+        );
+        self::assertFileExists($folder.'/deployment.json');
+        self::assertFileDoesNotExist($folder.'/demo.db');
+    }
+
+    public function testOfficialModeCannotBackUpTheDemoDatabase(): void
+    {
+        file_put_contents(
+            $this->directory.'/.env.local',
+            "APP_ENV=prod\nAPP_DEMO_MODE=0\nDATABASE_URL=sqlite:///%kernel.project_dir%/var/demo.db\n",
+        );
+        new \PDO('sqlite:'.$this->directory.'/var/demo.db');
+        [$status] = $this->backup();
+        self::assertSame(1, $status);
+        self::assertDirectoryDoesNotExist($this->directory.'/var/private/backups');
+    }
+
     #[DataProvider('invalidConfigurations')]
     public function testBackupRefusesAnUnexpectedConfiguration(string $configuration): void
     {

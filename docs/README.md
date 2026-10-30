@@ -25,6 +25,7 @@ Choisir le guide correspondant à la tâche. Chaque sujet possède un seul guide
 | Besoin | Guide |
 | --- | --- |
 | Envoyer une version du Mac vers alwaysdata | [Mise à jour manuelle de la démo](exploitation/deploiement-demo.md) |
+| Déployer et suivre le site des membres | [Instance officielle](exploitation/deploiement-officiel.md) |
 | Conserver une démo et préparer l’instance réelle | [Démo et production](exploitation/demo-et-production.md) |
 | Sauvegarder, suivre les mises à jour, traiter un incident | [Maintenance](exploitation/maintenance.md) |
 | Importer les profils et les soldes sur une installation neuve | [Initialisation privée](exploitation/initialisation-groupe.md) |

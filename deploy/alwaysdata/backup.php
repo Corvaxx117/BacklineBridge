@@ -21,21 +21,33 @@ try {
     $environment = new Dotenv()->parse($contents);
     if (
         ($environment['APP_ENV'] ?? null) !== 'prod'
-        || ($environment['APP_DEMO_MODE'] ?? null) !== '1'
-        || ($environment['DATABASE_URL'] ?? null) !== 'sqlite:///%kernel.project_dir%/var/demo.db'
         || is_file($root.'/.env.local.php')
         || is_file($root.'/.env.prod.local')
-        || !is_file($root.'/var/demo.db')
+        || is_file($root.'/.env.prod')
     ) {
-        throw new RuntimeException('Cette commande est réservée à la démonstration hébergée.');
+        throw new RuntimeException('Configuration de production inattendue.');
+    }
+    $databaseName = match (true) {
+        ($environment['APP_DEMO_MODE'] ?? null) === '1'
+            && ($environment['DATABASE_URL'] ?? null) === 'sqlite:///%kernel.project_dir%/var/demo.db' => 'demo.db',
+        ($environment['APP_DEMO_MODE'] ?? null) === '0'
+            && ($environment['DATABASE_URL'] ?? null) === 'sqlite:///%kernel.project_dir%/var/production.db' => 'production.db',
+        default => throw new RuntimeException('La base ne correspond pas à cette installation.'),
+    };
+    if (!is_file($root.'/var/'.$databaseName) || is_link($root.'/var/'.$databaseName)) {
+        throw new RuntimeException('Base de production absente ou liée à un autre fichier.');
     }
 
-    $files = [
-        '.env.local',
-        'public/.htaccess',
-        'var/private/.htpasswd',
-        'var/private/demo-access.json',
-    ];
+    $files = ['.env.local', 'public/.htaccess'];
+    if ('demo.db' === $databaseName) {
+        $files[] = 'var/private/.htpasswd';
+        $files[] = 'var/private/demo-access.json';
+    } elseif (is_file($root.'/var/private/.htpasswd')) {
+        $files[] = 'var/private/.htpasswd';
+    }
+    if (is_file($root.'/var/private/deployment.json')) {
+        $files[] = 'var/private/deployment.json';
+    }
     $activationFiles = glob($root.'/var/private/activation-codes-*.json');
     if (false === $activationFiles) {
         throw new RuntimeException('Impossible de parcourir les fichiers privés.');
@@ -54,11 +66,18 @@ try {
     if (!mkdir($directory, 0700, true)) {
         throw new RuntimeException('Impossible de créer le dossier de sauvegarde.');
     }
-    $database = new PDO('sqlite:'.$root.'/var/demo.db');
+    $database = new PDO('sqlite:'.$root.'/var/'.$databaseName);
     $database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $database->exec('PRAGMA busy_timeout = 10000');
-    $database->exec('VACUUM INTO '.$database->quote($directory.'/demo.db'));
-    chmod($directory.'/demo.db', 0600);
+    $database->exec('VACUUM INTO '.$database->quote($directory.'/'.$databaseName));
+    if (!chmod($directory.'/'.$databaseName, 0600)) {
+        throw new RuntimeException('Impossible de protéger la copie de la base.');
+    }
+    $copy = new PDO('sqlite:'.$directory.'/'.$databaseName);
+    $integrity = $copy->query('PRAGMA integrity_check');
+    if (false === $integrity || 'ok' !== $integrity->fetchColumn()) {
+        throw new RuntimeException('La copie de la base est invalide.');
+    }
     foreach ($files as $file) {
         $target = $directory.'/'.basename($file);
         if (!copy($root.'/'.$file, $target) || !chmod($target, 0600)) {
