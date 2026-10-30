@@ -141,7 +141,7 @@
             </div>
         </div>
         <div class="table-scroll">
-            <table class="ledger-table">
+            <table class="ledger-table ledger-table-stacked" role="table">
                 <thead>
                     <tr>
                         <th>Date</th>
@@ -154,54 +154,68 @@
                 <tbody>
                     {% for entry in entries %}
                         <tr class="{{ entry.cancelled ? 'entry-cancelled' : '' }}">
-                            <td>{{ entry.occurredOn|date('d/m/Y') }}</td>
-                            <td>
-                                <strong>{{ entry.label }}</strong><small>
-                                    {{ entry.kind.label }} · {{ entry.category }}{% if
-                                        entry.createdBy %}
-                                        · {{ entry.createdBy.displayName }}
-                                    {% endif %}
-                                </small>{% if entry.cancelled %}
-                                    <small>
-                                        Annulé : {{ entry.cancelReason }}{% if entry.cancelledBy %}
-                                            · {{ entry.cancelledBy.displayName }}
-                                        {% endif %}
-                                    </small>
-                                {% endif %}
+                            <td data-label="Date">
+                                <div class="ledger-cell-content">
+                                    {{ entry.occurredOn|date('d/m/Y') }}
+                                </div>
                             </td>
-                            <td>
-                                {{ entry.account.kind.label }}{% if entry.destination %}
-                                    → {{ entry.destination.kind.label }}
-                                {% endif %}
+                            <td data-label="Mouvement">
+                                <div class="ledger-cell-content">
+                                    <strong>{{ entry.label }}</strong><small>
+                                        {{ entry.kind.label }} · {{ entry.category }}{% if
+                                            entry.createdBy %}
+                                            · {{ entry.createdBy.displayName }}
+                                        {% endif %}
+                                    </small>{% if entry.cancelled %}
+                                        <small>
+                                            Annulé : {{ entry.cancelReason }}{% if
+                                                entry.cancelledBy %}
+                                                · {{ entry.cancelledBy.displayName }}
+                                            {% endif %}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td data-label="Compte">
+                                <div class="ledger-cell-content">
+                                    {{ entry.account.kind.label }}{% if entry.destination %}
+                                        → {{ entry.destination.kind.label }}
+                                    {% endif %}
+                                </div>
                             </td>
                             <td
+                                data-label="Montant"
                                 class="money-cell {{
                                 entry.kind.value == 'income'
                                     ? 'income-text'
                                     : entry.kind.value == 'expense' ? 'expense-text' : ''
                                 }}"
                             >
-                                {{ entry.kind.value == 'expense'
-                                    ? '− '
-                                    : entry.kind.value == 'income' ? '+ ' : '' }}{{
-                                    (entry.amountCents / 100)|number_format(2, ',', ' ')
-                                }} €
+                                <div class="ledger-cell-content">
+                                    {{ entry.kind.value == 'expense'
+                                        ? '− '
+                                        : entry.kind.value == 'income' ? '+ ' : '' }}{{
+                                        (entry.amountCents / 100)|number_format(2, ',', ' ')
+                                    }} €
+                                </div>
                             </td>
-                            <td>
-                                {% if not entry.cancelled and entry.kind.value != 'opening' %}
-                                    <a
-                                        href="{{
-                                        path(
-                                            'app_treasury_entry_cancel',
-                                            {
-                                                id: entry.id
-                                            }
-                                        )
-                                        }}"
-                                    >
-                                        Annuler
-                                    </a>
-                                {% endif %}
+                            <td data-label="Action">
+                                <div class="ledger-cell-content">
+                                    {% if not entry.cancelled and entry.kind.value != 'opening' %}
+                                        <a
+                                            href="{{
+                                            path(
+                                                'app_treasury_entry_cancel',
+                                                {
+                                                    id: entry.id
+                                                }
+                                            )
+                                            }}"
+                                        >
+                                            Annuler
+                                        </a>
+                                    {% endif %}
+                                </div>
                             </td>
                         </tr>
                     {% else %}

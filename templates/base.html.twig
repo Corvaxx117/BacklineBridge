@@ -10,6 +10,9 @@
             {% endblock %}
         </title>
         <link rel="stylesheet" href="/styles/app.css" />
+        <link rel="stylesheet" href="/styles/responsive.css" />
+        <script src="/scripts/stage-viewer.js" defer></script>
+        <script src="/scripts/navigation.js" defer></script>
     </head>
     <body>
         <a class="skip-link" href="#contenu">Aller au contenu</a>
@@ -38,7 +41,30 @@
                                 : sheet is defined ? sheet.band : null
                         )
                     %}
-                    <nav class="site-nav" aria-label="Navigation principale">
+                    <button
+                        type="button"
+                        class="nav-toggle"
+                        data-navigation-toggle
+                        aria-controls="primary-navigation"
+                        aria-expanded="false"
+                        hidden
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            aria-hidden="true"
+                        >
+                            <path d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <span data-navigation-label>Menu</span>
+                    </button>
+                    <nav
+                        id="primary-navigation"
+                        class="site-nav"
+                        aria-label="Navigation principale"
+                    >
                         <a
                             href="{{ path('app_patch_index') }}"
                             aria-current="{{

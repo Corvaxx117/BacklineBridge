@@ -53,6 +53,12 @@ La salle répond par catégorie : **À confirmer**, **Disponible**, **Alternativ
 
 Une réponse partielle peut être enregistrée et complétée plus tard. Le groupe la retrouve dans **Réponses de la salle**. Une alternative reste à valider avec le groupe.
 
+## Depuis un téléphone
+
+Le menu de l’en-tête donne accès aux rubriques et au compte personnel. Les formulaires et historiques s’adaptent à la largeur du navigateur.
+
+Le plan s’ouvre en vue d’ensemble. Utiliser **+ / −** pour zoomer, faire défiler le plan agrandi, puis **Vue d’ensemble** pour le recadrer. Dans l’éditeur, toucher la palette pour ajouter un élément ou le choisir dans « Sur la scène » ; ses commandes apparaissent sous le plan. Glisser un élément le déplace.
+
 ## Télécharger le PDF
 
 **Télécharger la fiche PDF** reprend le plan enregistré, le patch, le matériel demandé et les notes techniques. Enregistrer le plan avant de télécharger.

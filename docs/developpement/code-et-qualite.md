@@ -16,6 +16,8 @@ Les contrôleurs reçoivent les actions ; les services appliquent les règles ; 
 | `templates/pdf/`, `src/Service/Pdf/` | PDF et dessin du plan, avec Dompdf |
 | `migrations/`, `tests/` | Évolution des tables et vérifications automatiques |
 
+Les adaptations aux petits écrans sont regroupées dans `public/styles/responsive.css`. `navigation.js` gère le menu repliable ; `stage-viewer.js` cadre et zoome le plan sans modifier ses coordonnées enregistrées.
+
 ## Présenter le code
 
 PHP-CS-Fixer applique le style Symfony au PHP. Prettier s’occupe de Twig, JavaScript, CSS et de la configuration. Quatre espaces, deux pour GitHub et Docker Compose ; viser 100 caractères par ligne et répartir les longs arguments pour faciliter la lecture.

@@ -1,0 +1,558 @@
+/* Comportements partagés : le contenu reste utilisable sans JavaScript. */
+.nav-toggle:not([hidden]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid #75848b;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--white);
+    font-size: 14px;
+}
+.nav-toggle svg {
+    width: 20px;
+    height: 20px;
+}
+.stage-zoom-controls:not([hidden]) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--line);
+    background: var(--white);
+}
+.stage-zoom-controls button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--white);
+    color: var(--ink);
+    font-size: 14px;
+}
+.stage-zoom-controls button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+.stage-zoom-controls button[aria-pressed='true'] {
+    background: #eaf0e8;
+    border-color: #9cae9e;
+}
+.stage-zoom-controls output {
+    min-width: 48px;
+    text-align: center;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+}
+.stage-viewport {
+    position: relative;
+    margin-inline: auto;
+}
+.stage-viewer.is-enhanced .stage-board {
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+    transform-origin: top left;
+}
+
+/* Navigation sur tablette et téléphone. Sans JS, tous les liens restent visibles. */
+@media (max-width: 1100px) {
+    .site-header,
+    .site-header:has(.site-nav) {
+        min-height: 80px;
+    }
+    .header-inner,
+    .header-inner:has(.site-nav) {
+        flex-wrap: wrap;
+        min-height: 77px;
+        gap: 12px;
+        padding-block: 14px;
+    }
+    .header-inner .brand {
+        min-width: 0;
+        margin-right: auto;
+        letter-spacing: -0.02em;
+    }
+    .site-nav {
+        display: grid;
+        flex-basis: 100%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px 12px;
+        align-items: stretch;
+        padding-top: 12px;
+        border-top: 1px solid #ffffff24;
+    }
+    .site-nav[data-collapsed='true'] {
+        display: none;
+    }
+    .site-nav > a {
+        display: flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        overflow-wrap: anywhere;
+    }
+    .site-nav > a[aria-current='page'] {
+        background: #ffffff0d;
+    }
+    .site-nav .session-info {
+        display: flex;
+        grid-column: 1 / -1;
+        flex-wrap: wrap;
+        gap: 8px 14px;
+        align-items: center;
+    }
+    .site-nav .session-name {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        font-size: 14px;
+    }
+    .logout-form {
+        grid-column: 1 / -1;
+    }
+    .logout-form button {
+        min-height: 44px;
+        width: 100%;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 900px) {
+    .page-topline,
+    .panel-header,
+    .technical-heading,
+    .workspace-actions {
+        flex-wrap: wrap;
+    }
+    .hero > *,
+    .workspace-heading > *,
+    .panel-heading > *,
+    .form-grid > *,
+    .setup-fields > *,
+    .request-controls > * {
+        min-width: 0;
+    }
+    .stage-scroll {
+        overscroll-behavior-x: contain;
+    }
+    .stage-editor .stage-scroll {
+        height: auto;
+        max-height: 58svh;
+    }
+}
+
+/* Téléphone : champs lisibles, actions tactiles et cartes sur une colonne. */
+@media (max-width: 720px) {
+    .header-inner,
+    .page-shell,
+    .footer-inner,
+    .page-shell:has(.stage-editor) {
+        width: calc(100% - 32px);
+    }
+    .header-inner .brand {
+        font-size: clamp(17px, 4.4vw, 24px);
+        gap: 8px;
+    }
+    .brand .brand-symbol {
+        width: 28px;
+        flex-shrink: 0;
+    }
+    .brand-caption {
+        font-size: 8px;
+        letter-spacing: 0.15em;
+    }
+    .guest-badge {
+        flex-basis: 100%;
+        max-width: none;
+        text-align: left;
+        font-size: 12px;
+    }
+    .hero,
+    .workspace-heading,
+    .panel-heading,
+    .technical-heading {
+        gap: 18px;
+    }
+    .hero {
+        display: block;
+    }
+    .hero h1,
+    .form-heading h1,
+    .activation-card h1 {
+        font-size: clamp(28px, 8vw, 40px);
+        overflow-wrap: anywhere;
+    }
+    .hero-description,
+    .workspace-heading p,
+    .concert-context,
+    .concert-notes-content,
+    .panel-message {
+        font-size: 14px;
+    }
+    .demo-banner {
+        margin-bottom: 20px;
+    }
+    .eyebrow,
+    .page-topline > .eyebrow {
+        font-size: 10px;
+    }
+    .hero-actions,
+    .workspace-actions,
+    .concert-tools {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        width: 100%;
+        gap: 10px;
+    }
+    .hero-actions {
+        margin-top: 22px;
+    }
+    .hero-actions .hero-action {
+        margin-top: 0;
+    }
+    .hero > form {
+        margin-top: 20px;
+    }
+    .button,
+    .hero-actions .button,
+    .form-actions .button,
+    .concert-tools .button,
+    .reply-bulk .button,
+    .variant-actions .button {
+        min-height: 44px;
+        max-width: 100%;
+        padding: 11px 14px;
+        font-size: 14px;
+        white-space: normal;
+        text-align: center;
+    }
+    .text-button,
+    .edit-link,
+    .danger-link,
+    .cancel-link,
+    .trash-link,
+    .workspace-pagination a,
+    .dossier-nav a,
+    .variant-actions > a,
+    .site-nav .session-name {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        font-size: 13px;
+    }
+    .dossier-nav {
+        gap: 4px 18px;
+    }
+    .dossier-nav a {
+        padding-block: 8px;
+    }
+    fieldset {
+        min-inline-size: 0;
+    }
+    .form-grid,
+    .form-grid:first-of-type,
+    .conditions-form .form-grid,
+    .setup-fields,
+    .request-controls,
+    .reference-section-choices {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .field-source {
+        grid-column: auto;
+    }
+    .field > label,
+    .form-section-heading p,
+    .availability-specification,
+    .request-specification {
+        font-size: 13px;
+    }
+    .page-shell input:not([type='hidden']):not([type='checkbox']):not([type='radio']),
+    .page-shell select,
+    .page-shell textarea,
+    .field input,
+    .field select,
+    .field textarea,
+    .workspace-fields input:not([type='hidden']),
+    .workspace-fields select,
+    .workspace-fields textarea,
+    .activation-card input:not([type='hidden']),
+    .activation-card select,
+    .finance-note-form textarea,
+    .stage-palette select,
+    .stage-context-properties input,
+    .stage-context-properties textarea {
+        min-width: 0;
+        max-width: 100%;
+        min-height: 44px;
+        font-size: 16px;
+    }
+    .field-hint,
+    .field-errors ul,
+    .panel-footer,
+    .document-notice ul,
+    .publication-caption {
+        font-size: 12px;
+    }
+    .form-actions {
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .form-actions .button,
+    .workspace-heading > .button,
+    .finance-note-form button {
+        width: 100%;
+    }
+    .reference-tag {
+        max-width: 100%;
+        white-space: normal;
+        font-size: 11px;
+    }
+    .flash,
+    .panel-footer,
+    .equipment-group-header,
+    .availability-group > summary,
+    .reply-bulk {
+        flex-wrap: wrap;
+    }
+    .flash {
+        font-size: 13px;
+    }
+    .workspace-panel,
+    .activation-card,
+    .reference-import-form {
+        padding: 18px;
+    }
+    .activation-card {
+        margin-block: 22px;
+    }
+    .merch-card .panel-heading {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .merch-card .panel-heading > div {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+    .merch-variants > li {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .variant-actions {
+        margin-left: auto;
+        flex-wrap: wrap;
+    }
+    .workspace-pagination {
+        flex-wrap: wrap;
+        gap: 12px 18px;
+        align-items: center;
+    }
+    .balance-value {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+    .availability-choices label,
+    .reference-section-choices label,
+    .import-event-choice label,
+    .reply-section > summary,
+    .technical-dossier > summary,
+    .equipment-content > summary {
+        min-height: 44px;
+        font-size: 13px;
+    }
+
+    /* Les historiques deviennent des cartes avec les mêmes informations. */
+    .ledger-table-stacked,
+    .ledger-table-stacked tbody,
+    .ledger-table-stacked tr,
+    .ledger-table-stacked td {
+        display: block;
+    }
+    .ledger-table-stacked thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+    }
+    .ledger-table-stacked tbody {
+        display: grid;
+        gap: 14px;
+    }
+    .ledger-table-stacked tr {
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+    }
+    .ledger-table-stacked td {
+        display: grid;
+        grid-template-columns: minmax(65px, 0.4fr) minmax(0, 1fr);
+        gap: 12px;
+        padding: 8px 0;
+        border: 0;
+        white-space: normal;
+    }
+    .ledger-table-stacked td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: 12px;
+    }
+    .ledger-table-stacked td[colspan] {
+        display: block;
+    }
+    .ledger-table-stacked td[colspan]::before {
+        content: none;
+    }
+    .ledger-table-stacked td[data-label='Action']:not(:has(a)) {
+        display: none;
+    }
+    .ledger-cell-content {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+    .ledger-cell-content > a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+    }
+
+    /* La scène garde ses proportions, avec des commandes accessibles au toucher. */
+    .material-group-progress {
+        font-size: 11px;
+    }
+    .material-group-title > span,
+    .reply-bulk p {
+        font-size: 12px;
+    }
+    .material-fold-actions .text-button {
+        min-height: 44px;
+        font-size: 13px;
+    }
+    .stage-zoom-controls:not([hidden]) {
+        gap: 6px;
+        padding: 10px;
+    }
+    .stage-zoom-controls button {
+        padding-inline: 10px;
+    }
+    .stage-editor-topbar {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 12px;
+    }
+    .stage-history {
+        flex-wrap: wrap;
+    }
+    .stage-save-status {
+        flex: 1 1 160px;
+        font-size: 12px;
+    }
+    .stage-editor-topbar > .button {
+        width: 100%;
+    }
+    .stage-editor .stage-scroll {
+        height: auto;
+        padding: 12px;
+    }
+    .stage-palette-items {
+        overscroll-behavior-x: contain;
+    }
+    .stage-palette-item span {
+        font-size: 12px;
+    }
+    .stage-palette .stage-element-list-label {
+        display: block;
+        margin-top: 16px;
+        font-size: 13px;
+    }
+    .stage-palette select {
+        display: block;
+    }
+    .stage-context-toolbar {
+        position: static;
+        width: 100%;
+        max-width: 100%;
+        border: 0;
+        border-top: 1px solid var(--line);
+        border-radius: 0;
+        box-shadow: none;
+        gap: 8px;
+        padding: 12px;
+    }
+    .stage-selected-label {
+        flex-basis: 100%;
+        max-width: 100%;
+        font-size: 13px;
+    }
+    .stage-tool {
+        width: 44px;
+        height: 44px;
+    }
+    .stage-angle-input {
+        width: 55px;
+        height: 44px;
+        font-size: 16px;
+    }
+    .stage-tool-group {
+        flex-wrap: wrap;
+        padding-left: 0;
+        border-left: 0;
+    }
+    .stage-context-properties {
+        padding-inline: 0;
+    }
+    .stage-editor-footnote {
+        font-size: 12px;
+    }
+}
+
+@media (pointer: coarse) {
+    .page-shell input:not([type='hidden']):not([type='checkbox']):not([type='radio']),
+    .page-shell select,
+    .page-shell textarea {
+        font-size: 16px;
+        min-height: 44px;
+    }
+    .stage-tool {
+        width: 44px;
+        height: 44px;
+    }
+    .stage-angle-input {
+        height: 44px;
+        font-size: 16px;
+    }
+    .stage-palette-item {
+        touch-action: auto;
+    }
+}
+
+@media (max-width: 550px) {
+    .patch-table tbody .microphone-cell,
+    .patch-table tbody .stand-cell,
+    .patch-table tbody .notes-cell {
+        font-size: 13px;
+    }
+    .microphone-cell::before,
+    .stand-cell::before,
+    .notes-cell::before,
+    .section-label {
+        font-size: 11px;
+    }
+}

@@ -447,11 +447,14 @@
     // Les ajouts utilisent les mêmes événements pointeur que les éléments du plan,
     // pour fonctionner à la souris comme au toucher, sans dépendre du glisser-déposer HTML.
     for (const [kind, button] of palette) {
+        let pointerType = 'mouse';
         button.addEventListener('click', (e) => {
-            if (e.detail === 0) add(kind);
+            if (e.detail === 0 || pointerType !== 'mouse') add(kind);
         });
         button.addEventListener('pointerdown', (event) => {
-            if (event.button !== 0 || button.disabled) return;
+            pointerType = event.pointerType;
+            // Sur écran tactile, un appui ajoute l’élément ; glisser fait défiler la palette.
+            if (pointerType !== 'mouse' || event.button !== 0 || button.disabled) return;
             event.preventDefault();
             button.focus({ preventScroll: true });
             button.setPointerCapture(event.pointerId);
@@ -526,6 +529,7 @@
         }
     });
     window.addEventListener('resize', positionContext);
+    form.addEventListener('stage:viewportchange', positionContext);
     form.querySelector('.stage-scroll').addEventListener('scroll', positionContext);
     window.addEventListener('beforeunload', (e) => {
         if (dirty && !submitting) {
