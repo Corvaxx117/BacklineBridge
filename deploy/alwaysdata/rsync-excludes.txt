@@ -1,0 +1,7 @@
+# Conserver les données, accès et réglages propres au serveur.
+/.git/
+/.env.local
+/.env.*.local
+/.env.local.php
+/var/
+/public/.htaccess*

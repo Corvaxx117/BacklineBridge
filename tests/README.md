@@ -26,4 +26,4 @@ Les tests vérifient aussi les champs vides, les doublons et le refus d'écraser
 
 Avant une mise en ligne, lancer aussi `npm run format:check` et essayer le parcours concerné sur le site. Pour un changement de tables, vérifier les migrations sur une copie des données avant de toucher à la démo.
 
-Pour les contrôles PHPStan, le style PHP et le rapport de couverture, voir [Qualité et CI](../docs/qualite-et-ci.md).
+Pour les contrôles PHPStan, le style PHP et le rapport de couverture, voir [Code et qualité](../docs/developpement/code-et-qualite.md).
