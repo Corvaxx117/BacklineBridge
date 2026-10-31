@@ -1,6 +1,6 @@
 # BacklineBridge
 
-Préparer les concerts d’Avee Mana : dossier technique, plan de scène, échanges avec les salles, disponibilités, trésorerie et stock.
+Préparer les concerts d’Avee Mana : dossier technique, plan de scène, échanges avec les salles, disponibilités, missions du groupe, trésorerie et stock.
 
 **[Démo privée](https://backlinebridge.alwaysdata.net)** — comptes et données fictifs, accès sur invitation.
 
@@ -20,6 +20,7 @@ Ouvrir http://127.0.0.1:8765. Pour une nouvelle machine, suivre [l’installatio
 Commencer par **[l’index des guides](docs/README.md)**.
 
 - [Utiliser les concerts et le dossier technique](docs/utilisation/concerts.md).
+- [Répartir les tâches du groupe](docs/utilisation/taches.md).
 - [Comptes et droits](docs/utilisation/acces.md).
 - [Importer Bandsintown](docs/utilisation/bandsintown.md).
 - [Branches et messages de commit](docs/developpement/git.md).

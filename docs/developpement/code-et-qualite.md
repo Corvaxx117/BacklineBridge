@@ -72,3 +72,7 @@ Ouvrir `var/coverage/html/index.html`. La couverture mesure les lignes exécuté
 Pour suivre une modification du patch, lire `Controller/Patch/EditAction.php`, `Form/PatchLineType.php`, `Entity/PatchLine.php`, puis `Service/Patch/PatchLineFormHandler.php` sous `src/`, et `templates/patch/form.html.twig`.
 
 Exercice possible, encore à réaliser : proposer le prochain numéro de canal à l’ajout, tout en conservant la vérification des doublons. Commencer par un test du calcul sur un patch vide, continu puis incomplet.
+
+## To Do du groupe
+
+`BandTask` appartient au groupe, sans relation avec un concert. `TaskManager` gère les écritures ; `TaskVoter` contrôle la modification et la suppression. Le responsable est un `MemberProfile`, y compris avant activation de son compte. Les formulaires limitent le choix au même groupe. Les mises à jour vérifient la révision et les suppressions incluent cette révision dans la requête SQL.

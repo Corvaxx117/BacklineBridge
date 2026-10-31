@@ -12,6 +12,7 @@
         <link rel="stylesheet" href="/styles/app.css" />
         <link rel="stylesheet" href="/styles/responsive.css" />
         <link rel="stylesheet" href="/styles/collaboration.css" />
+        <link rel="stylesheet" href="/styles/tasks.css" />
         <script src="/scripts/stage-viewer.js" defer></script>
         <script src="/scripts/navigation.js" defer></script>
     </head>
@@ -89,6 +90,23 @@
                             Concerts
                         </a>
                         {% if currentBand %}
+                            <a
+                                href="{{
+                                path(
+                                    'app_task_index',
+                                    {
+                                        id: currentBand.id
+                                    }
+                                )
+                                }}"
+                                aria-current="{{
+                                app.request.attributes.get('_route') starts with 'app_task_'
+                                    ? 'page'
+                                    : 'false'
+                                }}"
+                            >
+                                To Do
+                            </a>
                             <a
                                 href="{{
                                 path(

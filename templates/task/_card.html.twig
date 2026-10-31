@@ -1,0 +1,128 @@
+<article class="task-card" data-task-id="{{ task.id }}" aria-labelledby="task-title-{{ task.id }}">
+    <h3 id="task-title-{{ task.id }}">
+        {% if is_granted('TASK_EDIT', task) %}
+            <a
+                href="{{
+                path(
+                    'app_task_edit',
+                    {
+                        id: task.id
+                    }
+                )
+                }}"
+            >
+                {{ task.title }}
+            </a>
+        {% else %}
+            {{ task.title }}
+        {% endif %}
+    </h3>
+    <div class="task-meta">
+        <span class="task-assignee {{ task.assignee ? '' : 'task-unassigned' }}">
+            {{ task.assignee ? task.assignee.publicName : 'Non attribuée' }}
+        </span>
+        {% if task.dueAt %}
+            <span class="task-due {{ task.overdue(today) ? 'task-overdue' : '' }}">
+                {{ task.overdue(today) ? 'En retard · ' : 'Pour le ' }}<time datetime="{{ task.dueAt|date('Y-m-d') }}">{{
+                        task.dueAt|date('d/m/Y')
+                    }}</time>
+            </span>
+        {% endif %}
+    </div>
+    {% if task.description %}
+        <details class="task-description">
+            <summary>
+                Précisions
+            </summary>
+            <p>
+                {{- task.description -}}
+            </p>
+        </details>
+    {% endif %}
+    <p class="task-author">
+        Créée par {{ task.createdByName }} · {{ task.createdAt|date('d/m/Y') }}
+    </p>
+    {% if task.completedAt %}
+        <p class="task-completed">
+            Terminée le {{ task.completedAt|date('d/m/Y') }}
+        </p>
+    {% endif %}
+    {% if is_granted('TASK_EDIT', task) %}
+        <form
+            method="post"
+            action="{{
+            path(
+                'app_task_state',
+                {
+                    id: task.id
+                }
+            )
+            }}"
+            class="task-state-form"
+            aria-label="Changer l’état de {{ task.title }}"
+        >
+            <input
+                type="hidden"
+                name="task_state[_token]"
+                value="{{ csrf_token('task_state_' ~ task.id) }}"
+            />
+            <input type="hidden" name="task_state[revision]" value="{{ task.revision }}" />
+            {% if task.status.value == 'todo' %}
+                <button
+                    class="task-action task-action-primary"
+                    name="task_state[status]"
+                    value="doing"
+                >
+                    Commencer
+                </button>
+                <button type="submit" class="task-action" name="task_state[status]" value="done">
+                    Terminer
+                </button>
+            {% elseif task.status.value == 'doing' %}
+                <button
+                    class="task-action task-action-primary"
+                    name="task_state[status]"
+                    value="done"
+                >
+                    Terminer
+                </button>
+                <button type="submit" class="task-action" name="task_state[status]" value="todo">
+                    Remettre à faire
+                </button>
+            {% else %}
+                <button type="submit" class="task-action" name="task_state[status]" value="todo">
+                    Réouvrir
+                </button>
+            {% endif %}
+        </form>
+        <div class="task-card-links">
+            <a
+                href="{{
+                path(
+                    'app_task_edit',
+                    {
+                        id: task.id
+                    }
+                )
+                }}"
+            >
+                Modifier
+            </a>
+            {% if is_granted('TASK_DELETE', task) %}
+                <a
+                    class="danger-link"
+                    href="{{
+                    path(
+                        'app_task_delete',
+                        {
+                            id: task.id
+                        }
+                    )
+                    }}"
+                >
+                    Supprimer
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</article>

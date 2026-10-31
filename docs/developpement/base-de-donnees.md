@@ -16,6 +16,7 @@ Aucun serveur SQL ni compte de base n’est nécessaire. phpMyAdmin gère MySQL/
 | `technical_sheet`, `patch_line` | Référence et copies de dossiers |
 | `bandsintown_concert` | Origine des concerts importés |
 | `concert_contact` | Interlocuteurs d’une date |
+| `band_task` | Missions du groupe, responsable, échéance et avancement |
 | `band_document` | Titres, liens et informations des documents partagés |
 
 Sur le serveur officiel, la base se trouve dans `/home/backlinebridgeoffice/backlinebridge/var/production.db`.
