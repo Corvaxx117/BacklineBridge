@@ -21,6 +21,22 @@ Tout commence à confirmer, même pour le créateur. Changer la date remet les d
 
 **Concert validé, membres disponibles et matériel confirmé sont trois informations différentes.**
 
+## Contacts et documents de la date
+
+La section **Contacts du concert** contient les personnes à joindre : nom, rôle, e-mail, téléphone et précisions facultatives. Ajouter plusieurs interlocuteurs, puis utiliser les liens pour leur écrire ou les appeler. Les coordonnées sont internes à l’équipe ; elles ne sont pas intégrées aux invitations de salle ni au PDF technique.
+
+Les responsables, le tourneur et les profils techniques peuvent ajouter, modifier et retirer un contact. Un formulaire périmé ne remplace pas une modification plus récente.
+
+Dans **Documents du concert**, ajouter une fiche reçue en PDF ou le lien d’un Google Doc, d’un fichier Drive, etc. Ces ajouts apparaissent aussi dans l’onglet commun [Documents](documents.md). La limite d’un PDF est de 10 Mo.
+
+## Supprimer une date
+
+Les responsables disposent du lien **Supprimer le concert**, en bas de son dossier. Une page présente les conséquences avant confirmation.
+
+La suppression est définitive : dossier technique de cette date, contacts, conditions, disponibilités, invitations et réponses de la salle sont retirés. Les documents restent dans la bibliothèque du groupe. La référence technique et les autres concerts sont conservés.
+
+Une suppression dans BacklineBridge ne supprime pas l’événement Bandsintown. Il pourra être réimporté. Un concert modifié depuis l’ouverture de la confirmation doit être relu avant suppression.
+
 ## Adapter le dossier technique
 
 Le plan est vu depuis le public. Cliquer sur un élément pour le déplacer ou afficher sa barre d’outils : rotation, taille, nom, duplication et suppression. La palette ajoute des éléments ; le menu « Sur la scène » aide à sélectionner ceux qui se superposent.

@@ -18,6 +18,10 @@ Les contrôleurs reçoivent les actions ; les services appliquent les règles ; 
 
 Les adaptations aux petits écrans sont regroupées dans `public/styles/responsive.css`. `navigation.js` gère le menu repliable ; `stage-viewer.js` cadre et zoome le plan sans modifier ses coordonnées enregistrées.
 
+Les contacts et documents passent par `Controller/Concert/Contact/` et `Controller/Document/`, avec des DTO de saisie et des services dédiés. `DocumentStorage` garde les PDF hors de `public/`, contrôle leur taille et sérialise les changements de fichiers avec un verrou partagé par la sauvegarde. Les formulaires vérifient le type réel du fichier avec Symfony Mime. `DocumentVoter` vérifie l’accès au groupe avant chaque lecture ou retrait.
+
+`ConcertRemover` retire le dossier d’une date dans une transaction, en vérifiant sa version. Les clés étrangères retirent ses contacts et détachent ses documents, qui restent dans la bibliothèque. Les styles de ces espaces sont dans `public/styles/collaboration.css`.
+
 ## Présenter le code
 
 PHP-CS-Fixer applique le style Symfony au PHP. Prettier s’occupe de Twig, JavaScript, CSS et de la configuration. Quatre espaces, deux pour GitHub et Docker Compose ; viser 100 caractères par ligne et répartir les longs arguments pour faciliter la lecture.

@@ -20,6 +20,8 @@ final class ConcertVoter extends Voter
     public const CONDITIONS = 'CONCERT_CONDITIONS';
     public const RESPOND_AVAILABILITY = 'CONCERT_RESPOND_AVAILABILITY';
     public const IMPORT_REFERENCE = 'CONCERT_IMPORT_REFERENCE';
+    public const DELETE = 'CONCERT_DELETE';
+    public const CONTACTS = 'CONCERT_CONTACTS';
 
     public function __construct(private readonly AccessDecisionManagerInterface $decisions)
     {
@@ -38,6 +40,8 @@ final class ConcertVoter extends Voter
                     self::SHARE,
                     self::RESPOND_AVAILABILITY,
                     self::IMPORT_REFERENCE,
+                    self::DELETE,
+                    self::CONTACTS,
                 ],
                 true,
             );
@@ -54,6 +58,8 @@ final class ConcertVoter extends Voter
             self::EDIT => BandVoter::EDIT_PATCH,
             self::UPDATE => BandVoter::PLAN_CONCERT,
             self::CONDITIONS => BandVoter::CONDITIONS,
+            self::CONTACTS => BandVoter::COLLABORATE,
+            self::DELETE => BandVoter::MANAGE_TECHNICAL,
             self::SHARE,
             self::RESPOND_AVAILABILITY,
             self::IMPORT_REFERENCE => BandVoter::MANAGE_TECHNICAL,
