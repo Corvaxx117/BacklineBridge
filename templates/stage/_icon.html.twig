@@ -1,4 +1,36 @@
-{% if kind == 'drums' %}
+{% if
+    kind
+        in [
+            'mic_vocal',
+            'mic_instrument',
+            'stand_straight',
+            'stand_boom',
+            'di_mono',
+            'di_stereo'
+        ] %}
+    <svg
+        width="25"
+        height="25"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+    >
+        {{
+            include(
+                'stage/_audio-symbol.svg.twig',
+                {
+                    kind: kind
+                },
+                with_context: false
+            )
+        }}
+    </svg>
+{% elseif kind == 'drums' %}
     <svg
         class="stage-drum-kit"
         width="260"

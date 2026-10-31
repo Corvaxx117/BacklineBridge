@@ -66,6 +66,7 @@ final readonly class ConcertCreator
             }
             $sheet->addLine(
                 new PatchLine()
+                    ->inheritSourceKey($source)
                     ->setChannelNumber($source->getChannelNumber())
                     ->setSourceName($source->getSourceName())
                     ->setPreferredMicrophone($source->getPreferredMicrophone())

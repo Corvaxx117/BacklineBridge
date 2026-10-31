@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Supprimer le concert · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <a
+        class="back-link"
+        href="{{
+        path(
+            'app_concert_show',
+            {
+                id: concert.id
+            }
+        )
+        }}"
+    >
+        ← Revenir au concert
+    </a>
+    <section class="form-heading" aria-labelledby="page-title">
+        <p class="eyebrow">
+            {{ concert.date|date('d/m/Y') }} · {{ concert.city }}
+        </p>
+        <h1 id="page-title">Supprimer ce concert<span class="title-period">?</span></h1>
+    </section>
+    <section class="form-panel confirmation-panel" aria-label="Confirmation de suppression">
+        <h2>{{ concert.venue }}</h2>
+        <p>
+            Cette action est définitive. Elle supprime le dossier technique de cette date, ses
+            contacts, conditions, disponibilités et réponses de salle. Les liens d’invitation
+            cessent de fonctionner.
+        </p>
+        <p>
+            <strong>Les documents seront conservés dans l’onglet Documents du groupe.</strong>
+        </p>
+        <p>
+            La fiche de référence du groupe reste disponible. Un concert importé reste présent sur
+            Bandsintown et pourra être réimporté dans BacklineBridge.
+        </p>
+        <form
+            action="{{
+            path(
+                'app_concert_delete',
+                {
+                    id: concert.id
+                }
+            )
+            }}"
+            method="post"
+            class="form-actions"
+        >
+            <input
+                type="hidden"
+                name="_token"
+                value="{{ csrf_token('concert_delete_' ~ concert.id) }}"
+            />
+            <input type="hidden" name="revision" value="{{ concert.revision }}" />
+            <button type="submit" class="button button-danger">Supprimer définitivement</button>
+            <a
+                class="button button-secondary"
+                href="{{
+                path(
+                    'app_concert_show',
+                    {
+                        id: concert.id
+                    }
+                )
+                }}"
+            >
+                Conserver le concert
+            </a>
+        </form>
+    </section>
+{% endblock %}

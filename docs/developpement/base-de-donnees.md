@@ -1,6 +1,6 @@
 # Voir SQLite dans DBeaver
 
-La base locale est `var/backlinebridge.db`. Elle est indépendante de la base hébergée `var/demo.db` de la démo.
+La base locale est `var/backlinebridge.db`. La démo utilise `var/demo.db` et l’instance officielle `var/production.db`, chacune sur son compte alwaysdata. Ces bases sont indépendantes.
 
 1. Dans DBeaver, choisir **Nouvelle connexion → SQLite**.
 2. Sélectionner le fichier dans **Path / Chemin**, accepter le pilote si demandé.
@@ -15,6 +15,13 @@ Aucun serveur SQL ni compte de base n’est nécessaire. phpMyAdmin gère MySQL/
 | `concert`, `concert_conditions`, `concert_availability` | Dates, accords et disponibilités |
 | `technical_sheet`, `patch_line` | Référence et copies de dossiers |
 | `bandsintown_concert` | Origine des concerts importés |
+| `concert_contact` | Interlocuteurs d’une date |
+| `band_task` | Missions du groupe, responsable, échéance et avancement |
+| `band_document` | Titres, liens et informations des documents partagés |
+
+Sur le serveur officiel, la base se trouve dans `/home/backlinebridgeoffice/backlinebridge/var/production.db`.
+
+Les PDF ajoutés par les membres sont des fichiers privés dans `var/documents/<identifiant du groupe>/`. SQLite conserve leurs informations, pas leur contenu. Pour sauvegarder ou restaurer l’ensemble, garder la base et les PDF correspondants avec le script décrit dans [Maintenance](../exploitation/maintenance.md).
 
 Les mots de passe sont hachés et les informations administratives chiffrées. Les requêtes de [inspecter-base.sql](inspecter-base.sql) évitent de les afficher.
 

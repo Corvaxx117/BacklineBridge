@@ -26,6 +26,9 @@ final class PrivateDataSubscriber implements EventSubscriberInterface
                 'app_activation_',
                 'app_account_',
                 'app_concert_bandsintown_',
+                'app_concert_',
+                'app_document_',
+                'app_task_',
             ] as $prefix
         ) {
             if (str_starts_with($route, $prefix)) {

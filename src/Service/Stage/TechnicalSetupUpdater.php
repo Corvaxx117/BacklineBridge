@@ -38,6 +38,9 @@ final readonly class TechnicalSetupUpdater
                 if (1.0 !== $item->scale) {
                     $data['scale'] = $item->scale;
                 }
+                if ([] !== $item->patchSources) {
+                    $data['patchSources'] = array_values(array_unique($item->patchSources));
+                }
 
                 return $data;
             }, $input->items),

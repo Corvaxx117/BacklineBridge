@@ -50,6 +50,11 @@
         {% endif %}
     </section>
     {{ include('concert/import/bandsintown/_source.html.twig') }}
+    <nav class="concert-section-links" aria-label="Aller à une section du concert">
+        <a href="#concert-contacts">Contacts <span>{{ contacts|length }}</span></a>
+        <a href="#concert-documents">Documents <span>{{ documents|length }}</span></a>
+        <a href="#dossier-technique">Dossier technique</a>
+    </nav>
     <nav class="concert-tools" aria-label="Préparation avec la salle">
         <a
             class="button button-secondary"
@@ -220,7 +225,31 @@
             </p>
         </section>
     {% endif %}
-    <details class="technical-dossier" {{ not role or role.value != 'booker' ? 'open' : '' }}>
+    {{
+        include(
+            'concert/contact/_panel.html.twig',
+            {
+                concert: concert,
+                contacts: contacts
+            },
+            with_context: false
+        )
+    }}
+    {{
+        include(
+            'concert/document/_panel.html.twig',
+            {
+                concert: concert,
+                documents: documents
+            },
+            with_context: false
+        )
+    }}
+    <details
+        id="dossier-technique"
+        class="technical-dossier"
+        {{ not role or role.value != 'booker' ? 'open' : '' }}
+    >
         <summary>
             Dossier technique <span>{{ lines|length }} sources</span>
         </summary>
@@ -304,4 +333,24 @@
             )
         }}
     </details>
+    {% if is_granted('CONCERT_DELETE', concert) %}
+        <div class="concert-management">
+            <p>
+                Gestion du concert
+            </p>
+            <a
+                class="danger-link"
+                href="{{
+                path(
+                    'app_concert_delete',
+                    {
+                        id: concert.id
+                    }
+                )
+                }}"
+            >
+                Supprimer le concert
+            </a>
+        </div>
+    {% endif %}
 {% endblock %}

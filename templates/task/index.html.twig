@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    To Do · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <section class="hero task-hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+            <p class="eyebrow">
+                {{ band.name }} · La vie du groupe
+            </p>
+            <h1 id="page-title">To Do<span class="title-period">.</span></h1>
+            <p>
+                Des idées aux actions : qui fait quoi, et pour quand ?
+            </p>
+        </div>
+        {% if is_granted('BAND_COLLABORATE', band) %}
+            <div class="hero-actions">
+                <a
+                    class="button button-primary"
+                    href="{{
+                    path(
+                        'app_task_create',
+                        {
+                            id: band.id
+                        }
+                    )
+                    }}"
+                >
+                    + Nouvelle tâche
+                </a>
+            </div>
+        {% endif %}
+    </section>
+
+    <form method="get" class="task-filters" role="search" aria-label="Filtrer les tâches">
+        <div class="field">
+            <label for="task-search">Rechercher</label>
+            <input
+                id="task-search"
+                name="q"
+                type="search"
+                value="{{ search }}"
+                maxlength="160"
+                placeholder="Un titre, une précision…"
+            />
+        </div>
+        <div class="field">
+            <label for="task-scope">Afficher</label>
+            <select id="task-scope" name="scope">
+                <option value="all" {{ scope == 'all' ? 'selected' : '' }}>
+                    Toutes les tâches
+                </option>
+                <option value="mine" {{ scope == 'mine' ? 'selected' : '' }}>
+                    Mes tâches
+                </option>
+                <option value="unassigned" {{ scope == 'unassigned' ? 'selected' : '' }}>
+                    Non attribuées
+                </option>
+            </select>
+        </div>
+        <button class="button button-secondary" type="submit">Filtrer</button>
+        {% if search or scope != 'all' %}
+            <a
+                class="task-reset"
+                href="{{
+                path(
+                    'app_task_index',
+                    {
+                        id: band.id
+                    }
+                )
+                }}"
+            >
+                Tout afficher
+            </a>
+        {% endif %}
+    </form>
+    <p class="task-board-help">
+        Un responsable par tâche. Les échéances les plus proches apparaissent en premier.
+    </p>
+    <div class="task-board">
+        {% for status in statuses %}
+            <section
+                class="task-column task-column-{{ status.value }}"
+                aria-labelledby="column-{{ status.value }}"
+            >
+                <header class="task-column-heading">
+                    <h2 id="column-{{ status.value }}">
+                        <span class="task-status-dot" aria-hidden="true"></span>{{ status.label }}
+                    </h2>
+                    <span class="task-count" aria-label="{{ columns[status.value]|length }} tâches">
+                        {{ columns[status.value]|length }}
+                    </span>
+                </header>
+                <div class="task-cards">
+                    {% for task in columns[status.value] %}
+                        {{
+                            include(
+                                'task/_card.html.twig',
+                                {
+                                    task: task,
+                                    today: today
+                                },
+                                with_context: false
+                            )
+                        }}
+                    {% else %}
+                        <p class="task-empty">
+                            {% if search or scope != 'all' %}
+                                Aucune tâche pour ce filtre.
+                            {% elseif status.value == 'todo' %}
+                                Le prochain chantier du groupe commence ici.
+                            {% elseif status.value == 'doing' %}
+                                Les tâches démarrées apparaîtront ici.
+                            {% else %}
+                                Les missions accomplies trouveront leur place ici.
+                            {% endif %}
+                        </p>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endfor %}
+    </div>
+{% endblock %}

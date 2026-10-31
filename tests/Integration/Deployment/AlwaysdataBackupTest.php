@@ -151,6 +151,34 @@ final class AlwaysdataBackupTest extends TestCase
         self::assertDirectoryDoesNotExist($this->directory.'/var/private/backups');
     }
 
+    public function testBackupIncludesThePdfsReferencedByItsDatabaseSnapshot(): void
+    {
+        $database = new \PDO('sqlite:'.$this->directory.'/var/demo.db');
+        $database->exec('CREATE TABLE band_document (band_id INTEGER, storage_key TEXT)');
+        $key = str_repeat('a', 32).'.pdf';
+        $database->exec("INSERT INTO band_document VALUES (1, '$key')");
+        mkdir($this->directory.'/var/documents/1', 0700, true);
+        file_put_contents($this->directory.'/var/documents/1/'.$key, '%PDF-1.4 test');
+        [$status, $output] = $this->backup();
+        self::assertSame(0, $status, $output);
+        $folders = glob($this->directory.'/var/private/backups/*');
+        $path = $folders[0].'/documents/1/'.$key;
+        self::assertSame('%PDF-1.4 test', file_get_contents($path));
+        self::assertSame(0600, fileperms($path) & 0777);
+        self::assertSame(0700, fileperms(dirname($path)) & 0777);
+    }
+
+    public function testBackupRefusesToReportSuccessWhenAReferencedPdfIsMissing(): void
+    {
+        $database = new \PDO('sqlite:'.$this->directory.'/var/demo.db');
+        $database->exec('CREATE TABLE band_document (band_id INTEGER, storage_key TEXT)');
+        $key = str_repeat('b', 32).'.pdf';
+        $database->exec("INSERT INTO band_document VALUES (1, '$key')");
+        [$status, $output] = $this->backup();
+        self::assertSame(1, $status);
+        self::assertStringNotContainsString('Sauvegarde créée', $output);
+    }
+
     #[DataProvider('invalidConfigurations')]
     public function testBackupRefusesAnUnexpectedConfiguration(string $configuration): void
     {

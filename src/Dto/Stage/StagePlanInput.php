@@ -31,6 +31,14 @@ final class StagePlanInput
 
     public static function fingerprint(TechnicalSheet $sheet): string
     {
-        return hash('sha256', json_encode($sheet->getStagePlan(), JSON_THROW_ON_ERROR));
+        $patch = [];
+        foreach ($sheet->getLines() as $line) {
+            if ($line->isActive()) {
+                $patch[] = [$line->getSourceKey(), $line->getChannelNumber(), $line->getSourceName()];
+            }
+        }
+        usort($patch, static fn (array $a, array $b): int => $a[1] <=> $b[1]);
+
+        return hash('sha256', json_encode([$sheet->getStagePlan(), $patch], JSON_THROW_ON_ERROR));
     }
 }

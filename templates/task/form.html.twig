@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ task ? 'Modifier la tâche' : 'Nouvelle tâche' }} · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <a
+        class="back-link"
+        href="{{
+        path(
+            'app_task_index',
+            {
+                id: band.id
+            }
+        )
+        }}"
+    >
+        ← Revenir au To Do
+    </a>
+    <section class="form-heading" aria-labelledby="page-title">
+        <p class="eyebrow">
+            {{ band.name }} · To Do
+        </p>
+        <h1 id="page-title">
+            {{ task ? 'Modifier la tâche' : 'Nouvelle tâche' }}<span class="title-period">.</span>
+        </h1>
+        <p>
+            Un titre suffit. Attribue la mission et ajoute une échéance si utile.
+        </p>
+    </section>
+    <section class="form-panel collaboration-form" aria-label="Tâche du groupe">
+        {{
+            form_start(
+                form,
+                {
+                    attr: {
+                        class: 'patch-form',
+                        novalidate: 'novalidate'
+                    }
+                }
+            )
+        }}
+        {% if form.vars.errors|length %}
+            <div class="form-error-summary" role="alert">
+                {{ form_errors(form) }}
+            </div>
+        {% endif %}
+        {% for field in [form.title, form.description] %}
+            {{
+                include(
+                    'concert/_field.html.twig',
+                    {
+                        field: field
+                    },
+                    with_context: false
+                )
+            }}
+        {% endfor %}
+        <div class="form-grid">
+            {% for field in [form.assignee, form.dueAt, form.status] %}
+                {{
+                    include(
+                        'concert/_field.html.twig',
+                        {
+                            field: field
+                        },
+                        with_context: false
+                    )
+                }}
+            {% endfor %}
+        </div>
+        <div class="form-actions">
+            <button class="button button-primary" type="submit">
+                {{ task ? 'Enregistrer' : 'Créer la tâche' }}
+            </button>
+            <a
+                class="cancel-link"
+                href="{{
+                path(
+                    'app_task_index',
+                    {
+                        id: band.id
+                    }
+                )
+                }}"
+            >
+                Annuler
+            </a>
+        </div>
+        {{ form_end(form) }}
+    </section>
+{% endblock %}

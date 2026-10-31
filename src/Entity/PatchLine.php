@@ -40,6 +40,9 @@ class PatchLine
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(length: 32, nullable: true)]
+    private ?string $sourceKey;
+
     #[ORM\ManyToOne(inversedBy: 'lines')]
     #[ORM\JoinColumn(nullable: false)]
     private ?TechnicalSheet $sheet = null;
@@ -85,6 +88,25 @@ class PatchLine
 
     #[ORM\Column(name: 'deleted_at', nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
+
+    public function __construct()
+    {
+        $this->sourceKey = bin2hex(random_bytes(16));
+    }
+
+    public function getSourceKey(): ?string
+    {
+        return $this->sourceKey;
+    }
+
+    public function inheritSourceKey(self $source): self
+    {
+        if (null !== $source->sourceKey) {
+            $this->sourceKey = $source->sourceKey;
+        }
+
+        return $this;
+    }
 
     public function getActive(): ?bool
     {

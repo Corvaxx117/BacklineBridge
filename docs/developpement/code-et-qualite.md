@@ -18,6 +18,12 @@ Les contrôleurs reçoivent les actions ; les services appliquent les règles ; 
 
 Les adaptations aux petits écrans sont regroupées dans `public/styles/responsive.css`. `navigation.js` gère le menu repliable ; `stage-viewer.js` cadre et zoome le plan sans modifier ses coordonnées enregistrées.
 
+Les contacts et documents passent par `Controller/Concert/Contact/` et `Controller/Document/`, avec des DTO de saisie et des services dédiés. `DocumentStorage` garde les PDF hors de `public/`, contrôle leur taille et sérialise les changements de fichiers avec un verrou partagé par la sauvegarde. Les formulaires vérifient le type réel du fichier avec Symfony Mime. `DocumentVoter` vérifie l’accès au groupe avant chaque lecture ou retrait.
+
+`ConcertRemover` retire le dossier d’une date dans une transaction, en vérifiant sa version. Les clés étrangères retirent ses contacts et détachent ses documents, qui restent dans la bibliothèque. Les styles de ces espaces sont dans `public/styles/collaboration.css`.
+
+Les éléments du plan peuvent référencer les sources du patch par `patchSources`. La colonne `patch_line.source_key` garde une identité stable, indépendante du numéro de canal et conservée lors d’une copie. `StagePatchLinks` limite les choix à la fiche courante, prépare l’affichage et adapte les liens lors des imports. La publication ne conserve que les repères déjà résolus : elle ne relit pas le patch actuel. Les mêmes symboles SVG sont utilisés dans le navigateur et dans le PDF.
+
 ## Présenter le code
 
 PHP-CS-Fixer applique le style Symfony au PHP. Prettier s’occupe de Twig, JavaScript, CSS et de la configuration. Quatre espaces, deux pour GitHub et Docker Compose ; viser 100 caractères par ligne et répartir les longs arguments pour faciliter la lecture.
@@ -66,3 +72,7 @@ Ouvrir `var/coverage/html/index.html`. La couverture mesure les lignes exécuté
 Pour suivre une modification du patch, lire `Controller/Patch/EditAction.php`, `Form/PatchLineType.php`, `Entity/PatchLine.php`, puis `Service/Patch/PatchLineFormHandler.php` sous `src/`, et `templates/patch/form.html.twig`.
 
 Exercice possible, encore à réaliser : proposer le prochain numéro de canal à l’ajout, tout en conservant la vérification des doublons. Commencer par un test du calcul sur un patch vide, continu puis incomplet.
+
+## To Do du groupe
+
+`BandTask` appartient au groupe, sans relation avec un concert. `TaskManager` gère les écritures ; `TaskVoter` contrôle la modification et la suppression. Le responsable est un `MemberProfile`, y compris avant activation de son compte. Les formulaires limitent le choix au même groupe. Les mises à jour vérifient la révision et les suppressions incluent cette révision dans la requête SQL.

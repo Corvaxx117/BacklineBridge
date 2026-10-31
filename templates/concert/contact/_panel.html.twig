@@ -1,0 +1,98 @@
+<section id="concert-contacts" class="collaboration-panel" aria-labelledby="contacts-title">
+    <div class="panel-header">
+        <div>
+            <p class="eyebrow">
+                Les bonnes personnes, au bon endroit
+            </p>
+            <h2 id="contacts-title">Contacts du concert</h2>
+        </div>
+        {% if is_granted('CONCERT_CONTACTS', concert) %}
+            <a
+                class="button button-secondary"
+                href="{{
+                path(
+                    'app_concert_contact_create',
+                    {
+                        id: concert.id
+                    }
+                )
+                }}"
+            >
+                Ajouter un contact
+            </a>
+        {% endif %}
+    </div>
+    {% if contacts is empty %}
+        <p class="collaboration-empty">
+            Régie, organisation, label, connaissance… Garde ici les coordonnées utiles pour cette
+            date.
+        </p>
+    {% else %}
+        <ul class="collaboration-grid" aria-label="Contacts du concert">
+            {% for contact in contacts %}
+                <li class="contact-card">
+                    <span class="collaboration-label">{{ contact.role.label }}</span>
+                    <h3>{{ contact.name }}</h3>
+                    <div class="contact-methods">
+                        {% if contact.email %}
+                            <a href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+                        {% endif %}
+                        {% if contact.phone %}
+                            <a href="{{ contact.telephoneUri }}">{{ contact.phone }}</a>
+                        {% endif %}
+                        {% if not contact.email and not contact.phone %}
+                            <span>Coordonnées à compléter</span>
+                        {% endif %}
+                    </div>
+                    {% if contact.notes %}
+                        <p class="collaboration-description">
+                            {{ contact.notes|nl2br }}
+                        </p>
+                    {% endif %}
+                    {% if is_granted('CONCERT_CONTACTS', concert) %}
+                        <div class="card-actions">
+                            <a
+                                class="edit-link"
+                                href="{{
+                                path(
+                                    'app_concert_contact_edit',
+                                    {
+                                        id: contact.id
+                                    }
+                                )
+                                }}"
+                                aria-label="Modifier le contact {{ contact.name }}"
+                            >
+                                Modifier
+                            </a>
+                            <form
+                                action="{{
+                                path(
+                                    'app_concert_contact_delete',
+                                    {
+                                        id: contact.id
+                                    }
+                                )
+                                }}"
+                                method="post"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="_token"
+                                    value="{{ csrf_token('contact_delete_' ~ contact.id) }}"
+                                />
+                                <button
+                                    type="submit"
+                                    class="text-button danger-link"
+                                    aria-label="Retirer le contact {{ contact.name }}"
+                                >
+                                    Retirer
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>

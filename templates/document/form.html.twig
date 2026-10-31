@@ -1,0 +1,109 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ source.value == 'pdf' ? 'Ajouter un PDF' : 'Ajouter un lien' }} · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <a
+        class="back-link"
+        href="{{
+        path(
+            'app_document_index',
+            {
+                id: band.id
+            }
+        )
+        }}"
+    >
+        ← Revenir aux documents
+    </a>
+    <section class="form-heading" aria-labelledby="page-title">
+        <p class="eyebrow">
+            {{ band.name }} / Documents
+        </p>
+        <h1 id="page-title">
+            {{ source.value == 'pdf' ? 'Ajouter un PDF' : 'Ajouter un lien' }}<span class="title-period">.</span>
+        </h1>
+        <p>
+            {{ source.value == 'pdf'
+                ? 'Le PDF sera accessible à l’équipe depuis BacklineBridge.'
+                : 'Le fichier reste chez son hébergeur. BacklineBridge garde son lien et les informations utiles.' }}
+        </p>
+    </section>
+    <section class="form-panel collaboration-form" aria-label="Ajouter un document">
+        {{
+            form_start(
+                form,
+                {
+                    attr: {
+                        class: 'patch-form',
+                        novalidate: 'novalidate'
+                    }
+                }
+            )
+        }}
+        {% if form.vars.errors|length %}
+            <div class="form-error-summary" role="alert">
+                {{ form_errors(form) }}
+            </div>
+        {% endif %}
+        <div class="form-grid">
+            {% for field in [form.title, form.category] %}
+                {{
+                    include(
+                        'concert/_field.html.twig',
+                        {
+                            field: field
+                        },
+                        with_context: false
+                    )
+                }}
+            {% endfor %}
+        </div>
+        {{
+            include(
+                'concert/_field.html.twig',
+                {
+                    field: source.value == 'pdf' ? form.file : form.url
+                },
+                with_context: false
+            )
+        }}
+        {{
+            include(
+                'concert/_field.html.twig',
+                {
+                    field: form.concert
+                },
+                with_context: false
+            )
+        }}
+        {{
+            include(
+                'concert/_field.html.twig',
+                {
+                    field: form.description
+                },
+                with_context: false
+            )
+        }}
+        <div class="form-actions">
+            <button class="button button-primary" type="submit">Partager avec l’équipe</button>
+            <a
+                class="cancel-link"
+                href="{{
+                path(
+                    'app_document_index',
+                    {
+                        id: band.id
+                    }
+                )
+                }}"
+            >
+                Annuler
+            </a>
+        </div>
+        {{ form_end(form) }}
+    </section>
+{% endblock %}

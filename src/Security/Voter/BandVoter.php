@@ -23,6 +23,7 @@ final class BandVoter extends Voter
     public const DELETE_PATCH = 'BAND_DELETE_PATCH';
     public const PLAN_CONCERT = 'BAND_PLAN_CONCERT';
     public const CONDITIONS = 'BAND_CONDITIONS';
+    public const COLLABORATE = 'BAND_COLLABORATE';
 
     public function __construct(
         private readonly BandMembershipRepository $memberships,
@@ -43,6 +44,7 @@ final class BandVoter extends Voter
                     self::PLAN_CONCERT,
                     self::CONDITIONS,
                     self::MANAGE_TECHNICAL,
+                    self::COLLABORATE,
                 ],
                 true,
             );
@@ -68,6 +70,7 @@ final class BandVoter extends Voter
             self::EDIT_PATCH => $role->canEdit(),
             self::DELETE_PATCH, self::MANAGE_TECHNICAL => BandRole::Manager === $role,
             self::PLAN_CONCERT, self::CONDITIONS => $role->canPlanConcerts(),
+            self::COLLABORATE => BandRole::Viewer !== $role,
             default => false,
         };
     }

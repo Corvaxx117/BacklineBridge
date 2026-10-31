@@ -6,6 +6,7 @@
     "require": {
         "php": "~8.4.1",
         "ext-ctype": "*",
+        "ext-fileinfo": "*",
         "ext-iconv": "*",
         "ext-sodium": "*",
         "doctrine/doctrine-bundle": "^3.3.3",
@@ -19,6 +20,7 @@
         "symfony/form": "8.1.*",
         "symfony/framework-bundle": "8.1.*",
         "symfony/http-client": "8.1.*",
+        "symfony/mime": "8.1.*",
         "symfony/rate-limiter": "8.1.*",
         "symfony/runtime": "8.1.*",
         "symfony/security-bundle": "8.1.*",
@@ -82,7 +84,7 @@
             "@auto-scripts"
         ],
         "test": "@php vendor/bin/phpunit",
-        "start": "@php -S 127.0.0.1:8765 -t public public/router.php",
+        "start": "@php -d upload_max_filesize=10M -d post_max_size=12M -S 127.0.0.1:8765 -t public public/router.php",
         "setup": [
             "@php bin/console doctrine:migrations:migrate --no-interaction",
             "@php bin/console app:seed-avee-mana"

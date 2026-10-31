@@ -1,0 +1,327 @@
+.concert-section-links,
+.collaboration-actions,
+.card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.concert-section-links {
+    margin: 0 0 1.5rem;
+    gap: 0.5rem 1.5rem;
+}
+
+.concert-section-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.concert-section-links span {
+    padding: 0.1rem 0.45rem;
+    border-radius: 1rem;
+    background: #e9ece6;
+    font-size: 0.8rem;
+}
+
+.collaboration-panel {
+    margin: 1.5rem 0;
+    border: 1px solid #dde2dc;
+    border-radius: 14px;
+    background: #fffefa;
+    scroll-margin-top: 1.5rem;
+    overflow: hidden;
+}
+
+.collaboration-panel .panel-header {
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1.5rem;
+}
+
+.collaboration-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 1.5rem;
+    list-style: none;
+}
+
+.document-grid {
+    padding: 0;
+}
+
+.collaboration-panel .document-grid {
+    padding: 1.5rem;
+}
+
+.contact-card,
+.document-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 1.5rem;
+    border: 1px solid #e1e5df;
+    border-radius: 12px;
+    background: #fffefa;
+    overflow-wrap: anywhere;
+}
+
+.contact-card h3,
+.document-card h3 {
+    margin: 0.35rem 0 0.7rem;
+    font-size: 1.2rem;
+    line-height: 1.4;
+}
+
+.collaboration-label {
+    color: #586b65;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.contact-methods {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.contact-methods a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    width: fit-content;
+}
+
+.collaboration-description,
+.document-meta {
+    color: #566761;
+    line-height: 1.7;
+}
+
+.document-meta {
+    margin: 0.75rem 0;
+    font-size: 0.85rem;
+}
+
+.document-meta span {
+    display: block;
+}
+
+.document-concert {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.document-card-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.document-card-heading > div {
+    min-width: 0;
+}
+
+.document-icon {
+    display: grid;
+    flex: 0 0 44px;
+    place-items: center;
+    width: 44px;
+    height: 48px;
+    border-radius: 10px;
+    background: #f1e8d9;
+    color: #9c633e;
+}
+
+.document-icon svg {
+    width: 26px;
+    height: 26px;
+}
+
+.card-actions {
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.card-actions form {
+    margin: 0;
+}
+
+.card-actions > a:not(.button),
+.card-actions button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+}
+
+.collaboration-empty {
+    margin: 0;
+    padding: 1.5rem;
+    color: #566761;
+    line-height: 1.7;
+}
+
+.collaboration-form,
+.confirmation-panel {
+    max-width: 850px;
+}
+
+.confirmation-panel {
+    padding: 2rem;
+    line-height: 1.8;
+}
+
+.confirmation-panel h2 {
+    overflow-wrap: anywhere;
+}
+
+.field-help {
+    margin-top: 0.5rem;
+    color: #566761;
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+.document-storage {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid #dde2dc;
+    border-radius: 12px;
+    background: #f5f6f0;
+}
+
+.document-storage p {
+    margin: 0.5rem 0 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.document-storage meter {
+    flex: 0 1 220px;
+    width: 220px;
+    max-width: 100%;
+    height: 16px;
+    accent-color: #b44c2f;
+}
+
+.document-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+    margin: 1.75rem 0;
+}
+
+.document-filters .field {
+    flex: 1 1 240px;
+    margin: 0;
+}
+
+.document-filters label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.document-filters .cancel-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+}
+
+.document-results {
+    margin: 1.5rem 0;
+    color: #566761;
+}
+
+.danger-link {
+    color: #9a3428;
+}
+
+.button-danger {
+    background: #a23529;
+    color: #fff;
+    border-color: #a23529;
+}
+
+.button-danger:hover {
+    background: #84291f;
+    border-color: #84291f;
+}
+
+.concert-management {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 0;
+    margin-top: 2rem;
+    border-top: 1px solid #dde2dc;
+}
+
+.concert-management p {
+    color: #566761;
+    font-size: 0.9rem;
+}
+
+.concert-management a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+}
+
+@media (max-width: 700px) {
+    .collaboration-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .collaboration-panel .panel-header,
+    .collaboration-grid,
+    .collaboration-panel .document-grid,
+    .confirmation-panel {
+        padding: 1rem;
+    }
+
+    .document-grid {
+        padding: 0;
+    }
+
+    .contact-card,
+    .document-card {
+        padding: 1rem;
+    }
+
+    .collaboration-actions {
+        width: 100%;
+    }
+
+    .collaboration-actions .button {
+        flex: 1 1 160px;
+    }
+
+    .document-filters .field {
+        flex-basis: 100%;
+    }
+
+    .document-filters input,
+    .document-filters select {
+        font-size: 16px;
+    }
+
+    .document-storage meter {
+        flex-basis: 100%;
+        width: 100%;
+    }
+}

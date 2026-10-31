@@ -6,9 +6,14 @@ namespace App\Service\Venue;
 
 use App\Entity\Concert;
 use App\Entity\TechnicalPublication;
+use App\Service\Stage\StagePatchLinks;
 
 final class PublicationBuilder
 {
+    public function __construct(private readonly StagePatchLinks $stageLinks)
+    {
+    }
+
     /** @return array<string, mixed> */
     public function snapshot(Concert $concert): array
     {
@@ -37,7 +42,7 @@ final class PublicationBuilder
             'notes' => $concert->getNotes(),
             'notices' => $sheet->getNotices(),
             'lines' => $lines,
-            'stagePlan' => $sheet->getStagePlan(),
+            'stagePlan' => $this->stageLinks->present($sheet),
             'equipment' => $sheet->getEquipmentRequests(),
         ];
     }
