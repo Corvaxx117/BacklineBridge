@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Actualiser le To Do · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <section class="form-heading" aria-labelledby="page-title">
+        <p class="eyebrow">
+            {{ band.name }} · To Do
+        </p>
+        <h1 id="page-title">Un instant<span class="title-period">.</span></h1>
+        <p role="alert">
+            {{ message }}
+        </p>
+        <a
+            class="button button-primary"
+            href="{{
+            path(
+                'app_task_index',
+                {
+                    id: band.id
+                }
+            )
+            }}"
+        >
+            Recharger le tableau
+        </a>
+    </section>
+{% endblock %}

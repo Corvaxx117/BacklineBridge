@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ editing ? 'Modifier le contact' : 'Ajouter un contact' }} · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <a
+        class="back-link"
+        href="{{
+        path(
+            'app_concert_show',
+            {
+                id: concert.id,
+                _fragment: 'concert-contacts'
+            }
+        )
+        }}"
+    >
+        ← Revenir au concert
+    </a>
+    <section class="form-heading" aria-labelledby="page-title">
+        <p class="eyebrow">
+            {{ concert.venue }} · {{ concert.date|date('d/m/Y') }}
+        </p>
+        <h1 id="page-title">
+            {{ editing ? 'Modifier le contact' : 'Ajouter un contact' }}<span class="title-period">.</span>
+        </h1>
+        <p>
+            Le nom et le rôle suffisent pour commencer. Les coordonnées peuvent être complétées plus
+            tard.
+        </p>
+    </section>
+    <section class="form-panel collaboration-form" aria-label="Contact du concert">
+        {{
+            form_start(
+                form,
+                {
+                    attr: {
+                        class: 'patch-form',
+                        novalidate: 'novalidate'
+                    }
+                }
+            )
+        }}
+        {% if form.vars.errors|length %}
+            <div class="form-error-summary" role="alert">
+                {{ form_errors(form) }}
+            </div>
+        {% endif %}
+        <div class="form-grid">
+            {% for field in [form.name, form.role, form.email, form.phone] %}
+                {{
+                    include(
+                        'concert/_field.html.twig',
+                        {
+                            field: field
+                        },
+                        with_context: false
+                    )
+                }}
+            {% endfor %}
+        </div>
+        {{
+            include(
+                'concert/_field.html.twig',
+                {
+                    field: form.notes
+                },
+                with_context: false
+            )
+        }}
+        <div class="form-actions">
+            <button class="button button-primary" type="submit">Enregistrer le contact</button>
+            <a
+                class="cancel-link"
+                href="{{
+                path(
+                    'app_concert_show',
+                    {
+                        id: concert.id
+                    }
+                )
+                }}"
+            >
+                Annuler
+            </a>
+        </div>
+        {{ form_end(form) }}
+    </section>
+{% endblock %}

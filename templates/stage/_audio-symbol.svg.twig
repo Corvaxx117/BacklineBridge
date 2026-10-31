@@ -1,0 +1,32 @@
+{% if kind == 'mic_vocal' %}
+    <rect x="8" y="2" width="8" height="12" rx="4" />
+    <path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4M8 22h8M9 6h6" />
+{% elseif kind == 'mic_instrument' %}
+    <g transform="rotate(-40 12 12)">
+        <rect x="9" y="2" width="6" height="9" rx="2" />
+        <path d="M10 11v8h4v-8M12 19v3M9 6h6" />
+    </g>
+{% elseif kind == 'stand_straight' %}
+    <path d="M12 4v15M8 22l4-3 4 3M12 19v4M10 4h4M10 11h4" />
+{% elseif kind == 'stand_boom' %}
+    <path d="M12 9v10M4 8l16-5M18 2l3 3M8 22l4-3 4 3M12 19v4" />
+{% elseif kind in ['di_mono', 'di_stereo'] %}
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <circle cx="6" cy="8" r="1" />
+    <circle cx="18" cy="8" r="1" />
+    {% if kind == 'di_stereo' %}
+        <circle cx="18" cy="15" r="1" />
+        <path d="M5 15h3M5 17h3" />
+    {% endif %}
+    <text
+        x="12"
+        y="15"
+        text-anchor="middle"
+        font-family="DejaVu Sans, sans-serif"
+        font-size="6"
+        stroke="none"
+        fill="currentColor"
+    >
+        DI
+    </text>
+{% endif %}

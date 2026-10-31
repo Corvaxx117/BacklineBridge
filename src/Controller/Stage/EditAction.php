@@ -8,6 +8,7 @@ use App\Dto\Stage\StagePlanInput;
 use App\Entity\TechnicalSheet;
 use App\Form\Stage\StagePlanType;
 use App\Security\Voter\TechnicalSheetVoter;
+use App\Service\Stage\StagePatchLinks;
 use App\Service\Stage\TechnicalSetupUpdater;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,16 +29,23 @@ final class EditAction extends AbstractController
         Request $request,
         #[MapEntity(id: 'id')] TechnicalSheet $sheet,
         TechnicalSetupUpdater $updater,
+        StagePatchLinks $links,
     ): Response {
         $this->denyAccessUnlessGranted(TechnicalSheetVoter::MANAGE, $sheet);
         $input = StagePlanInput::fromSheet($sheet);
-        $form = $this->createForm(StagePlanType::class, $input)->handleRequest($request);
+        $patchChoices = $links->choices($sheet);
+        $formChoices = [];
+        foreach ($patchChoices as $key => $choice) {
+            $formChoices[$choice['label']] = $key;
+        }
+        $form = $this->createForm(StagePlanType::class, $input, ['patch_choices' => $formChoices])
+            ->handleRequest($request);
         $status = $form->isSubmitted() ? 422 : 200;
         if ($form->isSubmitted() && $form->isValid()) {
             if (!hash_equals(StagePlanInput::fingerprint($sheet), $input->revision)) {
                 $form->addError(
                     new FormError(
-                        'Ce plan a changé depuis son ouverture. Rechargez la page avant de réessayer.',
+                        'Ce plan a changé, ou son patch a été modifié. Rechargez la page avant de réessayer.',
                     ),
                 );
                 $status = 409;
@@ -60,7 +68,7 @@ final class EditAction extends AbstractController
 
         return $this->render(
             'stage/edit.html.twig',
-            ['sheet' => $sheet, 'form' => $form->createView()],
+            ['sheet' => $sheet, 'form' => $form->createView(), 'patchChoices' => $patchChoices],
             new Response(status: $status),
         );
     }

@@ -6,6 +6,17 @@
             {
                 attr: {
                     'aria-describedby': field.vars.id ~ '_errors'
+                        ~ (field.vars.help ? ' ' ~ field.vars.id ~ '_help' : '')
+                }
+            }
+        )
+    }}
+    {{
+        form_help(
+            field,
+            {
+                help_attr: {
+                    class: 'field-help'
                 }
             }
         )

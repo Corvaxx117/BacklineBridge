@@ -73,9 +73,11 @@ try {
     if (null === $sheet) {
         throw new RuntimeException('La fiche de référence est absente.');
     }
+    $stageLinks = new App\Service\Stage\StagePatchLinks();
     $factory = new TechnicalDossierFactory(
         $em->getRepository(PatchLine::class),
-        new PublicationBuilder(),
+        new PublicationBuilder($stageLinks),
+        $stageLinks,
     );
     $twig = new Environment(new FilesystemLoader($root.'/templates'), ['strict_variables' => true]);
     $twig->addGlobal('app_name', 'BacklineBridge');

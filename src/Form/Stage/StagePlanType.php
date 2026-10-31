@@ -19,7 +19,7 @@ final class StagePlanType extends AbstractType
     {
         $builder->add('revision', HiddenType::class)->add('items', CollectionType::class, [
             'entry_type' => StageItemType::class,
-            'entry_options' => ['label' => false],
+            'entry_options' => ['label' => false, 'patch_choices' => $options['patch_choices']],
             'prototype_data' => new StageItemInput(),
             'allow_add' => true,
             'allow_delete' => true,
@@ -33,6 +33,8 @@ final class StagePlanType extends AbstractType
         $resolver->setDefaults([
             'data_class' => StagePlanInput::class,
             'csrf_token_id' => 'stage_plan',
+            'patch_choices' => [],
         ]);
+        $resolver->setAllowedTypes('patch_choices', 'array');
     }
 }

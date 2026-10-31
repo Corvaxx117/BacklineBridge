@@ -7,9 +7,13 @@ namespace App\Service\Concert;
 use App\Entity\Concert;
 use App\Entity\PatchLine;
 use App\Entity\TechnicalSheet;
+use App\Service\Stage\StagePatchLinks;
 
 final class ReferenceImportPreview
 {
+    public function __construct(private readonly StagePatchLinks $stageLinks)
+    {
+    }
     public const LABELS = [
         'patch' => 'Patch des entrées',
         'stage' => 'Plan de scène',
@@ -22,13 +26,17 @@ final class ReferenceImportPreview
      */
     public function forConcert(Concert $concert): array
     {
+        $currentSheet = $concert->getPatchSheet();
+        $referenceSheet = $concert->getBand()->getReferenceSheet();
         $current = $this->snapshot($concert->getPatchSheet());
         $reference = $this->snapshot($concert->getBand()->getReferenceSheet());
+        $stageChanged = $this->stageSignature($this->stageLinks->copyPlan($currentSheet, $referenceSheet))
+            !== $this->stageSignature($referenceSheet->getStagePlan());
         $sections = [];
         foreach (self::LABELS as $key => $label) {
             $sections[$key] = [
                 'label' => $label,
-                'changed' => $current[$key] !== $reference[$key],
+                'changed' => 'stage' === $key ? $stageChanged : $current[$key] !== $reference[$key],
                 'current' => $current[$key],
                 'reference' => $reference[$key],
             ];
@@ -42,9 +50,37 @@ final class ReferenceImportPreview
             ),
             'fingerprint' => hash(
                 'sha256',
-                json_encode([$concert->getId(), $current, $reference], JSON_THROW_ON_ERROR),
+                json_encode([
+                    $concert->getId(), $current, $reference,
+                    $concert->getPatchSheet()->getStagePlan(),
+                    $concert->getBand()->getReferenceSheet()->getStagePlan(),
+                ], JSON_THROW_ON_ERROR),
             ),
         ];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $items
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function stageSignature(array $items): array
+    {
+        return array_map(static function (array $item): array {
+            $sources = $item['patchSources'] ?? [];
+            sort($sources);
+
+            return [
+                'label' => $item['label'],
+                'kind' => $item['kind'],
+                'x' => (float) $item['x'],
+                'y' => (float) $item['y'],
+                'notes' => $item['notes'],
+                'rotation' => (float) ($item['rotation'] ?? 0),
+                'scale' => (float) ($item['scale'] ?? 1),
+                'patchSources' => $sources,
+            ];
+        }, $items);
     }
 
     /**
@@ -83,8 +119,10 @@ final class ReferenceImportPreview
                     'notes' => $item['notes'],
                     'rotation' => (float) ($item['rotation'] ?? 0),
                     'scale' => (float) ($item['scale'] ?? 1),
+                    'patchLabel' => $item['patchLabel'] ?? '',
+                    'patchMissing' => $item['patchMissing'] ?? 0,
                 ],
-                $sheet->getStagePlan(),
+                $this->stageLinks->present($sheet),
             ),
             'equipment' => $sheet->getEquipmentRequests(),
             'notes' => [

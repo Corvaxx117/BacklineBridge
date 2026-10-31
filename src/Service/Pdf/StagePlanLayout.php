@@ -20,6 +20,12 @@ final class StagePlanLayout
         'keys' => [160, '#dce8d5', '#99b18c'],
         'power' => [130, '#fffefa', '#bacbc0'],
         'other' => [130, '#fffefa', '#bacbc0'],
+        'mic_vocal' => [130, '#eee5df', '#bcabb7'],
+        'mic_instrument' => [130, '#eee5df', '#bcabb7'],
+        'stand_straight' => [130, '#f1f3ef', '#bacbc0'],
+        'stand_boom' => [130, '#f1f3ef', '#bacbc0'],
+        'di_mono' => [130, '#e0eaed', '#99b1bc'],
+        'di_stereo' => [130, '#e0eaed', '#99b1bc'],
     ];
 
     /**
@@ -42,12 +48,13 @@ final class StagePlanLayout
             [$width, $fill, $stroke] = self::STYLES[$kind];
             $label = $this->wrap($item['label'] ?? '', max(10, (int) (($width - 18) / 8)), 3);
             $notes = $this->wrap($item['notes'] ?? '', max(10, (int) (($width - 18) / 6)), 2);
+            $patch = $this->wrap($item['patchLabel'] ?? '', max(10, (int) (($width - 18) / 6)), 3);
             $symbolWidth = 'drums' === $kind ? $width - 28 : 24;
             $symbolHeight = 'drums' === $kind ? ($symbolWidth * 184) / 260 : 24;
             $height =
                 'riser' === $kind
                     ? 236
-                    : max(74, $symbolHeight + 14 + count($label) * 17 + count($notes) * 13);
+                    : max(74, $symbolHeight + 14 + count($label) * 17 + count($notes) * 13 + count($patch) * 12);
             $x = ($this->number($item['x'] ?? null, 50, 0, 100) / 100) * self::WIDTH;
             $y = ($this->number($item['y'] ?? null, 50, 0, 100) / 100) * self::HEIGHT;
             $rotation = $this->number($item['rotation'] ?? null, 0, 0, 360);
@@ -70,6 +77,7 @@ final class StagePlanLayout
                 'stroke',
                 'label',
                 'notes',
+                'patch',
                 'x',
                 'y',
                 'rotation',

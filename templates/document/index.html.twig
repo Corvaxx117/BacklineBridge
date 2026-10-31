@@ -1,0 +1,154 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Documents · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+            <p class="eyebrow">
+                {{ band.name }} / Bibliothèque partagée
+            </p>
+            <h1 id="page-title">Documents<span class="title-period">.</span></h1>
+            <p class="hero-description">
+                Les PDF utiles et les liens du groupe, réunis au même endroit.
+            </p>
+        </div>
+        {% if is_granted('BAND_COLLABORATE', band) %}
+            <div class="hero-actions">
+                <a
+                    class="button button-primary"
+                    href="{{
+                    path(
+                        'app_document_create',
+                        {
+                            id: band.id,
+                            source: 'pdf'
+                        }
+                    )
+                    }}"
+                >
+                    Ajouter un PDF
+                </a>
+                <a
+                    class="button button-secondary"
+                    href="{{
+                    path(
+                        'app_document_create',
+                        {
+                            id: band.id,
+                            source: 'lien'
+                        }
+                    )
+                    }}"
+                >
+                    Ajouter un lien
+                </a>
+            </div>
+        {% endif %}
+    </section>
+    <section class="document-storage" aria-label="Espace occupé par les PDF du groupe">
+        <div>
+            <strong>
+                PDF hébergés : {{ (usedBytes / 1048576)|number_format(1, ',', ' ') }} / {{
+                    (quotaBytes / 1048576)|number_format(0, ',', ' ')
+                }} Mo
+            </strong>
+            <p>
+                Pour les photos, vidéos et fichiers volumineux, garde un lien vers Drive ou ton
+                espace habituel.
+            </p>
+        </div>
+        <meter
+            min="0"
+            max="{{ quotaBytes }}"
+            value="{{ min(usedBytes, quotaBytes) }}"
+            aria-label="Utilisation du quota des PDF"
+        >
+            {{ (100 * usedBytes / quotaBytes)|round }} %
+        </meter>
+    </section>
+    <form
+        class="document-filters"
+        action="{{
+        path(
+            'app_document_index',
+            {
+                id: band.id
+            }
+        )
+        }}"
+        method="get"
+        role="search"
+    >
+        <div class="field">
+            <label for="document-search">Rechercher un document</label>
+            <input
+                type="search"
+                id="document-search"
+                name="q"
+                value="{{ search }}"
+                placeholder="Titre ou précision…"
+                maxlength="160"
+            />
+        </div>
+        <div class="field">
+            <label for="document-category">Catégorie</label>
+            <select id="document-category" name="category">
+                <option value="">
+                    Toutes les catégories
+                </option>
+                {% for choice in categories %}
+                    <option value="{{ choice.value }}" {{ category == choice ? 'selected' : '' }}>
+                        {{ choice.label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button class="button button-secondary" type="submit">Filtrer</button>
+        {% if search or category %}
+            <a
+                class="cancel-link"
+                href="{{
+                path(
+                    'app_document_index',
+                    {
+                        id: band.id
+                    }
+                )
+                }}"
+            >
+                Tout afficher
+            </a>
+        {% endif %}
+    </form>
+    <p class="document-results" role="status">
+        {{ documents|length }} document{{ (documents|length) != 1 ? 's' : '' }}
+    </p>
+    {% if documents is empty %}
+        <section class="collaboration-panel collaboration-empty" aria-label="Aucun document">
+            <h2>
+                {{ search or category
+                    ? 'Aucun résultat pour cette recherche.'
+                    : 'Les documents du groupe ont leur place ici.' }}
+            </h2>
+            <p>
+                {{ search or category
+                    ? 'Essaie un autre titre ou une autre catégorie.'
+                    : 'Ajoute une fiche technique en PDF ou colle le lien d’un document partagé.' }}
+            </p>
+        </section>
+    {% else %}
+        {{
+            include(
+                'document/_cards.html.twig',
+                {
+                    documents: documents,
+                    showConcert: true
+                },
+                with_context: false
+            )
+        }}
+    {% endif %}
+{% endblock %}

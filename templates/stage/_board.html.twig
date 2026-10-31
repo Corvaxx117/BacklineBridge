@@ -47,6 +47,17 @@
                         </span>
                         <strong>{{ item.label }}</strong>
                         <small>{{ item.notes }}</small>
+                        {% if item.patchLabel|default('') %}
+                            <span
+                                class="stage-patch-badge {{
+                                item.patchMissing|default(0)
+                                    ? 'has-missing-source'
+                                    : ''
+                                }}"
+                            >
+                                {{ item.patchLabel }}
+                            </span>
+                        {% endif %}
                     </div>
                 {% endfor %}
                 <span class="stage-orientation stage-front">Public · avant-scène</span>

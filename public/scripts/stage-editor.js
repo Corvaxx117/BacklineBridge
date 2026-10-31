@@ -11,6 +11,23 @@
     const elementList = form.querySelector('[data-stage-element-list]');
     const nameInput = form.querySelector('[data-stage-name]');
     const notesInput = form.querySelector('[data-stage-notes]');
+    const sourceSearch = form.querySelector('[data-stage-source-search]');
+    const sourceOptions = form.querySelector('[data-stage-source-options]');
+    const sourceSummary = form.querySelector('[data-stage-source-summary]');
+    const sourceChoices = new Map(
+        [
+            ...form
+                .querySelector('[data-stage-patch-choices]')
+                .content.querySelectorAll('[data-stage-source-option]'),
+        ].map((option) => [
+            option.dataset.key,
+            {
+                label: option.dataset.label,
+                channel: option.dataset.channel ? Number(option.dataset.channel) : null,
+                available: option.dataset.available === 'true',
+            },
+        ]),
+    );
     const angleInput = form.querySelector('[data-stage-angle]');
     const status = form.querySelector('[data-stage-status]');
     const announce = (message) => {
@@ -28,6 +45,7 @@
     let nextId = 1;
     let selectedId = null;
     let textBefore = null;
+    let propertyMode = null;
     let submitting = false;
     let dirty = false;
     const initiallyUnsaved = form.dataset.stageUnsaved === 'true';
@@ -50,6 +68,9 @@
         y: clamp(readNumber(row, 'y', 50), 0, 100),
         rotation: rotation(readNumber(row, 'rotation', 0)),
         scale: clamp(readNumber(row, 'scale', 1), 0.5, 2.5),
+        patchSources: [
+            ...(row.querySelector('select[name$="[patchSources][]"]')?.selectedOptions ?? []),
+        ].map((option) => option.value),
     }));
     const serialize = (list) => JSON.stringify(list.map(({ id, ...item }) => item));
     const saved = serialize(items);
@@ -85,7 +106,98 @@
         if (textBefore) commit(textBefore);
         textBefore = null;
         properties.hidden = true;
+        propertyMode = null;
         form.querySelector('[data-stage-action="text"]').setAttribute('aria-expanded', 'false');
+        form.querySelector('[data-stage-action="patch"]').setAttribute('aria-expanded', 'false');
+    }
+
+    function patchLabel(item) {
+        const channels = item.patchSources
+            .map((key) => sourceChoices.get(key)?.channel)
+            .filter((channel) => channel !== null && channel !== undefined)
+            .sort((a, b) => a - b);
+        const missing = item.patchSources.length - channels.length;
+        const parts = [];
+        if (channels.length)
+            parts.push(`${channels.length === 1 ? 'Entrée' : 'Entrées'} ${channels.join(', ')}`);
+        if (missing) parts.push(`${missing} source${missing > 1 ? 's retirées' : ' retirée'}`);
+        return { label: parts.join(' · '), missing };
+    }
+
+    function updateSourceChoices() {
+        const item = selected();
+        const limit = Number(palette.get(item.kind).dataset.sourceLimit);
+        const search = sourceSearch.value.trim().toLocaleLowerCase();
+        let visible = 0;
+        for (const label of sourceOptions.querySelectorAll('label')) {
+            const checkbox = label.querySelector('input');
+            const choice = sourceChoices.get(checkbox.value);
+            checkbox.checked = item.patchSources.includes(checkbox.value);
+            checkbox.disabled =
+                !checkbox.checked && (!choice.available || item.patchSources.length >= limit);
+            label.hidden = !choice.label.toLocaleLowerCase().includes(search);
+            if (!label.hidden) visible++;
+        }
+        form.querySelector('[data-stage-source-empty]').hidden = visible !== 0;
+        sourceSummary.textContent = item.patchSources.length
+            ? `${item.patchSources.length} entrée${item.patchSources.length > 1 ? 's' : ''} associée${item.patchSources.length > 1 ? 's' : ''}.`
+            : 'Aucune entrée associée.';
+    }
+
+    for (const [key, choice] of sourceChoices) {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = key;
+        label.className = 'stage-source-option';
+        label.classList.toggle('is-unavailable', !choice.available);
+        label.append(checkbox, document.createTextNode(choice.label));
+        sourceOptions.append(label);
+    }
+    sourceSearch.addEventListener('input', updateSourceChoices);
+    sourceOptions.addEventListener('change', () => {
+        const item = selected();
+        if (!item) return;
+        item.patchSources = [...sourceOptions.querySelectorAll('input:checked')].map(
+            (input) => input.value,
+        );
+        updateSourceChoices();
+        paint(item);
+        updateStatus();
+        positionContext();
+    });
+
+    function editProperties(patch = false) {
+        const mode = patch ? 'patch' : 'text';
+        if (!properties.hidden && propertyMode === mode) {
+            finishText();
+            positionContext();
+            return;
+        }
+        const item = selected();
+        textBefore ??= capture();
+        propertyMode = mode;
+        nameInput.value = item.label;
+        notesInput.value = item.notes;
+        sourceSearch.value = '';
+        updateSourceChoices();
+        properties.hidden = false;
+        for (const field of properties.querySelectorAll('[data-stage-text-field]')) {
+            field.hidden = patch;
+        }
+        properties.querySelector('[data-stage-source-picker]').hidden = !patch;
+        for (const action of ['text', 'patch']) {
+            form.querySelector(`[data-stage-action="${action}"]`).setAttribute(
+                'aria-expanded',
+                String(action === mode),
+            );
+        }
+        positionContext();
+        if (patch) sourceSearch.focus();
+        else {
+            nameInput.focus();
+            nameInput.select();
+        }
     }
 
     function positionContext() {
@@ -124,6 +236,11 @@
         node.style.setProperty('--stage-scale', item.scale);
         node.querySelector('strong').textContent = item.label || 'Élément';
         node.querySelector('small').textContent = item.notes;
+        const binding = patchLabel(item);
+        const badge = node.querySelector('.stage-patch-badge');
+        badge.textContent = binding.label;
+        badge.hidden = binding.label === '';
+        badge.classList.toggle('has-missing-source', binding.missing > 0);
         const hit = node.querySelector('[data-stage-hit]');
         hit.setAttribute('aria-label', `Sélectionner : ${item.label || 'Élément'}`);
         hit.setAttribute('aria-pressed', String(item.id === selectedId));
@@ -237,7 +354,14 @@
         symbol.append(
             form.querySelector(`[data-stage-icon="${item.kind}"]`).content.cloneNode(true),
         );
-        hit.append(symbol, document.createElement('strong'), document.createElement('small'));
+        const badge = document.createElement('span');
+        badge.className = 'stage-patch-badge';
+        hit.append(
+            symbol,
+            document.createElement('strong'),
+            document.createElement('small'),
+            badge,
+        );
         hit.addEventListener('click', () => select(item.id));
         hit.addEventListener('pointerdown', (e) => gesture(e, item.id, 'move'));
         hit.addEventListener('keydown', (e) => {
@@ -319,6 +443,7 @@
                 y: round(clamp(point.y, 2, 98)),
                 rotation: 0,
                 scale: 1,
+                patchSources: [],
             };
             items.push(item);
             selectedId = item.id;
@@ -363,6 +488,7 @@
             change(() => {
                 const item = {
                     ...selected(),
+                    patchSources: [...selected().patchSources],
                     id: String(nextId++),
                     label: `${Array.from(selected().label).slice(0, 62).join('')} (copie)`,
                     x: clamp(selected().x + 4, 2, 98),
@@ -378,22 +504,8 @@
                 selectedId = null;
                 announce('Élément retiré. Utilisez Annuler pour le restaurer.');
             }),
-        text: () => {
-            if (!properties.hidden) {
-                finishText();
-                positionContext();
-                return;
-            }
-            const item = selected();
-            textBefore = capture();
-            nameInput.value = item.label;
-            notesInput.value = item.notes;
-            properties.hidden = false;
-            form.querySelector('[data-stage-action="text"]').setAttribute('aria-expanded', 'true');
-            positionContext();
-            nameInput.focus();
-            nameInput.select();
-        },
+        text: () => editProperties(),
+        patch: () => editProperties(true),
         'finish-text': () => {
             finishText();
             updateContext();
@@ -404,7 +516,8 @@
         if (action && actions[action] && (['undo', 'redo'].includes(action) || selected()))
             actions[action]();
     });
-    properties.addEventListener('input', () => {
+    properties.addEventListener('input', (event) => {
+        if (![nameInput, notesInput].includes(event.target)) return;
         const item = selected();
         if (!item) return;
         item.label = nameInput.value;
@@ -416,7 +529,7 @@
             item.label || 'Élément';
     });
     properties.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && e.target === nameInput) {
+        if (e.key === 'Enter' && [nameInput, sourceSearch].includes(e.target)) {
             e.preventDefault();
             finishText();
             updateContext();
@@ -440,6 +553,17 @@
         }
     });
     elementList.addEventListener('change', () => select(elementList.value));
+    function filterPalette(family) {
+        for (const button of palette.values())
+            button.hidden = button.dataset.stageFamily !== family;
+        for (const button of form.querySelectorAll('[data-stage-filter]')) {
+            button.setAttribute('aria-pressed', String(button.dataset.stageFilter === family));
+        }
+    }
+    for (const button of form.querySelectorAll('[data-stage-filter]')) {
+        button.addEventListener('click', () => filterPalette(button.dataset.stageFilter));
+    }
+    filterPalette('scene');
     board.addEventListener('click', (e) => {
         if (!e.target.closest('.stage-node')) select(null);
     });
@@ -542,11 +666,14 @@
         const fields = [];
         items.forEach(({ id, ...item }, index) => {
             for (const [name, value] of Object.entries(item)) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = `${payload.dataset.rootName}[${index}][${name}]`;
-                input.value = value;
-                fields.push(input);
+                const values = Array.isArray(value) ? value : [value];
+                for (const entry of values) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = `${payload.dataset.rootName}[${index}][${name}]${Array.isArray(value) ? '[]' : ''}`;
+                    input.value = entry;
+                    fields.push(input);
+                }
             }
         });
         // Le jeton CSRF et l'empreinte du formulaire restent en dehors de cette collection.
@@ -554,6 +681,7 @@
         submitting = true;
     });
     form.querySelector('[data-stage-action="text"]').setAttribute('aria-expanded', 'false');
+    form.querySelector('[data-stage-action="patch"]').setAttribute('aria-expanded', 'false');
     render();
     form.querySelector('[data-stage-save]').disabled = false;
 })();

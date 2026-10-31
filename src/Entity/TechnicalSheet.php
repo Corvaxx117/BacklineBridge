@@ -18,7 +18,8 @@ use Doctrine\ORM\Mapping as ORM;
  *     y: float|int,
  *     notes: string,
  *     rotation?: float|int,
- *     scale?: float|int
+ *     scale?: float|int,
+ *     patchSources?: list<string>
  * }
  * @phpstan-type EquipmentRequest array{
  *     id: string,

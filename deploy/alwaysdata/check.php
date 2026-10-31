@@ -21,7 +21,7 @@ $supportsPhpVersion = static fn (string $version): bool => version_compare(
 $check('PHP 8.4.1 ou supérieur dans la branche 8.4', $supportsPhpVersion(PHP_VERSION));
 
 foreach (
-    ['ctype', 'iconv', 'sodium', 'pdo_sqlite', 'dom', 'xml', 'mbstring', 'intl'] as $extension
+    ['ctype', 'iconv', 'fileinfo', 'sodium', 'pdo_sqlite', 'dom', 'xml', 'mbstring', 'intl'] as $extension
 ) {
     $check('Extension '.$extension, extension_loaded($extension));
 }

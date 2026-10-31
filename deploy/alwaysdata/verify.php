@@ -62,9 +62,11 @@ try {
     if (null === $sheet) {
         throw new RuntimeException('Initialiser la fiche technique avant ce contrôle.');
     }
+    $stageLinks = new App\Service\Stage\StagePatchLinks();
     $factory = new TechnicalDossierFactory(
         $manager->getRepository(PatchLine::class),
-        new PublicationBuilder(),
+        new PublicationBuilder($stageLinks),
+        $stageLinks,
     );
     $twig = new Environment(new FilesystemLoader($projectDir.'/templates'), [
         'strict_variables' => true,

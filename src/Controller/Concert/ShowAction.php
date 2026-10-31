@@ -6,8 +6,10 @@ namespace App\Controller\Concert;
 
 use App\Entity\Concert;
 use App\Entity\ConcertConditions;
+use App\Entity\ConcertContact;
 use App\Entity\User;
 use App\Form\ConcertAvailabilityType;
+use App\Repository\BandDocumentRepository;
 use App\Repository\BandsintownConcertRepository;
 use App\Repository\PatchLineRepository;
 use App\Security\Voter\ConcertVoter;
@@ -34,12 +36,15 @@ final class ShowAction extends AbstractController
         #[CurrentUser] User $user,
         ConcertAvailabilityManager $availability,
         BandsintownConcertRepository $bandsintown,
+        BandDocumentRepository $documents,
     ): Response {
         $this->denyAccessUnlessGranted(ConcertVoter::VIEW, $concert);
         $canViewConditions = $this->isGranted(ConcertVoter::CONDITIONS, $concert);
 
         return $this->render('concert/show.html.twig', [
             'concert' => $concert,
+            'contacts' => $entityManager->getRepository(ConcertContact::class)->findBy(['concert' => $concert], ['name' => 'ASC']),
+            'documents' => $documents->forConcert($concert),
             'bandsintownSource' => $bandsintown->forConcert($concert),
             'sheet' => $concert->getPatchSheet(),
             'lines' => $lines->findForSheet($concert->getPatchSheet()),

@@ -21,11 +21,41 @@ Tout commence à confirmer, même pour le créateur. Changer la date remet les d
 
 **Concert validé, membres disponibles et matériel confirmé sont trois informations différentes.**
 
+## Contacts et documents de la date
+
+La section **Contacts du concert** contient les personnes à joindre : nom, rôle, e-mail, téléphone et précisions facultatives. Ajouter plusieurs interlocuteurs, puis utiliser les liens pour leur écrire ou les appeler. Les coordonnées sont internes à l’équipe ; elles ne sont pas intégrées aux invitations de salle ni au PDF technique.
+
+Les responsables, le tourneur et les profils techniques peuvent ajouter, modifier et retirer un contact. Un formulaire périmé ne remplace pas une modification plus récente.
+
+Dans **Documents du concert**, ajouter une fiche reçue en PDF ou le lien d’un Google Doc, d’un fichier Drive, etc. Ces ajouts apparaissent aussi dans l’onglet commun [Documents](documents.md). La limite d’un PDF est de 10 Mo.
+
+## Supprimer une date
+
+Les responsables disposent du lien **Supprimer le concert**, en bas de son dossier. Une page présente les conséquences avant confirmation.
+
+La suppression est définitive : dossier technique de cette date, contacts, conditions, disponibilités, invitations et réponses de la salle sont retirés. Les documents restent dans la bibliothèque du groupe. La référence technique et les autres concerts sont conservés.
+
+Une suppression dans BacklineBridge ne supprime pas l’événement Bandsintown. Il pourra être réimporté. Un concert modifié depuis l’ouverture de la confirmation doit être relu avant suppression.
+
 ## Adapter le dossier technique
 
 Le plan est vu depuis le public. Cliquer sur un élément pour le déplacer ou afficher sa barre d’outils : rotation, taille, nom, duplication et suppression. La palette ajoute des éléments ; le menu « Sur la scène » aide à sélectionner ceux qui se superposent.
 
 Les flèches déplacent la sélection, Suppr la retire et Échap la désélectionne. Utiliser **Annuler / Rétablir**, puis **Enregistrer le plan**.
+
+### Micros, pieds et DI sur le plan
+
+La palette propose deux familles : **Scène** et **Micros et DI**. La seconde contient un micro chant, un micro instrument, un pied droit, un pied perche, une DI mono et une DI stéréo. Les éléments se déplacent, tournent et se redimensionnent comme les autres.
+
+Pour les relier au patch :
+
+1. Sélectionner l’élément, puis le bouton **Relier aux entrées du patch**, représenté par une chaîne.
+2. Rechercher et cocher les sources concernées. Un micro ou une DI mono accepte une entrée ; une DI stéréo en accepte deux.
+3. Choisir **Terminer**, puis **Enregistrer le plan**.
+
+Les sources doivent déjà exister dans le patch de cette fiche. Le plan affiche leurs numéros de canal ; une renumérotation suit la même source. Une source retirée est signalée sur le plan et peut être décochée ou remplacée dans la sélection. Restaurer cette source rétablit son lien.
+
+Les associations sont reprises dans les copies de concert et les imports de référence. Chaque concert affiche les canaux de son propre patch. Le PDF reprend les repères ; une publication envoyée à une salle conserve les numéros qui existaient lors de son envoi.
 
 Le matériel est regroupé par catégorie. Adapter les quantités et précisions, ou ajouter un équipement. Les préférences d’amplis et l’IEM mono/stéréo restent à confirmer avec la salle.
 
