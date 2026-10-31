@@ -1,0 +1,116 @@
+<ul class="collaboration-grid document-grid" aria-label="Documents partagés">
+    {% for document in documents %}
+        <li class="document-card">
+            <div class="document-card-heading">
+                <span class="document-icon">
+                    {{
+                        include(
+                            'document/_icon.html.twig',
+                            {
+                                pdf: document.pdf
+                            },
+                            with_context: false
+                        )
+                    }}
+                </span>
+                <div>
+                    <span class="collaboration-label">
+                        {{ document.category.label }} · {{ document.pdf ? 'PDF' : 'Lien' }}
+                    </span>
+                    <h3>{{ document.title }}</h3>
+                </div>
+            </div>
+            {% if document.description %}
+                <p class="collaboration-description">
+                    {{ document.description|nl2br }}
+                </p>
+            {% endif %}
+            <p class="document-meta">
+                Ajouté par {{ document.createdByName }} · {{ document.createdAt|date('d/m/Y') }}
+                <span>
+                    {{ document.pdf
+                        ? ((document.sizeBytes / 1024)|number_format(0, ',', ' ')) ~ ' Ko'
+                        : document.externalHost }}
+                </span>
+            </p>
+            {% if showConcert and document.concert %}
+                <a
+                    class="document-concert"
+                    href="{{
+                    path(
+                        'app_concert_show',
+                        {
+                            id: document.concert.id,
+                            _fragment: 'concert-documents'
+                        }
+                    )
+                    }}"
+                >
+                    {{ document.concert.date|date('d/m/Y') }} · {{ document.concert.venue }}
+                </a>
+            {% elseif showConcert %}
+                <p class="document-meta">
+                    Document du groupe
+                </p>
+            {% endif %}
+            <div class="card-actions">
+                {% if document.pdf %}
+                    <a
+                        class="button button-secondary"
+                        href="{{
+                        path(
+                            'app_document_file',
+                            {
+                                id: document.id
+                            }
+                        )
+                        }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Ouvrir le PDF <span class="visually-hidden">(nouvel onglet)</span>
+                    </a>
+                    <a
+                        class="edit-link"
+                        href="{{
+                        path(
+                            'app_document_file',
+                            {
+                                id: document.id,
+                                download: 1
+                            }
+                        )
+                        }}"
+                    >
+                        Télécharger
+                    </a>
+                {% else %}
+                    <a
+                        class="button button-secondary"
+                        href="{{ document.externalUrl }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Ouvrir le document <span class="visually-hidden">(nouvel onglet)</span>
+                    </a>
+                {% endif %}
+                {% if is_granted('DOCUMENT_DELETE', document) %}
+                    <a
+                        class="danger-link"
+                        href="{{
+                        path(
+                            'app_document_delete',
+                            {
+                                id: document.id
+                            }
+                        )
+                        }}"
+                        aria-label="Retirer le document {{ document.title }}"
+                    >
+                        Retirer
+                    </a>
+                {% endif %}
+            </div>
+        </li>
+    {% endfor %}
+</ul>

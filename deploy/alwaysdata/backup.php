@@ -11,6 +11,7 @@ if (PHP_SAPI !== 'cli') {
 
 umask(0077);
 $root = dirname(__DIR__, 2);
+$documentLock = null;
 
 try {
     require $root.'/vendor/autoload.php';
@@ -61,6 +62,16 @@ try {
         }
     }
 
+    $documentsDirectory = $root.'/var/documents';
+    if (is_link($documentsDirectory) || (!is_dir($documentsDirectory) && !mkdir($documentsDirectory, 0700))) {
+        throw new RuntimeException('Stockage des documents inaccessible.');
+    }
+    $documentLock = fopen($documentsDirectory.'/.storage.lock', 'c+b');
+    if (false === $documentLock || !flock($documentLock, LOCK_EX)) {
+        throw new RuntimeException('Les documents sont occupés. Réessaie la sauvegarde.');
+    }
+    chmod($documentsDirectory.'/.storage.lock', 0600);
+
     $directory =
         $root.'/var/private/backups/'.gmdate('Ymd-His').'-'.bin2hex(random_bytes(4));
     if (!mkdir($directory, 0700, true)) {
@@ -84,9 +95,41 @@ try {
             throw new RuntimeException('La sauvegarde des fichiers privés a échoué.');
         }
     }
+    // Le même verrou que l’upload garde la copie SQLite et ses PDF cohérents.
+    $tableExists = $copy->query("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'band_document'");
+    if (false !== $tableExists && 1 === (int) $tableExists->fetchColumn()) {
+        $documents = $copy->query('SELECT band_id, storage_key FROM band_document WHERE storage_key IS NOT NULL');
+        if (false === $documents) {
+            throw new RuntimeException('Liste des PDF illisible.');
+        }
+        foreach ($documents->fetchAll(PDO::FETCH_ASSOC) as $document) {
+            $bandId = (int) $document['band_id'];
+            $key = (string) $document['storage_key'];
+            if ($bandId < 1 || 1 !== preg_match('/^[a-f0-9]{32}\.pdf$/D', $key)) {
+                throw new RuntimeException('Chemin de PDF inattendu.');
+            }
+            $sourceDirectory = $documentsDirectory.'/'.$bandId;
+            $source = $sourceDirectory.'/'.$key;
+            $targetDirectory = $directory.'/documents/'.$bandId;
+            if (is_link($sourceDirectory) || is_link($source) || !is_file($source)) {
+                throw new RuntimeException('Un PDF de la base est absent du stockage.');
+            }
+            if (!is_dir($targetDirectory) && !mkdir($targetDirectory, 0700, true)) {
+                throw new RuntimeException('Copie des PDF impossible.');
+            }
+            if (!copy($source, $targetDirectory.'/'.$key) || !chmod($targetDirectory.'/'.$key, 0600)) {
+                throw new RuntimeException('Sauvegarde d’un PDF impossible.');
+            }
+        }
+    }
     fwrite(STDOUT, "Sauvegarde créée : $directory\n");
-    fwrite(STDOUT, "Elle contient la base et les accès privés, pas le code de l’application.\n");
+    fwrite(STDOUT, "Elle contient la base, les PDF hébergés et les accès privés, pas le code de l’application.\n");
 } catch (Throwable) {
     fwrite(STDERR, "Sauvegarde incomplète ou impossible. N’envoie pas la mise à jour.\n");
     exit(1);
+} finally {
+    if (is_resource($documentLock)) {
+        flock($documentLock, LOCK_UN);
+        fclose($documentLock);
+    }
 }

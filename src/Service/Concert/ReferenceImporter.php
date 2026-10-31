@@ -8,6 +8,7 @@ use App\Dto\Concert\ReferenceImportInput;
 use App\Entity\Concert;
 use App\Entity\PatchLine;
 use App\Entity\TechnicalSheet;
+use App\Service\Stage\StagePatchLinks;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class ReferenceImporter
@@ -15,6 +16,7 @@ final readonly class ReferenceImporter
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ReferenceImportPreview $previews,
+        private StagePatchLinks $stageLinks,
     ) {
     }
 
@@ -44,10 +46,13 @@ final readonly class ReferenceImporter
         $reference = $concert->getBand()->getReferenceSheet();
         $sheet = $concert->getPatchSheet();
         $this->entityManager->wrapInTransaction(function () use ($input, $reference, $sheet): void {
+            if (in_array('patch', $input->sections, true)) {
+                $this->replacePatch($reference, $sheet);
+            }
             foreach ($input->sections as $section) {
                 match ($section) {
-                    'patch' => $this->replacePatch($reference, $sheet),
-                    'stage' => $sheet->setStagePlan($reference->getStagePlan()),
+                    'patch' => null,
+                    'stage' => $sheet->setStagePlan($this->stageLinks->copyPlan($reference, $sheet)),
                     'equipment' => $sheet->setEquipmentRequests($reference->getEquipmentRequests()),
                     'notes' => $sheet
                         ->setBandName($reference->getBandName())
@@ -61,6 +66,7 @@ final readonly class ReferenceImporter
 
     private function replacePatch(TechnicalSheet $reference, TechnicalSheet $sheet): void
     {
+        $linkedPlan = $this->stageLinks->copyPlan($sheet, $reference);
         $existing = [];
         foreach ($sheet->getLines() as $line) {
             if ($line->isActive()) {
@@ -72,8 +78,9 @@ final readonly class ReferenceImporter
                 continue;
             }
             $channel = $source->getChannelNumber();
-            $line = $existing[$channel] ?? new PatchLine();
+            $line = $existing[$channel] ?? new PatchLine()->inheritSourceKey($source);
             $line
+                ->inheritSourceKey($source)
                 ->setChannelNumber($channel)
                 ->setSourceName($source->getSourceName())
                 ->setPreferredMicrophone($source->getPreferredMicrophone())
@@ -87,5 +94,6 @@ final readonly class ReferenceImporter
         foreach ($existing as $line) {
             $line->archive();
         }
+        $sheet->setStagePlan($linkedPlan);
     }
 }

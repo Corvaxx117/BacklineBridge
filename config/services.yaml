@@ -43,3 +43,10 @@ services:
               timeout: 5
               max_duration: 12
               max_redirects: 0
+
+when@test:
+    services:
+        App\Service\Document\DocumentStorage:
+            autowire: true
+            arguments:
+                $directory: '%env(resolve:DOCUMENT_TEST_DIRECTORY)%'

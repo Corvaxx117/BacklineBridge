@@ -56,11 +56,19 @@ final class StageItemType extends AbstractType
                 'required' => false,
                 'empty_data' => '',
                 'attr' => ['maxlength' => 250],
+            ])
+            ->add('patchSources', ChoiceType::class, [
+                'label' => 'Entrées du patch',
+                'choices' => $options['patch_choices'],
+                'multiple' => true,
+                'required' => false,
+                'invalid_message' => 'Une source choisie n’est plus disponible dans ce patch. Recharge le plan.',
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => StageItemInput::class]);
+        $resolver->setDefaults(['data_class' => StageItemInput::class, 'patch_choices' => []]);
+        $resolver->setAllowedTypes('patch_choices', 'array');
     }
 }

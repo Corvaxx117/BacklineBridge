@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Retirer le document · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <a
+        class="back-link"
+        href="{{
+        path(
+            'app_document_index',
+            {
+                id: band.id
+            }
+        )
+        }}"
+    >
+        ← Revenir aux documents
+    </a>
+    <section class="form-heading" aria-labelledby="page-title">
+        <p class="eyebrow">
+            {{ band.name }} / Documents
+        </p>
+        <h1 id="page-title">Retirer ce document<span class="title-period">?</span></h1>
+    </section>
+    <section
+        class="form-panel confirmation-panel"
+        aria-label="Confirmation de suppression du document"
+    >
+        <h2>{{ document.title }}</h2>
+        <p>
+            {{ document.pdf
+                ? 'Le PDF sera supprimé du serveur et l’espace correspondant sera libéré. Cette action est définitive.'
+                : 'Le lien sera retiré de BacklineBridge. Le fichier reste chez son hébergeur.' }}
+        </p>
+        <form
+            action="{{
+            path(
+                'app_document_delete',
+                {
+                    id: document.id
+                }
+            )
+            }}"
+            method="post"
+            class="form-actions"
+        >
+            <input
+                type="hidden"
+                name="_token"
+                value="{{ csrf_token('document_delete_' ~ document.id) }}"
+            />
+            <button class="button button-danger" type="submit">Retirer le document</button>
+            <a
+                class="button button-secondary"
+                href="{{
+                path(
+                    'app_document_index',
+                    {
+                        id: band.id
+                    }
+                )
+                }}"
+            >
+                Conserver le document
+            </a>
+        </form>
+    </section>
+{% endblock %}

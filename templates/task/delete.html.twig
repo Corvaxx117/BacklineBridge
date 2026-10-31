@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Supprimer la tâche · {{ app_name }}
+{% endblock %}
+
+{% block body %}
+    <a
+        class="back-link"
+        href="{{
+        path(
+            'app_task_index',
+            {
+                id: band.id
+            }
+        )
+        }}"
+    >
+        ← Revenir au To Do
+    </a>
+    <section class="form-heading" aria-labelledby="page-title">
+        <p class="eyebrow">
+            {{ band.name }} · To Do
+        </p>
+        <h1 id="page-title">Supprimer la tâche<span class="title-period">?</span></h1>
+    </section>
+    <section
+        class="form-panel confirmation-panel task-confirmation"
+        aria-label="Confirmation de suppression de la tâche"
+    >
+        <h2>{{ task.title }}</h2>
+        <p>
+            Cette tâche sera retirée du tableau pour tout le groupe. Cette action est définitive.
+        </p>
+        <form method="post" class="form-actions">
+            <input type="hidden" name="_token" value="{{ csrf_token('task_delete_' ~ task.id) }}" />
+            <input type="hidden" name="revision" value="{{ task.revision }}" />
+            <button class="button button-danger" type="submit">Supprimer la tâche</button>
+            <a
+                class="cancel-link"
+                href="{{
+                path(
+                    'app_task_index',
+                    {
+                        id: band.id
+                    }
+                )
+                }}"
+            >
+                Conserver la tâche
+            </a>
+        </form>
+    </section>
+{% endblock %}
