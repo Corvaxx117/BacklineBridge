@@ -22,6 +22,8 @@ Les contacts et documents passent par `Controller/Concert/Contact/` et `Controll
 
 `ConcertRemover` retire le dossier d’une date dans une transaction, en vérifiant sa version. Les clés étrangères retirent ses contacts et détachent ses documents, qui restent dans la bibliothèque. Les styles de ces espaces sont dans `public/styles/collaboration.css`.
 
+Les éléments du plan peuvent référencer les sources du patch par `patchSources`. La colonne `patch_line.source_key` garde une identité stable, indépendante du numéro de canal et conservée lors d’une copie. `StagePatchLinks` limite les choix à la fiche courante, prépare l’affichage et adapte les liens lors des imports. La publication ne conserve que les repères déjà résolus : elle ne relit pas le patch actuel. Les mêmes symboles SVG sont utilisés dans le navigateur et dans le PDF.
+
 ## Présenter le code
 
 PHP-CS-Fixer applique le style Symfony au PHP. Prettier s’occupe de Twig, JavaScript, CSS et de la configuration. Quatre espaces, deux pour GitHub et Docker Compose ; viser 100 caractères par ligne et répartir les longs arguments pour faciliter la lecture.

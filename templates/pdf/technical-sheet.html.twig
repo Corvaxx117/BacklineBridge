@@ -184,7 +184,12 @@
                                 {% for item in dossier.stagePlan %}
                                     <tr>
                                         <td>{{ item.label }}</td>
-                                        <td>{{ item.notes ? : '-' }}</td>
+                                        <td>
+                                            {{ item.notes ? : '-' }}
+                                            {% if item.patchLabel|default('') %}
+                                                <br /><strong>{{ item.patchLabel }}</strong>
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

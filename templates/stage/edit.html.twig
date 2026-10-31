@@ -98,6 +98,12 @@
                 Touchez ou cliquez pour ajouter. À la souris, vous pouvez aussi glisser sur la
                 scène.
             </p>
+            <div class="stage-palette-filters" role="group" aria-label="Famille d’éléments">
+                <button type="button" data-stage-filter="scene" aria-pressed="true">Scène</button>
+                <button type="button" data-stage-filter="audio" aria-pressed="false">
+                    Micros et DI
+                </button>
+            </div>
             <div class="stage-palette-items">
                 {% for label, kind in constant('App\\Dto\\Stage\\StageItemInput::KINDS') %}
                     <button
@@ -105,6 +111,22 @@
                         class="stage-palette-item"
                         data-add-stage-kind="{{ kind }}"
                         data-label="{{ label }}"
+                        data-source-limit="{{ constant(
+                            'App\\Dto\\Stage\\StageItemInput::SOURCE_LIMITS'
+                        )[kind]|default(12) }}"
+                        data-stage-family="{{
+                        kind
+                            in [
+                                'mic_vocal',
+                                'mic_instrument',
+                                'stand_straight',
+                                'stand_boom',
+                                'di_mono',
+                                'di_stereo'
+                            ]
+                            ? 'audio'
+                            : 'scene'
+                        }}"
                         draggable="false"
                         aria-label="Ajouter : {{ label }}"
                     >
@@ -178,12 +200,13 @@
                     </output>{{ tools.tool('grow', 'Agrandir l’élément', 'plus') }}
                 </div>
                 <div class="stage-tool-group">
-                    {{ tools.tool('text', 'Modifier le nom et les précisions', 'text') }}{{
+                    {{ tools.tool('text', 'Modifier le nom et les précisions', 'text') }}
+                    {{ tools.tool('patch', 'Relier aux entrées du patch', 'link') }}{{
                         tools.tool('duplicate', 'Dupliquer l’élément', 'duplicate')
                     }}{{ tools.tool('delete', 'Supprimer l’élément', 'trash') }}
                 </div>
                 <div class="stage-context-properties" data-stage-properties hidden>
-                    <div class="field">
+                    <div class="field" data-stage-text-field>
                         <label for="stage-selected-name">Nom de l’élément</label>
                         <input
                             id="stage-selected-name"
@@ -192,7 +215,7 @@
                             data-stage-name
                         />
                     </div>
-                    <div class="field">
+                    <div class="field" data-stage-text-field>
                         <label for="stage-selected-notes">Précisions (facultatif)</label>
                         <textarea
                             id="stage-selected-notes"
@@ -201,6 +224,28 @@
                             data-stage-notes
                         ></textarea>
                     </div>
+                    <fieldset class="stage-source-picker" data-stage-source-picker hidden>
+                        <legend>
+                            Entrées du patch
+                        </legend>
+                        <p>
+                            Choisis les sources associées à cet élément.
+                        </p>
+                        <label class="visually-hidden" for="stage-source-search">
+                            Filtrer les sources
+                        </label>
+                        <input
+                            id="stage-source-search"
+                            type="search"
+                            placeholder="Rechercher une source…"
+                            data-stage-source-search
+                        />
+                        <div class="stage-source-options" data-stage-source-options></div>
+                        <p data-stage-source-empty hidden>
+                            Aucune source correspondante.
+                        </p>
+                        <p class="field-help" data-stage-source-summary></p>
+                    </fieldset>
                     <button
                         type="button"
                         class="button button-secondary"
@@ -231,6 +276,19 @@
         {% endfor %}
     </div>
     {% do form.items.setRendered %}
+    <template data-stage-patch-choices>
+        {% for key, choice in patchChoices %}
+            <span
+                data-stage-source-option
+                data-key="{{ key }}"
+                data-label="{{ choice.label }}"
+                data-channel="{{ choice.channel }}"
+                data-available="{{ choice.available ? 'true' : 'false' }}"
+            >
+
+            </span>
+        {% endfor %}
+    </template>
     {% for label, kind in constant('App\\Dto\\Stage\\StageItemInput::KINDS') %}
         <template data-stage-icon="{{ kind }}">
             {{

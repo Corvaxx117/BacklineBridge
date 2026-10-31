@@ -43,6 +43,20 @@ Le plan est vu depuis le public. Cliquer sur un élément pour le déplacer ou a
 
 Les flèches déplacent la sélection, Suppr la retire et Échap la désélectionne. Utiliser **Annuler / Rétablir**, puis **Enregistrer le plan**.
 
+### Micros, pieds et DI sur le plan
+
+La palette propose deux familles : **Scène** et **Micros et DI**. La seconde contient un micro chant, un micro instrument, un pied droit, un pied perche, une DI mono et une DI stéréo. Les éléments se déplacent, tournent et se redimensionnent comme les autres.
+
+Pour les relier au patch :
+
+1. Sélectionner l’élément, puis le bouton **Relier aux entrées du patch**, représenté par une chaîne.
+2. Rechercher et cocher les sources concernées. Un micro ou une DI mono accepte une entrée ; une DI stéréo en accepte deux.
+3. Choisir **Terminer**, puis **Enregistrer le plan**.
+
+Les sources doivent déjà exister dans le patch de cette fiche. Le plan affiche leurs numéros de canal ; une renumérotation suit la même source. Une source retirée est signalée sur le plan et peut être décochée ou remplacée dans la sélection. Restaurer cette source rétablit son lien.
+
+Les associations sont reprises dans les copies de concert et les imports de référence. Chaque concert affiche les canaux de son propre patch. Le PDF reprend les repères ; une publication envoyée à une salle conserve les numéros qui existaient lors de son envoi.
+
 Le matériel est regroupé par catégorie. Adapter les quantités et précisions, ou ajouter un équipement. Les préférences d’amplis et l’IEM mono/stéréo restent à confirmer avec la salle.
 
 Un responsable peut supprimer une entrée du patch, annuler l’action ou la restaurer depuis la corbeille. Les autres canaux ne sont pas renumérotés. Un canal réutilisé doit être libéré avant une restauration.

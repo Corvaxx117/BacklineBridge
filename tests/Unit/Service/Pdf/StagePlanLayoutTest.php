@@ -9,6 +9,26 @@ use PHPUnit\Framework\TestCase;
 
 final class StagePlanLayoutTest extends TestCase
 {
+    public function testAllAudioSymbolsAndTheirPatchLabelsHaveSpaceInThePdf(): void
+    {
+        $kinds = ['mic_vocal', 'mic_instrument', 'stand_straight', 'stand_boom', 'di_mono', 'di_stereo'];
+        $items = array_map(static fn (string $kind): array => [
+            'kind' => $kind,
+            'label' => 'Élément audio',
+            'notes' => 'Précision',
+            'patchLabel' => 'Entrées 12, 13',
+            'x' => 50,
+            'y' => 50,
+        ], $kinds);
+        $layout = new StagePlanLayout()->prepare($items);
+        self::assertSame($kinds, array_column($layout['nodes'], 'kind'));
+        foreach ($layout['nodes'] as $node) {
+            self::assertSame(['Entrées 12, 13'], $node['patch']);
+            $lastBaseline = $node['labelY'] + count($node['label']) * 17 + count($node['notes']) * 13;
+            self::assertLessThanOrEqual($node['height'] / 2 - 2, $lastBaseline);
+        }
+    }
+
     public function testTransformsRemainInsideTheExportedViewport(): void
     {
         $layout = new StagePlanLayout()->prepare([

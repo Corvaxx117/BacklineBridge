@@ -9,6 +9,7 @@ use App\Entity\PatchLine;
 use App\Entity\TechnicalPublication;
 use App\Entity\TechnicalSheet;
 use App\Repository\PatchLineRepository;
+use App\Service\Stage\StagePatchLinks;
 use App\Service\Venue\PublicationBuilder;
 
 final readonly class TechnicalDossierFactory
@@ -16,6 +17,7 @@ final readonly class TechnicalDossierFactory
     public function __construct(
         private PatchLineRepository $lines,
         private PublicationBuilder $publications,
+        private StagePatchLinks $stageLinks,
     ) {
     }
 
@@ -47,7 +49,7 @@ final readonly class TechnicalDossierFactory
                 ],
                 $this->lines->findForSheet($sheet),
             ),
-            stagePlan: $sheet->getStagePlan(),
+            stagePlan: $this->stageLinks->present($sheet),
             equipment: $sheet->getEquipmentRequests(),
             documentLabel: $sheet->getDocumentLabel(),
         );

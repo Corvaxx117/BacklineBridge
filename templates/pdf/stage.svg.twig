@@ -102,6 +102,20 @@
                         {{ line }}
                     </text>
                 {% endfor %}
+                {% for line in node.patch %}
+                    <text
+                        x="0"
+                        y="{{
+                        node.labelY + (node.label|length) * 17 + (node.notes|length) * 13
+                            + loop.index0 * 12
+                        }}"
+                        font-size="10"
+                        font-weight="bold"
+                        fill="#24483f"
+                    >
+                        {{ line }}
+                    </text>
+                {% endfor %}
             </g>
         {% endfor %}
     </g>
