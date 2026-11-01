@@ -40,6 +40,7 @@ final class CreateAction extends AbstractController
     ): Response {
         $this->denyAccessUnlessGranted(BandVoter::COLLABORATE, $band);
         $input = new DocumentInput();
+        $concert = null;
         $concertId = $request->query->getInt('concert');
         if ($concertId > 0) {
             $concert = $entityManager->find(Concert::class, $concertId);
@@ -48,15 +49,24 @@ final class CreateAction extends AbstractController
             }
             $input->concert = $concert;
         }
+        $roadmap = null !== $concert && 'roadmap' === $request->query->getString('usage');
+        if ($roadmap) {
+            $input = DocumentInput::forRoadmap($concert);
+        }
         $form = $this->createForm(DocumentType::class, $input, [
             'band' => $band,
             'source' => $source,
+            'concert_context' => $concert,
+            'roadmap' => $roadmap,
             'validation_groups' => ['Default', $source->value],
         ])->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $document = $documents->create($band, $user, $input, $source);
-                $this->addFlash('success', 'Le document est maintenant partagé avec l’équipe.');
+                $this->addFlash('success', $roadmap
+                    ? 'La feuille de route est maintenant accessible à toute l’équipe.'
+                    : 'Le document est maintenant partagé avec l’équipe.',
+                );
 
                 if (null !== $document->getConcert()) {
                     return $this->redirectToRoute(
@@ -82,6 +92,8 @@ final class CreateAction extends AbstractController
             'band' => $band,
             'form' => $form,
             'source' => $source,
+            'concertContext' => $concert,
+            'roadmap' => $roadmap,
         ], new Response(status: $form->isSubmitted() ? 422 : 200));
     }
 }
