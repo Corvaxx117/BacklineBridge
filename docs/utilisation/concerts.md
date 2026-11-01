@@ -79,7 +79,13 @@ Le lien ouvre une **copie datée** du dossier technique, sans finances ni profil
 
 Toute personne possédant un lien valide peut l’utiliser. Créer un lien par interlocuteur ; le nom déclaré ne prouve pas son identité. Un lien local ne fonctionne que sur le Mac.
 
-La salle répond par catégorie : **À confirmer**, **Disponible**, **Alternative proposée** ou **Indisponible**. Une alternative nécessite une description. Les commandes groupées complètent les demandes encore à confirmer ; « Tout le groupe » remplace tous les choix explicitement. La dernière action groupée peut être annulée avant une modification individuelle.
+La salle répond par catégorie : **À confirmer**, **Disponible**, **Alternative proposée** ou **Indisponible**. Une alternative nécessite une description. Les commandes groupées complètent les demandes affichées encore à confirmer ; « Tout le groupe » remplace tous les choix affichés explicitement. Les réponses masquées par un filtre sont conservées. La dernière action groupée peut être annulée avant une modification individuelle.
+
+Le bouton **Confirmer le matériel** ouvre directement le formulaire, placé avant le plan de scène. Le nom ou la fonction du technicien se renseigne au début. Le plan reste consultable dans la même page. Les points techniques importants sont ouverts lors de la première réponse, puis repliables pour les visites suivantes.
+
+Le filtre **À confirmer** isole les demandes sans réponse ou les alternatives incomplètes. Après un premier enregistrement, cette vue est proposée par défaut ; le choix d’affichage est retenu dans l’onglet du navigateur. Une ligne qui vient d’être renseignée reste visible jusqu’à l’enregistrement pour permettre d’ajouter ses précisions. **Toutes les demandes** permet de revoir les réponses précédentes.
+
+Une barre fixe affiche la progression et le bouton **Enregistrer ma réponse**, également accessibles sur mobile. Masquer une réponse ne la retire pas du formulaire : ses valeurs restent transmises et conservées. Sans JavaScript, toutes les demandes et le bouton de fin de formulaire restent utilisables.
 
 Une réponse partielle peut être enregistrée et complétée plus tard. Le groupe la retrouve dans **Réponses de la salle**. Une alternative reste à valider avec le groupe.
 
