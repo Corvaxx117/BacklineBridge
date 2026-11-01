@@ -26,14 +26,16 @@ final class DocumentType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $band = $options['band'];
-        $builder
-            ->add('title', TextType::class, ['label' => 'Titre', 'attr' => ['maxlength' => 160]])
-            ->add('category', EnumType::class, [
+        $builder->add('title', TextType::class, ['label' => 'Titre', 'attr' => ['maxlength' => 160]]);
+        if (!$options['roadmap']) {
+            $builder->add('category', EnumType::class, [
                 'class' => DocumentCategory::class,
                 'choice_label' => static fn (DocumentCategory $category): string => $category->label(),
                 'label' => 'Catégorie',
-            ])
-            ->add('concert', EntityType::class, [
+            ]);
+        }
+        if (null === $options['concert_context']) {
+            $builder->add('concert', EntityType::class, [
                 'class' => Concert::class,
                 'label' => 'Concert associé',
                 'placeholder' => 'Document du groupe, sans concert particulier',
@@ -48,7 +50,9 @@ final class DocumentType extends AbstractType
                     ->where('concert.band = :band')
                     ->setParameter('band', $band)
                     ->orderBy('concert.date', 'DESC'),
-            ])
+            ]);
+        }
+        $builder
             ->add('description', TextareaType::class, [
                 'label' => 'Précisions',
                 'required' => false,
@@ -77,7 +81,11 @@ final class DocumentType extends AbstractType
         $resolver->setAllowedTypes('source', DocumentSource::class);
         $resolver->setDefaults([
             'data_class' => DocumentInput::class,
+            'concert_context' => null,
+            'roadmap' => false,
             'csrf_token_id' => 'band_document',
         ]);
+        $resolver->setAllowedTypes('concert_context', ['null', Concert::class]);
+        $resolver->setAllowedTypes('roadmap', 'bool');
     }
 }

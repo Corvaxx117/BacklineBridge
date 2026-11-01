@@ -9,9 +9,17 @@ L’onglet **Documents** réunit les PDF hébergés dans BacklineBridge et les l
 3. Donner un titre clair, choisir une catégorie et, si utile, le concert associé.
 4. Ajouter une précision puis partager avec l’équipe.
 
-Exemple : **Fiche technique — La Maroquinerie — 12 décembre 2026**, catégorie **Technique**, associée à la date concernée. Les catégories disponibles sont Technique, Contrats, Logistique, Communication et Autres documents.
+Exemple : **Fiche technique — La Maroquinerie — 12 décembre 2026**, catégorie **Technique**, associée à la date concernée. Les catégories disponibles sont Technique, Feuilles de route, Contrats, Logistique, Communication et Autres documents.
 
 Rechercher par titre ou précision, puis filtrer par catégorie. Les documents ajoutés depuis un concert apparaissent aussi dans la bibliothèque commune, avec un lien vers ce concert. Le nom de la personne ayant ajouté le document est affiché.
+
+## Feuille de route d’un concert
+
+Ouvrir le concert, rejoindre **Documents du concert**, puis cliquer sur **Ajouter la feuille de route**. Le titre, la catégorie et le concert sont déjà renseignés. Choisir le PDF reçu, ajouter une précision si utile et partager. L’onglet **Ajouter un lien** permet aussi de conserver un Google Doc ou un fichier déjà présent sur Drive.
+
+Le document apparaît sur le concert et dans la bibliothèque commune, avec la catégorie **Feuilles de route**. Les quatre musiciens, Marty et Romain peuvent tous effectuer cet ajout et consulter les fichiers partagés. Les régisseurs invités disposent d’un espace distinct.
+
+Depuis un concert, le rattachement à cette date est fixé par l’application. Le bouton de retour et l’annulation ramènent à ce concert. Depuis l’onglet Documents, il reste possible de choisir librement un concert du groupe.
 
 ## PDF ou lien ?
 

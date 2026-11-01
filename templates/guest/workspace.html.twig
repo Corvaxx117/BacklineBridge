@@ -16,22 +16,30 @@
                 Dossier #{{ publication.id }} · publié le {{ publication.publishedAt|date('d/m/Y à H:i') }}
             </p>
         </div>
-        <form
-            method="post"
-            action="{{
-            path(
-                'app_guest_exit',
-                {
-                    access: access
-                }
-            )
-            }}"
-        >
-            <input type="hidden" name="_token" value="{{ csrf_token('guest_exit_' ~ access) }}" />
-            <button class="button button-secondary" type="submit">Quitter cet accès</button>
-        </form>
+        <div class="guest-entry-actions">
+            <a class="button button-primary" href="#confirmation-materiel">Confirmer le matériel</a>
+            <form
+                method="post"
+                action="{{
+                path(
+                    'app_guest_exit',
+                    {
+                        access: access
+                    }
+                )
+                }}"
+            >
+                <input
+                    type="hidden"
+                    name="_token"
+                    value="{{ csrf_token('guest_exit_' ~ access) }}"
+                />
+                <button class="button button-secondary" type="submit">Quitter cet accès</button>
+            </form>
+        </div>
     </section>
     <nav class="dossier-nav" aria-label="Sections du dossier">
+        <a href="#confirmation-materiel">Confirmer le matériel</a>
         <a href="#plan-de-scene">Plan de scène</a>
         <a href="#backline">Matériel disponible</a>
         <a href="#patch-salle">Patch des entrées</a>
@@ -57,48 +65,15 @@
             </p>
         </section>
     {% endif %}
-    <section class="technical-panel" id="plan-de-scene">
-        <div class="panel-header">
-            <div>
-                <p class="eyebrow">
-                    Implantation prévue
-                </p>
-                <h2>Plan de scène</h2>
-            </div>
-            <span class="muted-caption">Vue depuis le public</span>
-        </div>
-        {% if snapshot.stagePlan %}
-            {{
-                include(
-                    'stage/_board.html.twig',
-                    {
-                        items: snapshot.stagePlan
-                    },
-                    with_context: false
-                )
-            }}
-        {% else %}
-            <p class="panel-message">
-                Le groupe n’a pas encore ajouté de plan.
-            </p>
-        {% endif %}
-    </section>
-    {% if snapshot.notices %}
-        <aside class="guest-notices">
-            <h2>À garder en tête</h2>
-            <ul>
-                {% for notice in snapshot.notices %}
-                    <li>{{ notice }}</li>
-                {% endfor %}
-            </ul>
-        </aside>
-    {% endif %}
     {{
         form_start(
             form,
             {
                 attr: {
                     class: 'venue-reply-form',
+                    id: 'venue-reply-form',
+                    'data-reply-saved': reply ? 'true' : 'false',
+                    'data-reply-view-key': invitation.id ~ ':' ~ publication.id,
                     novalidate: 'novalidate',
                     'data-venue-reply': ''
                 }
@@ -112,12 +87,57 @@
             </strong>{{ form_errors(form) }}
         </div>
     {% endif %}
-    <div class="reply-intro">
-        <h2>Le matériel à votre disposition</h2>
+    <div class="reply-intro" id="confirmation-materiel" tabindex="-1">
+        <h2>Confirmer le matériel</h2>
         <p>
             Renseignez une catégorie à la fois. Les réponses rapides complètent plusieurs demandes
             en un clic ; vous pouvez ensuite ajuster chaque ligne et préciser les alternatives.
         </p>
+    </div>
+    {% if snapshot.notices %}
+        <details class="guest-notices reply-notices" {{ reply ? '' : 'open' }}>
+            <summary>
+                Points techniques à lire · {{ snapshot.notices|length }}
+            </summary>
+            <ul>
+                {% for notice in snapshot.notices %}
+                    <li>{{ notice }}</li>
+                {% endfor %}
+            </ul>
+        </details>
+    {% endif %}
+    <div class="reply-respondent">
+        {{
+            include(
+                'technical/_field.html.twig',
+                {
+                    field: form.respondent,
+                    full: true
+                }
+            )
+        }}
+    </div>
+    <div class="reply-filters" data-reply-enhancement hidden>
+        <div class="reply-filter-options" role="group" aria-label="Afficher les demandes">
+            <button type="button" data-reply-filter="all" aria-pressed="true">
+                Toutes les demandes
+            </button>
+            <button type="button" data-reply-filter="pending" aria-pressed="false">
+                À confirmer <span data-reply-pending-count></span>
+            </button>
+        </div>
+        <p data-reply-filter-hint>
+            Les réponses masquées restent enregistrées.
+        </p>
+    </div>
+    <div class="reply-empty technical-panel" data-reply-empty hidden>
+        <h3>Toutes les demandes sont renseignées.</h3>
+        <p>
+            Vous pouvez revoir vos réponses ou laisser un message au groupe.
+        </p>
+        <button type="button" class="button button-secondary" data-reply-filter="all">
+            Voir toutes les demandes
+        </button>
     </div>
     <div class="reply-overview">
         <div>
@@ -142,7 +162,12 @@
         backline: 'gear_',
         'patch-salle': 'line_'
     } %}
-        <section class="reply-section" id="{{ section }}" aria-labelledby="{{ section }}-title">
+        <section
+            class="reply-section"
+            data-reply-section
+            id="{{ section }}"
+            aria-labelledby="{{ section }}-title"
+        >
             <div class="reply-section-heading">
                 <p class="eyebrow">
                     {{ section == 'backline'
@@ -189,7 +214,7 @@
     {% endfor %}
     {% do form.answers.setRendered %}
     <section class="reply-contact technical-panel" id="reponse">
-        <h2>Votre réponse</h2>
+        <h2>Un message pour le groupe ?</h2>
         {% if reply %}
             <p class="field-hint">
                 Dernier enregistrement : {{ reply.updatedAt|date('d/m/Y à H:i') }}. Vous pouvez
@@ -198,14 +223,6 @@
         {% endif %}
         <div class="form-grid">
             {{
-                include(
-                    'technical/_field.html.twig',
-                    {
-                        field: form.respondent,
-                        full: true
-                    }
-                )
-            }}{{
                 include(
                     'technical/_field.html.twig',
                     {
@@ -220,6 +237,43 @@
             <span class="field-hint">La réponse sera visible par l’équipe du groupe.</span>
         </div>
     </section>
+    <div class="reply-save-bar" data-reply-save-bar hidden>
+        <div class="reply-save-inner">
+            <div class="reply-save-summary" role="status" aria-live="polite">
+                <strong data-reply-save-progress>Votre réponse</strong>
+                <span data-reply-save-status>Vous pouvez enregistrer une réponse partielle.</span>
+            </div>
+            <button class="button button-primary" type="submit" data-reply-save-button>
+                Enregistrer ma réponse
+            </button>
+        </div>
+    </div>
     {{ form_end(form) }}
+    <section class="technical-panel" id="plan-de-scene">
+        <div class="panel-header">
+            <div>
+                <p class="eyebrow">
+                    Implantation prévue
+                </p>
+                <h2>Plan de scène</h2>
+            </div>
+            <span class="muted-caption">Vue depuis le public</span>
+        </div>
+        {% if snapshot.stagePlan %}
+            {{
+                include(
+                    'stage/_board.html.twig',
+                    {
+                        items: snapshot.stagePlan
+                    },
+                    with_context: false
+                )
+            }}
+        {% else %}
+            <p class="panel-message">
+                Le groupe n’a pas encore ajouté de plan.
+            </p>
+        {% endif %}
+    </section>
     <script src="/scripts/venue-reply.js" defer></script>
 {% endblock %}

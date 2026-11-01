@@ -6,12 +6,28 @@
     <div class="panel-header">
         <div>
             <p class="eyebrow">
-                Fiche de la salle, accès, contrat…
+                Feuille de route, fiche de la salle, accès, contrat…
             </p>
             <h2 id="concert-documents-title">Documents du concert</h2>
         </div>
         {% if is_granted('BAND_COLLABORATE', concert.band) %}
             <div class="collaboration-actions">
+                <a
+                    class="button button-primary"
+                    href="{{
+                    path(
+                        'app_document_create',
+                        {
+                            id: concert.band.id,
+                            source: 'pdf',
+                            concert: concert.id,
+                            usage: 'roadmap'
+                        }
+                    )
+                    }}"
+                >
+                    Ajouter la feuille de route
+                </a>
                 <a
                     class="button button-secondary"
                     href="{{
@@ -47,8 +63,8 @@
     </div>
     {% if documents is empty %}
         <p class="collaboration-empty">
-            Ajoute un PDF ou le lien d’un document partagé. Toute l’équipe le retrouvera ici et dans
-            l’onglet Documents.
+            Ajoute la feuille de route envoyée par la salle, un autre PDF ou le lien d’un document
+            partagé. Toute l’équipe le retrouvera ici et dans l’onglet Documents.
         </p>
     {% else %}
         {{

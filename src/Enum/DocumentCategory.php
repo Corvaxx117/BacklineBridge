@@ -7,6 +7,7 @@ namespace App\Enum;
 enum DocumentCategory: string
 {
     case Technical = 'technical';
+    case Roadmap = 'roadmap';
     case Contract = 'contract';
     case Logistics = 'logistics';
     case Promotion = 'promotion';
@@ -16,6 +17,7 @@ enum DocumentCategory: string
     {
         return match ($this) {
             self::Technical => 'Technique',
+            self::Roadmap => 'Feuilles de route',
             self::Contract => 'Contrats',
             self::Logistics => 'Logistique',
             self::Promotion => 'Communication',
