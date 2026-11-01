@@ -43,6 +43,19 @@ final class DocumentInput
     #[Assert\Length(max: 2048, groups: ['lien'])]
     public ?string $url = null;
 
+    public static function forRoadmap(Concert $concert): self
+    {
+        $input = new self();
+        $input->concert = $concert;
+        $input->category = DocumentCategory::Roadmap;
+        $prefix = 'Feuille de route — ';
+        $date = $concert->getDate()->format('d/m/Y');
+        $venueLength = 160 - mb_strlen($prefix.' — '.$date);
+        $input->title = $prefix.mb_substr($concert->getVenue(), 0, $venueLength).' — '.$date;
+
+        return $input;
+    }
+
     #[Assert\Callback(groups: ['lien'])]
     public function validateUrl(ExecutionContextInterface $context): void
     {
