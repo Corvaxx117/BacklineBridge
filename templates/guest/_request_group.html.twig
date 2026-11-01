@@ -37,7 +37,10 @@
             }}
         </span>
         <span class="material-group-title">
-            {{ category }}<span>{{ items|length }} demande{{ (items|length) > 1 ? 's' : '' }}</span>
+            {{ category }}<span data-group-request-count>{{ items|length }} demande{{ (items|length)
+                    > 1
+                    ? 's'
+                    : '' }}</span>
         </span>
         <span class="material-group-progress" data-group-progress>
             {{ answered }} / {{ items|length }} renseignées
