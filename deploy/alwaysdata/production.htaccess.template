@@ -25,3 +25,16 @@ RewriteRule ^ https://{{HOST}}%{REQUEST_URI} [R=308,L]
     Header always set Strict-Transport-Security "max-age=31536000"
     Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 </IfModule>
+
+# BEGIN BacklineBridge asset cache
+<IfModule mod_mime.c>
+    AddType text/javascript .mjs
+</IfModule>
+# Seuls les fichiers statiques versionnés peuvent être conservés dans le navigateur.
+# Les pages, documents privés et erreurs gardent la règle no-store ci-dessus.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(?:css|js|mjs|svg|ico|png|woff2?)$">
+        Header always set Cache-Control "private, max-age=31536000, immutable" "expr=(%{REQUEST_STATUS} == 200 || %{REQUEST_STATUS} == 304) && %{QUERY_STRING} =~ m#(^|&)v=[a-f0-9]{16}(&|$)#"
+    </FilesMatch>
+</IfModule>
+# END BacklineBridge asset cache

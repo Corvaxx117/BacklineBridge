@@ -33,15 +33,20 @@ final readonly class VenueWorkspace
             ->addOrderBy('i.id', 'DESC')
             ->getQuery()
             ->getResult();
+        $replies = [];
+        if ([] !== $invitations) {
+            foreach ($this->em->getRepository(VenueReply::class)->findBy(['invitation' => $invitations]) as $reply) {
+                $replies[$reply->getInvitation()->getId()] = $reply;
+            }
+        }
+        $currentFingerprint = $this->builder->fingerprint($this->builder->snapshot($concert));
         $rows = [];
         foreach ($invitations as $invitation) {
-            $reply = $this->em
-                ->getRepository(VenueReply::class)
-                ->findOneBy(['invitation' => $invitation]);
+            $reply = $replies[$invitation->getId()] ?? null;
             $rows[] = [
                 'invitation' => $invitation,
                 'reply' => $reply,
-                'outdated' => $this->builder->isOutdated($invitation->getPublication()),
+                'outdated' => $currentFingerprint !== $invitation->getPublication()->getFingerprint(),
                 'requests' => $this->builder->requests(
                     $invitation->getPublication()->getSnapshot(),
                 ),

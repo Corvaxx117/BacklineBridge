@@ -62,3 +62,7 @@ php bin/console cache:clear --env=dev
 ```
 
 Ces commandes actualisent Composer et Symfony. Elles ne remplacent pas l’analyse de l’erreur si elle apparaît aussi dans `composer quality`.
+
+## Outils frontend
+
+Utiliser Node.js 22 ou plus récent pour `npm ci`, la préparation des fichiers publics et les tests navigateur. Après une modification des styles ou scripts, lancer `npm run assets` pour renouveler leurs versions. Voir [Performances](performance.md).

@@ -1,0 +1,337 @@
+/* Création et disponibilité de l’équipe */
+.concert-creator {
+    margin-top: 10px;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+.concert-availability-link {
+    display: inline-block;
+    margin-top: 8px;
+    color: var(--success-text);
+    font-size: 12px;
+    text-underline-offset: 4px;
+}
+.availability-panel {
+    margin: 28px 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    overflow: hidden;
+    scroll-margin-top: 24px;
+}
+.availability-counter {
+    color: var(--success-text);
+    font-size: 13px;
+    white-space: nowrap;
+}
+.availability-roster {
+    list-style: none;
+    margin: 0;
+    padding: 0 28px;
+}
+.availability-person {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    padding: 15px 0;
+    border-top: 1px solid var(--border);
+}
+.availability-person strong {
+    font-size: 14px;
+    font-weight: 600;
+}
+.availability-person p {
+    margin: 6px 0;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+.availability-person small,
+.availability-you {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: normal;
+}
+.availability-badge {
+    flex-shrink: 0;
+    padding: 6px 10px;
+    border-radius: 20px;
+    background: var(--surface-muted);
+    color: var(--text-muted);
+    font-size: 11px;
+}
+.availability-available {
+    background: var(--success-bg);
+    color: var(--success-text);
+}
+.availability-unavailable {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+}
+.availability-alert,
+.availability-complete {
+    margin: 0 28px 16px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    background: var(--danger-bg);
+    color: var(--danger-text);
+    font-size: 13px;
+}
+.availability-complete {
+    background: var(--success-bg);
+    color: var(--success-text);
+}
+.availability-response {
+    margin: 6px 28px 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+.availability-form {
+    display: grid;
+    gap: 18px;
+}
+.availability-form > .button {
+    justify-self: start;
+}
+.availability-choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+.availability-choices legend {
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+.availability-choice {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+}
+.availability-choice:has(input:checked) {
+    background: var(--success-bg);
+    border-color: var(--border-strong);
+}
+.availability-choice input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--success-fill);
+}
+.availability-comment summary {
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+.availability-comment .field {
+    margin-top: 16px;
+}
+.availability-comment textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font: inherit;
+}
+.availability-comment .help-text {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+/* Import volontaire de la fiche de référence */
+.reference-import-notice {
+    padding: 20px 24px;
+    margin-bottom: 26px;
+    background: var(--warning-bg);
+    border: 1px solid var(--warning-border);
+    border-radius: 9px;
+    font-size: 13px;
+    line-height: 1.8;
+}
+.reference-import-notice p {
+    margin: 8px 0 0;
+}
+.reference-comparisons {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+.reference-comparison {
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--surface);
+    overflow: hidden;
+}
+.reference-comparison > summary {
+    padding: 20px 24px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+}
+.reference-comparison > summary span {
+    margin-left: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 12px;
+}
+.reference-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--border);
+}
+.reference-columns > section {
+    padding: 22px;
+    min-width: 0;
+}
+.reference-columns > section + section {
+    border-left: 1px solid var(--border);
+    background: var(--success-bg);
+}
+.reference-columns h2 {
+    margin: 0 0 18px;
+    color: var(--success-text);
+    font-size: 15px;
+}
+.reference-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+}
+.reference-items li {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    overflow-wrap: anywhere;
+}
+.reference-items li:last-child {
+    border-bottom: 0;
+}
+.reference-items strong,
+.reference-items span,
+.reference-items small {
+    display: block;
+    margin-bottom: 4px;
+}
+.reference-items small {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+.reference-items p {
+    margin: 5px 0 0;
+    line-height: 1.7;
+}
+.reference-import-form form {
+    display: grid;
+    gap: 22px;
+}
+.reference-import-form input[type='checkbox'] {
+    flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    accent-color: var(--success-fill);
+    margin: 2px 0 0;
+}
+@media (max-width: 780px) {
+    .reference-columns {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .reference-columns > section + section {
+        border-left: 0;
+        border-top: 1px solid var(--border);
+    }
+    .availability-roster {
+        padding: 0 20px;
+    }
+    .availability-response {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+    .availability-panel .panel-header {
+        align-items: flex-start;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+}
+@media (max-width: 550px) {
+    .availability-choice {
+        padding: 10px;
+        font-size: 12px;
+    }
+    .availability-person {
+        align-items: flex-start;
+    }
+    .reference-comparison > summary span {
+        display: block;
+        margin: 6px 0 0 17px;
+    }
+}
+.technical-heading {
+    flex-wrap: wrap;
+}
+.technical-heading p {
+    flex: 1 1 320px;
+}
+.reference-import-form {
+    padding: 24px;
+}
+.reference-selection {
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+.reference-selection legend {
+    margin-bottom: 14px;
+    font-size: 14px;
+    font-weight: 600;
+}
+.reference-section-choices {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+}
+.reference-section-choices label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+}
+.reference-section-choices label:has(input:checked) {
+    background: var(--success-bg);
+    border-color: var(--border-strong);
+}
+.reference-confirmation {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 1.7;
+    cursor: pointer;
+}
+.reference-import-form .form-actions {
+    margin: 0;
+    padding: 20px 0 0;
+    background: transparent;
+    flex-wrap: wrap;
+}
+.availability-form > ul,
+.reference-import-form form > ul {
+    color: var(--danger-text);
+    font-size: 13px;
+    padding-left: 20px;
+}
+
+.form-panel > .availability-form {
+    padding: 24px;
+}

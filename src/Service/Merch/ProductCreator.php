@@ -9,7 +9,7 @@ use App\Entity\Band;
 use App\Entity\MerchProduct;
 use App\Entity\MerchVariant;
 use App\Entity\User;
-use App\Service\Finance\MusicianAccess;
+use App\Service\Security\MusicianAccess;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 

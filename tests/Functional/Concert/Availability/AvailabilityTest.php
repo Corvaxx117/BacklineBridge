@@ -53,7 +53,9 @@ final class AvailabilityTest extends DatabaseTestCase
         self::assertSelectorTextContains('.availability-counter', '0 / 5');
         self::assertSelectorExists('.availability-response[open]');
         self::assertSelectorExists('.availability-details:not([open])');
-        self::assertSelectorCount(5, 'details[data-concert-section]:not([open])');
+        foreach (['concert-documents', 'concert-contacts', 'concert-conditions', 'dossier-technique', 'concert-calendar-section'] as $section) {
+            self::assertSelectorExists('details#'.$section.':not([open])');
+        }
         $this->client->request('GET', '/concerts');
         self::assertSelectorTextContains('.concert-creator', 'Responsable de test');
         self::assertSelectorTextContains('.concert-availability-link', 'À confirmer');

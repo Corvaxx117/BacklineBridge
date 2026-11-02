@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Service\Concert;
 
 use App\Entity\Concert;
-use App\Entity\PatchLine;
 use App\Entity\TechnicalSheet;
 use App\Entity\User;
 use App\Enum\ConcertStatus;
 use App\Repository\BandMembershipRepository;
+use App\Service\Patch\PatchLineCopier;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class ConcertCreator
@@ -18,6 +18,7 @@ final readonly class ConcertCreator
         private EntityManagerInterface $entityManager,
         private ConcertAvailabilityManager $availability,
         private BandMembershipRepository $memberships,
+        private PatchLineCopier $copier,
     ) {
     }
 
@@ -66,16 +67,7 @@ final readonly class ConcertCreator
             if (!$source->isActive()) {
                 continue;
             }
-            $sheet->addLine(
-                new PatchLine()
-                    ->inheritSourceKey($source)
-                    ->setChannelNumber($source->getChannelNumber())
-                    ->setSourceName($source->getSourceName())
-                    ->setPreferredMicrophone($source->getPreferredMicrophone())
-                    ->setStand($source->getStand())
-                    ->setNotes($source->getNotes())
-                    ->setSection($source->getSection()),
-            );
+            $sheet->addLine($this->copier->copy($source));
         }
 
         $band =

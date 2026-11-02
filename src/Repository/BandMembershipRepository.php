@@ -8,26 +8,32 @@ use App\Entity\Band;
 use App\Entity\BandMembership;
 use App\Entity\User;
 use App\Enum\BandRole;
+use App\Service\Security\ReadRequestCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /** @extends ServiceEntityRepository<BandMembership> */
 class BandMembershipRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, private readonly ReadRequestCache $reads)
     {
         parent::__construct($registry, BandMembership::class);
     }
 
     public function roleFor(User $user, Band $band): ?BandRole
     {
-        // Relire l'adhésion à chaque décision prend en compte sa révocation, même en session active.
-        return $this->findOneBy(['user' => $user, 'band' => $band])?->getRole();
+        return $this->reads->remember(
+            'role.'.$user->getId().'.'.$band->getId(),
+            fn (): ?BandRole => $this->findOneBy(['user' => $user, 'band' => $band])?->getRole(),
+        );
     }
 
     public function firstRoleFor(User $user): ?BandRole
     {
-        return $this->findOneBy(['user' => $user], ['band' => 'ASC'])?->getRole();
+        return $this->reads->remember(
+            'first_role.'.$user->getId(),
+            fn (): ?BandRole => $this->findOneBy(['user' => $user], ['band' => 'ASC'])?->getRole(),
+        );
     }
 
     /** @return list<BandMembership> */

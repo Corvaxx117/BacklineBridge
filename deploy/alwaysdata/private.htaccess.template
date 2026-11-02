@@ -30,3 +30,16 @@ SetEnvIf X-Forwarded-Proto "^https$" HTTPS=on
     Header always set X-Content-Type-Options "nosniff"
     Header always set Cache-Control "private, no-store"
 </IfModule>
+
+# BEGIN BacklineBridge asset cache
+<IfModule mod_mime.c>
+    AddType text/javascript .mjs
+</IfModule>
+# Seuls les fichiers statiques versionnés peuvent être conservés dans le navigateur.
+# Les pages, documents privés et erreurs gardent la règle no-store ci-dessus.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(?:css|js|mjs|svg|ico|png|woff2?)$">
+        Header always set Cache-Control "private, max-age=31536000, immutable" "expr=(%{REQUEST_STATUS} == 200 || %{REQUEST_STATUS} == 304) && %{QUERY_STRING} =~ m#(^|&)v=[a-f0-9]{16}(&|$)#"
+    </FilesMatch>
+</IfModule>
+# END BacklineBridge asset cache

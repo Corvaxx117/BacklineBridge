@@ -9,14 +9,14 @@ Les contrôleurs reçoivent les actions ; les services appliquent les règles ; 
 | `src/Controller/` | Une action par classe, rangée par fonctionnalité |
 | `src/Service/` | Création de concerts, import, ventes, disponibilités… |
 | `src/Entity/`, `src/Repository/` | Données et recherches |
-| `src/Form/`, `src/Dto/`, `src/Validator/` | Saisie et vérifications |
+| `src/Form/`, `src/Dto/`, `src/Validator/`, `src/ValueObject/` | Saisie et vérifications |
 | `src/Security/Voter/` | Autorisations côté serveur |
 | `src/Integration/Bandsintown/`, `src/Integration/GoogleCalendar/` | Clients API et lecture des réponses |
 | `templates/`, `public/styles/`, `public/scripts/` | Pages, styles et interactions |
 | `templates/pdf/`, `src/Service/Pdf/` | PDF et dessin du plan, avec Dompdf |
 | `migrations/`, `tests/` | Évolution des tables et vérifications automatiques |
 
-Les adaptations aux petits écrans sont regroupées dans `public/styles/responsive.css`. `navigation.js` gère le menu mobile et le sous-menu « Le groupe » (fermeture par Échap ou clic extérieur) ; `stage-viewer.js` cadre et zoome le plan sans modifier ses coordonnées enregistrées.
+Les feuilles métier sont choisies par `branding/_styles.html.twig` ; `technical.css`, `concert-team.css` et `group.css` complètent le socle commun. Les adaptations aux petits écrans sont regroupées dans `public/styles/responsive.css`. `navigation.js` gère le menu mobile et le sous-menu « Le groupe » (fermeture par Échap ou clic extérieur) ; `stage-viewer.js` cadre et zoome le plan sans modifier ses coordonnées enregistrées.
 
 Les contacts et documents passent par `Controller/Concert/Contact/` et `Controller/Document/`, avec des DTO de saisie et des services dédiés. `DocumentStorage` garde les PDF hors de `public/`, contrôle leur taille et sérialise les changements de fichiers avec un verrou partagé par la sauvegarde. Les formulaires vérifient le type réel du fichier avec Symfony Mime. `DocumentVoter` vérifie l’accès au groupe avant chaque lecture ou retrait.
 
@@ -85,7 +85,7 @@ Le compte de service reçoit uniquement les droits accordés par le partage Goog
 
 L’identifiant envoyé à Google est calculé à partir du groupe, du concert et de `GOOGLE_CALENDAR_NAMESPACE`. Après un doublon HTTP 409, le client relit l’événement et vérifie son marqueur privé ; il ne fait jamais de mise à jour ou de suppression. L’identifiant d’installation doit rester stable. La synchronisation dans les deux sens est hors du périmètre actuel.
 
-Les fichiers FullCalendar sont copiés dans `public/vendor/fullcalendar/` et versionnés pour être déployés sans Node.js sur le serveur. Notre code d’interface reste dans `public/scripts/calendar.js` et `public/styles/calendar-grid.css`. Après une mise à jour npm de FullCalendar, lancer `npm run calendar:assets`. La CI vérifie leur conformité au verrou npm avec `npm run calendar:assets:check`. Les fichiers tiers conservent leur licence et sont exclus de Prettier.
+Les vues Mois et Semaine de FullCalendar sont regroupées et minifiées avec esbuild ; les styles et la licence sont copiés dans `public/vendor/fullcalendar/` et versionnés pour être déployés sans Node.js sur le serveur. Notre code d’interface reste dans `public/scripts/calendar.js` et `public/styles/calendar-grid.css`. Après une mise à jour npm de FullCalendar, lancer `npm run calendar:assets`, puis `npm run assets`. La CI vérifie leur conformité au verrou npm avec `npm run calendar:assets:check`. Les fichiers tiers conservent leur licence et sont exclus de Prettier.
 
 ## Thèmes clair et sombre
 
@@ -100,3 +100,15 @@ Le changement émet `backlinebridge:themechange` ; le calendrier y répond en me
 ## Vue d’ensemble du concert
 
 `concert/show.html.twig` privilégie la réponse personnelle et les notes. Les sections secondaires utilisent des éléments HTML `details` : ouverture au clavier et fonctionnement sans JavaScript. `concert-details.js` ouvre la section visée par un lien direct ou un retour de formulaire. Les styles propres à cette page sont dans `concert-detail.css`. La présentation ne modifie ni les droits ni les données enregistrées.
+
+## Setlists internes
+
+`Setlist` conserve une liste ordonnée de titres pour une fiche de référence ou de concert, dans une table séparée. La fiche technique ne porte pas cette relation : les données préparées pour les publications, les salles et les PDF restent inchangées. Supprimer une fiche retire sa setlist par clé étrangère.
+
+Les deux contrôleurs de `Controller/Setlist/` délèguent à `SetlistManager`. `BAND_SETLIST` et le service vérifient le profil Musicien et le rôle Responsable ; la lecture utilise les droits existants sur les fiches et concerts. `SetlistContent` vérifie les titres. La version du formulaire et la version Doctrine empêchent un enregistrement périmé de remplacer celui d’un autre membre. L’import vérifie la référence et le concert dans la même transaction et exige une confirmation avant remplacement.
+
+L’encart utilise `templates/setlist/` et `public/styles/setlist.css`, avec les couleurs du thème. Le mécanisme existant de `concert-details.js` ouvre aussi `#setlist` sur la fiche de référence. Aucun nouveau script ou paquet n’est nécessaire.
+
+## Optimisations et tests navigateur
+
+Les requêtes ciblées, les caches privés, le découpage des styles et les parcours navigateur sont décrits dans [Performances](performance.md). Les tests de lecture imposent un nombre de requêtes borné ; les tests navigateur protègent les gestes du plan et les réponses groupées de salle. `MusicianAccess` est partagé depuis `Service/Security/`.

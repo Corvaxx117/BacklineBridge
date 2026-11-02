@@ -63,9 +63,35 @@ services:
               max_duration: 12
               max_redirects: 0
 
+    google_auth.http_client:
+        class: GuzzleHttp\Client
+        autowire: false
+        autoconfigure: false
+        arguments:
+            - connect_timeout: 3
+              timeout: 8
+              allow_redirects: false
+
+    cache.google_tokens:
+        class: Symfony\Component\Cache\Adapter\FilesystemAdapter
+        factory: ['@App\Service\Cache\PrivateCacheFactory', 'create']
+        arguments: ['google-tokens', 3500, '%kernel.cache_dir%/private/google-tokens']
+        tags: [cache.pool]
+
 when@test:
     services:
         App\Service\Document\DocumentStorage:
             autowire: true
             arguments:
                 $directory: '%env(resolve:DOCUMENT_TEST_DIRECTORY)%'
+
+        App\Tests\Support\QueryCounter:
+            public: true
+            tags:
+                - { name: kernel.reset, method: reset }
+
+        test.query_counter_middleware:
+            class: Doctrine\DBAL\Logging\Middleware
+            arguments: ['@App\Tests\Support\QueryCounter']
+            tags:
+                - { name: doctrine.middleware, connection: default }

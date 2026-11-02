@@ -5,8 +5,9 @@
 {% endblock %}
 
 {% block page_assets %}
-    <link rel="stylesheet" href="/styles/concert-detail.css" />
-    <script src="/scripts/concert-details.js" defer></script>
+    <link rel="stylesheet" href="{{ asset('/styles/concert-detail.css') }}" />
+    <link rel="stylesheet" href="{{ asset('/styles/setlist.css') }}" />
+    <script src="{{ asset('/scripts/concert-details.js') }}" defer></script>
 {% endblock %}
 
 {% block body %}
@@ -69,7 +70,18 @@
     {% if concert.notes %}
         <section class="concert-notes" aria-labelledby="concert-notes-title">
             <div class="concert-notes-heading">
-                <h2 id="concert-notes-title">Notes</h2>
+                <h2 id="concert-notes-title" class="concert-section-label">
+                    {{
+                        include(
+                            'concert/_section_icon.html.twig',
+                            {
+                                icon: 'notes'
+                            },
+                            with_context: false
+                        )
+                    }}
+                    <span>Notes</span>
+                </h2>
                 {% if is_granted('CONCERT_UPDATE', concert) %}
                     <a
                         class="edit-link"
@@ -91,6 +103,17 @@
             </p>
         </section>
     {% endif %}
+    {{
+        include(
+            'setlist/_panel.html.twig',
+            {
+                sheet: sheet,
+                setlist: setlist,
+                referenceSetlist: referenceSetlist
+            },
+            with_context: false
+        )
+    }}
     {{
         include(
             'concert/document/_panel.html.twig',
@@ -133,6 +156,7 @@
                 'concert/_section_summary.html.twig',
                 {
                     title: 'Dossier technique',
+                    icon: 'technical',
                     titleId: 'technical-dossier-title',
                     meta: (lines|length) ~ ' sources · plan et matériel'
                 },
@@ -270,6 +294,7 @@
                     'concert/_section_summary.html.twig',
                     {
                         title: 'Google Agenda',
+                        icon: 'calendar',
                         titleId: 'concert-calendar-section-title',
                         meta: calendarName
                     },
@@ -286,6 +311,7 @@
                     'concert/_section_summary.html.twig',
                     {
                         title: 'Annonce Bandsintown',
+                        icon: 'bandsintown',
                         titleId: 'concert-bandsintown-title',
                         meta: 'Adresse et billetterie'
                     },

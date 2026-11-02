@@ -65,23 +65,25 @@ final readonly class TreasuryRepository
             ->getSingleScalarResult();
     }
 
-    /** @return list<TreasuryEntry> */
-    public function chartEntries(Band $band, \DateTimeImmutable $since): array
+    /** @return list<array{month: string, kind: string, amount: int}> */
+    public function monthlyTotals(Band $band, \DateTimeImmutable $since): array
     {
-        return $this->em
-            ->createQueryBuilder()
-            ->select('entry')
-            ->from(TreasuryEntry::class, 'entry')
-            ->join('entry.account', 'account')
-            ->where('account.band = :band')
-            ->andWhere('entry.occurredOn >= :since')
-            ->andWhere('entry.cancelledAt IS NULL')
-            ->andWhere('entry.kind IN (:kinds)')
-            ->setParameter('band', $band)
-            ->setParameter('since', $since)
-            ->setParameter('kinds', ['income', 'expense'])
-            ->getQuery()
-            ->getResult();
+        $rows = $this->em->getConnection()->fetchAllAssociative(
+            <<<'SQL'
+                SELECT strftime('%Y-%m', entry.occurred_on) AS month, entry.kind,
+                    SUM(entry.amount_cents) AS amount
+                FROM treasury_entry entry
+                JOIN treasury_account account ON account.id = entry.account_id
+                WHERE account.band_id = :band AND entry.occurred_on >= :since
+                    AND entry.cancelled_at IS NULL AND entry.kind IN ('income', 'expense')
+                GROUP BY month, entry.kind
+                SQL,
+            ['band' => $band->getId(), 'since' => $since->format('Y-m-d')],
+        );
+
+        return array_map(static fn (array $row): array => [
+            'month' => $row['month'], 'kind' => $row['kind'], 'amount' => (int) $row['amount'],
+        ], $rows);
     }
 
     /** @return list<FinanceNote> */

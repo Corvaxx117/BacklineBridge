@@ -37,12 +37,22 @@ final readonly class CalendarReader
         $tag = $this->configuration->cacheKey();
         $key = $tag.'.'.$period->from->format('Ymd').'.'.$period->until->format('Ymd');
 
-        return $this->cache->get($key, function (ItemInterface $item) use ($period, $tag): AgendaListing {
+        $result = $this->cache->get($key, function (ItemInterface $item) use ($period, $tag): AgendaListing|string {
             $item->expiresAfter(300);
             $item->tag($tag);
+            try {
+                return $this->google->events($period->from, $period->until);
+            } catch (GoogleCalendarUnavailable $exception) {
+                $item->expiresAfter(20);
 
-            return $this->google->events($period->from, $period->until);
+                return $exception->getMessage();
+            }
         });
+        if (is_string($result)) {
+            throw new GoogleCalendarUnavailable($result);
+        }
+
+        return $result;
     }
 
     public function invalidate(): void

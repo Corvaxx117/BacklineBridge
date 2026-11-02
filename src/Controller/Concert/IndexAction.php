@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller\Concert;
 
 use App\Entity\User;
-use App\Repository\ConcertAvailabilityRepository;
 use App\Repository\ConcertRepository;
 use App\Repository\TechnicalSheetRepository;
 use App\Security\Voter\BandVoter;
@@ -21,15 +20,14 @@ final class IndexAction extends AbstractController
         #[CurrentUser] User $user,
         ConcertRepository $concerts,
         TechnicalSheetRepository $sheets,
-        ConcertAvailabilityRepository $availability,
     ): Response {
         $reference = $sheets->findReferenceForUser($user);
-        $dates = $concerts->findForUser($user);
+        $dates = $concerts->findCardsForUser($user);
         $today = new \DateTimeImmutable('today', new \DateTimeZone('Europe/Paris'));
         $upcoming = [];
         $past = [];
         foreach ($dates as $concert) {
-            if ($concert->getDate()->format('Y-m-d') < $today->format('Y-m-d')) {
+            if ($concert->date->format('Y-m-d') < $today->format('Y-m-d')) {
                 $past[] = $concert;
             } else {
                 $upcoming[] = $concert;
@@ -41,7 +39,6 @@ final class IndexAction extends AbstractController
             'upcomingConcerts' => $upcoming,
             'pastConcerts' => array_reverse($past),
             'band' => $reference?->getBand(),
-            'myAvailabilities' => $availability->forUserAndConcerts($user, $upcoming),
             'canCreate' => null !== $reference
                 && $this->isGranted(BandVoter::PLAN_CONCERT, $reference->getBand()),
         ]);

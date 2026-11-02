@@ -165,5 +165,5 @@
     {% else %}
         {% do form.events.setRendered %}
     {% endif %}
-    {{ form_end(form) }}<script src="/scripts/bandsintown-import.js" defer></script>
+    {{ form_end(form) }}<script src="{{ asset('/scripts/bandsintown-import.js') }}" defer></script>
 {% endblock %}
