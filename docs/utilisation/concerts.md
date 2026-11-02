@@ -100,3 +100,9 @@ Le plan s’ouvre en vue d’ensemble. Utiliser **+ / −** pour zoomer, faire d
 **Télécharger la fiche PDF** reprend le plan enregistré, le patch, le matériel demandé et les notes techniques. Enregistrer le plan avant de télécharger.
 
 Le PDF exclut les conditions privées, les disponibilités et les entrées supprimées. Celui de la salle utilise la copie partagée ; ses réponses ne remplacent pas les demandes du groupe. Les liens expirés ou révoqués ne permettent plus de télécharger.
+
+## Dates à venir et historique
+
+La liste place les **Concerts à venir** en premier, par date croissante. Les **Concerts passés** apparaissent ensuite, du plus récent au plus ancien, avec un badge **Passé**. Leurs dossiers restent consultables.
+
+La séparation se fait au changement de jour dans le fuseau Europe/Paris. Une date d’aujourd’hui reste dans les dates à venir : l’application ne connaît pas encore l’heure réelle de fin du concert. Le statut **En attente / Validé** reste indépendant du passage de la date.

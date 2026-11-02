@@ -1369,15 +1369,15 @@ button {
     min-width: 0;
     overflow-wrap: anywhere;
 }
-.concert-card-copy h2 {
+.concert-card-copy h3 {
     font-size: 23px;
     letter-spacing: -0.025em;
     margin: 5px 0;
 }
-.concert-card-copy h2 a {
+.concert-card-copy h3 a {
     text-decoration: none;
 }
-.concert-card-copy h2 a:hover {
+.concert-card-copy h3 a:hover {
     text-decoration: underline;
 }
 .concert-card-copy > p:last-child {
@@ -1431,7 +1431,7 @@ button {
         margin: 0;
         justify-self: start;
     }
-    .concert-card-copy h2 {
+    .concert-card-copy h3 {
         font-size: 25px;
     }
     .concert-context {
