@@ -51,6 +51,9 @@ final class AvailabilityTest extends DatabaseTestCase
         self::assertSelectorTextContains('.availability-roster', 'Marty');
         self::assertSelectorTextNotContains('.availability-roster', 'Romain');
         self::assertSelectorTextContains('.availability-counter', '0 / 5');
+        self::assertSelectorExists('.availability-response[open]');
+        self::assertSelectorExists('.availability-details:not([open])');
+        self::assertSelectorCount(5, 'details[data-concert-section]:not([open])');
         $this->client->request('GET', '/concerts');
         self::assertSelectorTextContains('.concert-creator', 'Responsable de test');
         self::assertSelectorTextContains('.concert-availability-link', 'À confirmer');
@@ -68,6 +71,8 @@ final class AvailabilityTest extends DatabaseTestCase
         self::assertResponseRedirects('/concerts/'.$concertId.'#disponibilites', 303);
         $this->client->followRedirect();
         self::assertSelectorTextContains('.availability-counter', '1 / 2');
+        self::assertSelectorExists('.availability-response:not([open])');
+        self::assertSelectorTextContains('.availability-response > summary', 'Disponible');
         self::assertSelectorNotExists('.availability-roster script');
         $em = $this->entityManager();
         $em->clear();
@@ -88,12 +93,14 @@ final class AvailabilityTest extends DatabaseTestCase
         $this->reply($concertId, ['status' => 'unavailable', 'comment' => 'Autre engagement.']);
         self::assertResponseStatusCodeSame(303);
         $this->client->followRedirect();
-        self::assertSelectorTextContains('.availability-alert', '1 personne indisponible');
+        self::assertSelectorTextContains('#disponibilites > .availability-alert', '1 personne indisponible');
+        self::assertSelectorTextContains('#disponibilites > .availability-alert', 'Marty');
+        self::assertSelectorExists('.availability-details:not([open])');
         $this->reply($concertId, ['status' => 'available', 'comment' => '']);
         $this->client->followRedirect();
         self::assertSelectorTextContains(
             '.availability-complete',
-            'Tous les responsables inscrits',
+            'Tout le monde est disponible',
         );
         $this->reply($concertId, ['status' => 'pending', 'comment' => 'À revoir.']);
         $this->client->followRedirect();

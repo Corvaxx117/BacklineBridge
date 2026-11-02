@@ -4,6 +4,10 @@
     Concerts · {{ app_name }}
 {% endblock %}
 
+{% block page_assets %}
+    <link rel="stylesheet" href="/styles/concerts.css" />
+{% endblock %}
+
 {% block body %}
     <div class="page-topline">
         <span class="eyebrow">Les dates du groupe</span>
@@ -65,76 +69,61 @@
             {% endif %}
         </section>
     {% else %}
-        <ol class="concert-list" aria-label="Concerts par date croissante">
-            {% for concert in concerts %}
-                <li class="concert-card">
-                    <time class="concert-date" datetime="{{ concert.date|date('Y-m-d') }}">
-                        {{ concert.date|date('d/m/Y') }}
-                    </time>
-                    <div class="concert-card-copy">
-                        <p class="eyebrow">
-                            {{ concert.patchSheet.bandName }}
-                        </p>
-                        <h2>
-                            <a
-                                href="{{
-                                path(
-                                    'app_concert_show',
-                                    {
-                                        id: concert.id
-                                    }
-                                )
-                                }}"
-                            >
-                                {{ concert.venue }}
-                            </a>
-                        </h2>
-                        <p>
-                            {{ concert.city }}
-                            <span class="status-badge status-{{ concert.status.value }}">
-                                {{ concert.status.label }}
-                            </span>
-                        </p>
-                        <p class="concert-creator">
-                            {{ concert.createdByName
-                                ? 'Créé par ' ~ concert.createdByName
-                                : 'Créateur non renseigné' }}
-                        </p>
-                        {% if is_granted('CONCERT_RESPOND_AVAILABILITY', concert) %}
-                            {% set myStatus = myAvailabilities[concert.id].status|default(null) %}
-                            <a
-                                class="concert-availability-link"
-                                href="{{
-                                path(
-                                    'app_concert_show',
-                                    {
-                                        id: concert.id
-                                    }
-                                )
-                                }}#disponibilites"
-                            >
-                                Ma disponibilité : {{ myStatus ? myStatus.label : 'À confirmer' }}
-                            </a>
-                        {% endif %}
-                    </div>
-                    <a
-                        class="button button-secondary"
-                        href="{{
-                        path(
-                            'app_concert_show',
-                            {
-                                id: concert.id
-                            }
-                        )
-                        }}"
-                        aria-label="Ouvrir le concert à {{ concert.venue }} du {{ concert.date|date(
-                            'd/m/Y'
-                        ) }}"
-                    >
-                        Ouvrir le dossier <span aria-hidden="true">→</span>
-                    </a>
-                </li>
-            {% endfor %}
-        </ol>
+        <section class="concert-group" aria-labelledby="upcoming-concerts-title">
+            <div class="concert-group-heading">
+                <h2 id="upcoming-concerts-title">Concerts à venir</h2>
+                <span class="reference-tag">{{ upcomingConcerts|length }}</span>
+            </div>
+            {% if upcomingConcerts is empty %}
+                <p class="concert-group-empty">
+                    Aucun concert à venir pour le moment.
+                </p>
+            {% else %}
+                <ol
+                    class="concert-list"
+                    aria-label="Concerts à venir, du plus proche au plus lointain"
+                >
+                    {% for concert in upcomingConcerts %}
+                        {{
+                            include(
+                                'concert/_card.html.twig',
+                                {
+                                    concert: concert,
+                                    past: false,
+                                    myAvailabilities: myAvailabilities
+                                },
+                                with_context: false
+                            )
+                        }}
+                    {% endfor %}
+                </ol>
+            {% endif %}
+        </section>
+        {% if pastConcerts is not empty %}
+            <section class="concert-group concert-history" aria-labelledby="past-concerts-title">
+                <div class="concert-group-heading">
+                    <h2 id="past-concerts-title">Concerts passés</h2>
+                    <span class="reference-tag">{{ pastConcerts|length }}</span>
+                </div>
+                <ol
+                    class="concert-list"
+                    aria-label="Concerts passés, du plus récent au plus ancien"
+                >
+                    {% for concert in pastConcerts %}
+                        {{
+                            include(
+                                'concert/_card.html.twig',
+                                {
+                                    concert: concert,
+                                    past: true,
+                                    myAvailabilities: myAvailabilities
+                                },
+                                with_context: false
+                            )
+                        }}
+                    {% endfor %}
+                </ol>
+            </section>
+        {% endif %}
     {% endif %}
 {% endblock %}

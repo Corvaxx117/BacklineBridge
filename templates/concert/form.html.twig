@@ -81,7 +81,7 @@
                 </div>
             </div>
             <div class="form-grid">
-                {% for field in [form.date, form.venue, form.city, form.status] %}
+                {% for field in [form.date, form.startTime, form.venue, form.city, form.status] %}
                     <div class="field{{ field.vars.name == 'venue' ? ' field-full' : '' }}">
                         {{ form_label(field) }}
                         {{
@@ -90,6 +90,17 @@
                                 {
                                     attr: {
                                         'aria-describedby': field.vars.id ~ '_errors'
+                                            ~ (field.vars.help ? ' ' ~ field.vars.id ~ '_help' : '')
+                                    }
+                                }
+                            )
+                        }}
+                        {{
+                            form_help(
+                                field,
+                                {
+                                    help_attr: {
+                                        class: 'field-hint'
                                     }
                                 }
                             )

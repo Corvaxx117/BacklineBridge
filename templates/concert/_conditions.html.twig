@@ -1,0 +1,95 @@
+<details
+    id="concert-conditions"
+    class="conditions-panel concert-disclosure"
+    data-concert-section
+    aria-labelledby="conditions-title"
+>
+    {{
+        include(
+            'concert/_section_summary.html.twig',
+            {
+                title: 'Conditions du concert',
+                titleId: 'conditions-title',
+                meta: conditions ? 'Accueil et rémunération' : 'À compléter'
+            },
+            with_context: false
+        )
+    }}
+    <div class="panel-header">
+        <a
+            class="button button-secondary"
+            href="{{
+            path(
+                'app_concert_conditions',
+                {
+                    id: concert.id
+                }
+            )
+            }}"
+        >
+            {{ conditions ? 'Modifier les conditions' : 'Compléter les conditions' }}
+        </a>
+    </div>
+    <dl class="conditions-grid">
+        <div>
+            <dt>
+                Hébergement
+            </dt>
+            <dd>{{ conditions ? conditions.accommodation.label : 'À confirmer' }}</dd>
+        </div>
+        <div>
+            <dt>
+                Frais de transport
+            </dt>
+            <dd>{{ conditions ? conditions.transportCoverage.label : 'À confirmer' }}</dd>
+        </div>
+        <div>
+            <dt>
+                Montant convenu
+            </dt>
+            <dd>
+                {{ conditions and conditions.feeCents is not null
+                    ? ((conditions.feeCents / 100)|number_format(2, ',', ' ')) ~ ' €'
+                    : 'À confirmer' }}
+            </dd>
+        </div>
+        <div>
+            <dt>
+                Cadre de rémunération
+            </dt>
+            <dd>{{ conditions ? conditions.paymentFramework.label : 'À confirmer' }}</dd>
+        </div>
+        <div>
+            <dt>
+                Moyen de paiement
+            </dt>
+            <dd>{{ conditions ? conditions.paymentMethod.label : 'À confirmer' }}</dd>
+        </div>
+        <div>
+            <dt>
+                Rémunération de l’ingé son
+            </dt>
+            <dd>
+                {{ conditions ? conditions.engineerPayment.label : 'À confirmer' }}{% if
+                    conditions %}
+                    <span class="condition-amount">
+                        {{ conditions.engineerPaymentFramework.label }}
+                    </span>
+                {% endif %}
+                {% if conditions and conditions.engineerFeeCents is not null %}
+                    <span class="condition-amount">
+                        {{ (conditions.engineerFeeCents / 100)|number_format(2, ',', ' ') }} €
+                    </span>
+                {% endif %}
+            </dd>
+        </div>
+        {% if conditions and conditions.notes %}
+            <div class="field-full">
+                <dt>
+                    Précisions
+                </dt>
+                <dd>{{ conditions.notes|nl2br }}</dd>
+            </div>
+        {% endif %}
+    </dl>
+</details>

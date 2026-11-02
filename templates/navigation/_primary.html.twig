@@ -1,0 +1,127 @@
+{% set routeName = app.request.attributes.get('_route') %}
+<button
+    type="button"
+    class="nav-toggle"
+    data-navigation-toggle
+    aria-controls="primary-navigation"
+    aria-expanded="false"
+    hidden
+>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+    <span data-navigation-label>Menu</span>
+</button>
+<nav id="primary-navigation" class="site-nav" aria-label="Navigation principale">
+    <a
+        class="nav-primary-link"
+        href="{{ path('app_concert_index') }}"
+        aria-current="{{ concertActive ? 'page' : 'false' }}"
+    >
+        Concerts
+    </a>
+    {% if currentBand and is_granted('BAND_CALENDAR', currentBand) %}
+        <a
+            class="nav-primary-link"
+            href="{{
+            path(
+                'app_calendar_index',
+                {
+                    id: currentBand.id
+                }
+            )
+            }}"
+            aria-current="{{ routeName == 'app_calendar_index' ? 'page' : 'false' }}"
+        >
+            Agenda
+        </a>
+    {% endif %}
+    <a
+        class="nav-primary-link"
+        href="{{ path('app_patch_index') }}"
+        aria-current="{{ referenceActive ? 'page' : 'false' }}"
+    >
+        Fiche technique
+    </a>
+    {% if currentBand %}
+        {% set groupItems = [
+            {
+                label: 'To Do',
+                route: 'app_task_index',
+                active: routeName starts with 'app_task_'
+            },
+            {
+                label: 'Documents',
+                route: 'app_document_index',
+                active: routeName starts with 'app_document_'
+            }
+        ] %}
+        {% if is_granted('BAND_TREASURY', currentBand) %}
+            {% set groupItems =
+                groupItems|merge(
+                    [
+                        {
+                            label: 'Trésorerie & stock',
+                            route: 'app_treasury_index',
+                            active: routeName starts with 'app_treasury_'
+                                or routeName starts with 'app_stock_'
+                        }
+                    ]
+                )
+            %}
+        {% endif %}
+        {% set groupItems =
+            groupItems|merge(
+                [
+                    {
+                        label: 'Équipe & liens',
+                        route: 'app_profile_team',
+                        active: routeName starts with 'app_profile_'
+                    }
+                ]
+            )
+        %}
+        <details
+            class="nav-group"
+            data-nav-menu
+            data-current="{{ groupItems|filter(item => item.active)|length ? 'true' : 'false' }}"
+        >
+            <summary>
+                Le groupe <span class="nav-chevron" aria-hidden="true"></span>
+            </summary>
+            <div class="nav-group-links">
+                {% for item in groupItems %}
+                    <a
+                        href="{{
+                        path(
+                            item.route,
+                            {
+                                id: currentBand.id
+                            }
+                        )
+                        }}"
+                        aria-current="{{ item.active ? 'page' : 'false' }}"
+                    >
+                        {{ item.label }}
+                    </a>
+                {% endfor %}
+            </div>
+        </details>
+    {% endif %}
+    <span class="session-info">
+        <a
+            class="session-name"
+            href="{{ path('app_account_password') }}"
+            title="Changer mon mot de passe"
+        >
+            {{ app.user.displayName }}
+        </a>
+        {% if currentRole %}
+            <span class="role-badge">{{ currentRole.label }}</span>
+        {% endif %}
+    </span>
+    <form action="{{ path('app_logout') }}" method="post" class="logout-form">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" />
+        <button type="submit">Se déconnecter</button>
+    </form>
+</nav>

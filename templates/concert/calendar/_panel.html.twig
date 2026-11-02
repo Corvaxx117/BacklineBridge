@@ -1,0 +1,62 @@
+<section id="concert-calendar" class="calendar-panel" aria-labelledby="concert-calendar-title">
+    <div>
+        <h2 id="concert-calendar-title">{{ calendarName }}</h2>
+        {% if calendarConfigured %}
+            <p>
+                {{ concert.startTime ?? '20:00' }} · durée indicative : 1 h · {{ calendarTimezone }}{% if
+                    not concert.startTime %} · horaire par défaut{% endif %}
+            </p>
+            <p class="field-hint">
+                L’ajout est volontaire. Les modifications suivantes se font dans Google Agenda.
+            </p>
+        {% else %}
+            <p>
+                L’agenda Google du groupe n’est pas encore connecté.
+            </p>
+        {% endif %}
+        {% for url in app.flashes('calendar_event_url') %}
+            <p>
+                <a class="calendar-link" href="{{ url }}" target="_blank" rel="noopener noreferrer">
+                    Ouvrir ce concert dans Google Agenda ↗
+                </a>
+            </p>
+        {% endfor %}
+    </div>
+    <div class="calendar-panel-actions">
+        {% if calendarConfigured and is_granted('BAND_CALENDAR_PUBLISH', concert.band) %}
+            <form
+                action="{{
+                path(
+                    'app_concert_calendar_publish',
+                    {
+                        id: concert.id
+                    }
+                )
+                }}"
+                method="post"
+            >
+                <input
+                    type="hidden"
+                    name="_token"
+                    value="{{ csrf_token('calendar_publish_' ~ concert.id) }}"
+                />
+                <button class="button button-secondary" type="submit">
+                    Ajouter à Google Agenda
+                </button>
+            </form>
+        {% endif %}
+        <a
+            class="calendar-link"
+            href="{{
+            path(
+                'app_calendar_index',
+                {
+                    id: concert.band.id
+                }
+            )
+            }}"
+        >
+            Consulter l’agenda
+        </a>
+    </div>
+</section>

@@ -3,10 +3,16 @@
     "private": true,
     "scripts": {
         "format": "prettier --write . --ignore-unknown",
-        "format:check": "prettier --check . --ignore-unknown"
+        "format:check": "prettier --check . --ignore-unknown",
+        "calendar:assets": "node tools/frontend/calendar-assets.mjs",
+        "calendar:assets:check": "node tools/frontend/calendar-assets.mjs --check",
+        "test:frontend": "node --test tests/Frontend/*.test.mjs"
     },
     "devDependencies": {
         "@zackad/prettier-plugin-twig": "^0.17.0",
         "prettier": "^3.6.2"
+    },
+    "dependencies": {
+        "fullcalendar": "^7.1.3"
     }
 }

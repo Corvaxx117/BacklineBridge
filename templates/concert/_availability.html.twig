@@ -1,55 +1,52 @@
+{% set myResponse = availability.rows|filter(person => person.mine)|first %}
+{% set unavailable = availability.rows|filter(person => person.status.value == 'unavailable') %}
 <section class="availability-panel" id="disponibilites" aria-labelledby="availability-title">
     <div class="panel-header">
-        <div>
-            <p class="eyebrow">
-                L’équipe pour cette date
-            </p>
-            <h2 id="availability-title">Qui est disponible ?</h2>
+        <h2 id="availability-title">Disponibilités</h2>
+        <div class="availability-summary">
+            <span class="availability-counter">
+                {{ availability.counts.available }} / {{ availability.total }} disponibles
+            </span>
+            {% if availability.counts.pending %}
+                <span class="availability-pending">
+                    {{ availability.counts.pending }} à confirmer
+                </span>
+            {% elseif availability.total and not availability.counts.unavailable %}
+                <span class="availability-complete">Tout le monde est disponible</span>
+            {% endif %}
         </div>
-        <span class="availability-counter">
-            {{ availability.counts.available }} / {{ availability.total }} disponibles
-        </span>
     </div>
-    {% if availability.counts.unavailable %}
-        <p class="availability-alert">
-            Date à discuter : {{ availability.counts.unavailable }} {{ availability.counts.unavailable
-                == 1
-                ? 'personne indisponible'
-                : 'personnes indisponibles' }}.
-        </p>
-    {% elseif availability.total and availability.counts.pending == 0 %}
-        <p class="availability-complete">
-            Tous les responsables inscrits ont confirmé leur disponibilité.
+    {% if unavailable %}
+        <p class="availability-alert" role="status">
+            {{ unavailable|length }}
+            {{ (unavailable|length) == 1 ? 'personne indisponible' : 'personnes indisponibles' }} :
+            <strong>{{ unavailable|map(person => person.user.displayName)|join(', ') }}</strong>.
         </p>
     {% endif %}
-    <ul class="availability-roster">
-        {% for person in availability.rows %}
-            <li class="availability-person">
-                <div>
-                    <strong>
-                        {{ person.user.displayName }}{% if person.mine %}
-                            <span class="availability-you">(moi)</span>
-                        {% endif %}
-                    </strong>
-                    {% if person.comment %}
-                        <p>
-                            {{ person.comment|nl2br }}
-                        </p>
-                    {% endif %}
-                    {% if person.answeredAt %}
-                        <small>Réponse du {{ person.answeredAt|date('d/m/Y à H:i') }}</small>
-                    {% endif %}
-                </div>
-                <span class="availability-badge availability-{{ person.status.value }}">
-                    {{ person.status.label }}
-                </span>
-            </li>
-        {% else %}
-            <li class="availability-person">Aucun responsable dans ce groupe pour le moment.</li>
-        {% endfor %}
-    </ul>
     {% if availabilityForm %}
-        <div class="availability-response">
+        <details
+            class="availability-response"
+            {{ not myResponse or myResponse.status.value == 'pending' ? 'open' : '' }}
+        >
+            <summary>
+                <span>
+                    Ma réponse
+                    <span
+                        class="availability-badge availability-{{
+                        myResponse
+                            ? myResponse.status.value
+                            : 'pending'
+                        }}"
+                    >
+                        {{ myResponse ? myResponse.status.label : 'À confirmer' }}
+                    </span>
+                </span>
+                <span class="availability-response-action">
+                    {{ not myResponse or myResponse.status.value == 'pending'
+                        ? 'Répondre'
+                        : 'Modifier' }}
+                </span>
+            </summary>
             {{
                 include(
                     'concert/_availability_form.html.twig',
@@ -60,12 +57,42 @@
                     with_context: false
                 )
             }}
-        </div>
+        </details>
     {% endif %}
-    <p class="panel-footer">
-        Chaque responsable répond pour lui-même, ingé son compris. Ces réponses concernent le {{
-            concert.date|date('d/m/Y')
-        }} ; elles restent distinctes du statut du concert et des confirmations de la salle. L’équipe
-        affichée correspond aux responsables disposant d’un compte.
-    </p>
+    <details class="availability-details">
+        <summary>
+            Les réponses de l’équipe
+        </summary>
+        <ul class="availability-roster">
+            {% for person in availability.rows %}
+                <li class="availability-person">
+                    <div>
+                        <strong>
+                            {{ person.user.displayName }}{% if person.mine %}
+                                <span class="availability-you">(moi)</span>
+                            {% endif %}
+                        </strong>
+                        {% if person.comment %}
+                            <p>
+                                {{ person.comment|nl2br }}
+                            </p>
+                        {% endif %}
+                        {% if person.answeredAt %}
+                            <small>Réponse du {{ person.answeredAt|date('d/m/Y à H:i') }}</small>
+                        {% endif %}
+                    </div>
+                    <span class="availability-badge availability-{{ person.status.value }}">
+                        {{ person.status.label }}
+                    </span>
+                </li>
+            {% else %}
+                <li class="availability-person">
+                    Aucun responsable dans ce groupe pour le moment.
+                </li>
+            {% endfor %}
+        </ul>
+        <p class="availability-help">
+            Chacun répond pour lui-même, ingénieur son compris.
+        </p>
+    </details>
 </section>

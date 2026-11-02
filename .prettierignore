@@ -14,3 +14,6 @@
 *.php
 /bin/console
 /bin/phpunit
+
+# Bibliothèques tierces copiées sans modifier leur distribution.
+/public/vendor/

@@ -1,16 +1,24 @@
-<section
+<details
     id="concert-documents"
-    class="collaboration-panel"
+    class="collaboration-panel concert-disclosure"
     aria-labelledby="concert-documents-title"
+    data-concert-section
 >
-    <div class="panel-header">
-        <div>
-            <p class="eyebrow">
-                Feuille de route, fiche de la salle, accès, contrat…
-            </p>
-            <h2 id="concert-documents-title">Documents du concert</h2>
-        </div>
-        {% if is_granted('BAND_COLLABORATE', concert.band) %}
+    {{
+        include(
+            'concert/_section_summary.html.twig',
+            {
+                title: 'Documents du concert',
+                titleId: 'concert-documents-title',
+                meta: documents|length
+                    ? (documents|length) ~ ((documents|length) == 1 ? ' document' : ' documents')
+                    : 'Aucun document'
+            },
+            with_context: false
+        )
+    }}
+    {% if is_granted('BAND_COLLABORATE', concert.band) %}
+        <div class="panel-header">
             <div class="collaboration-actions">
                 <a
                     class="button button-primary"
@@ -59,12 +67,11 @@
                     Ajouter un lien
                 </a>
             </div>
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
     {% if documents is empty %}
         <p class="collaboration-empty">
-            Ajoute la feuille de route envoyée par la salle, un autre PDF ou le lien d’un document
-            partagé. Toute l’équipe le retrouvera ici et dans l’onglet Documents.
+            Aucun document ajouté pour cette date.
         </p>
     {% else %}
         {{
@@ -78,4 +85,4 @@
             )
         }}
     {% endif %}
-</section>
+</details>

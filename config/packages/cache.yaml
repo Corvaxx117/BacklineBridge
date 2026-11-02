@@ -21,3 +21,6 @@ framework:
         pools:
             cache.bandsintown:
                 adapter: cache.adapter.filesystem
+            cache.google_calendar:
+                adapter: cache.adapter.filesystem
+                tags: true

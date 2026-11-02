@@ -55,6 +55,23 @@ class Concert
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(length: 5, nullable: true)]
+    private ?string $startTime = null;
+
+    public function getStartTime(): ?string
+    {
+        return $this->startTime;
+    }
+
+    public function setStartTime(?string $startTime): void
+    {
+        $startTime = '' === $startTime ? null : $startTime;
+        if (null !== $startTime && 1 !== preg_match('/^(?:[01][0-9]|2[0-3]):[0-5][0-9]$/D', $startTime)) {
+            throw new \InvalidArgumentException('L’heure du concert doit suivre le format HH:MM.');
+        }
+        $this->startTime = $startTime;
+    }
+
     public function getStatus(): ConcertStatus
     {
         return $this->status;

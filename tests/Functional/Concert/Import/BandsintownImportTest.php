@@ -99,6 +99,7 @@ final class BandsintownImportTest extends DatabaseTestCase
         $em->clear();
         $concert = $em->getRepository(Concert::class)->findOneBy([]);
         self::assertSame('Salle de test', $concert->getVenue());
+        self::assertSame('20:30', $concert->getStartTime());
         self::assertSame('validated', $concert->getStatus()->value);
         self::assertSame($this->userId, $concert->getCreatedBy()->getId());
         self::assertNotSame($this->sheetId, $concert->getPatchSheet()->getId());

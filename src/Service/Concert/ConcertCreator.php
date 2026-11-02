@@ -29,8 +29,9 @@ final readonly class ConcertCreator
         ConcertStatus $status = ConcertStatus::Pending,
         ?string $notes = null,
         ?User $createdBy = null,
+        ?string $startTime = null,
     ): Concert {
-        $concert = $this->prepare($reference, $date, $venue, $city, $status, $notes, $createdBy);
+        $concert = $this->prepare($reference, $date, $venue, $city, $status, $notes, $createdBy, $startTime);
         $this->entityManager->flush();
 
         return $concert;
@@ -45,6 +46,7 @@ final readonly class ConcertCreator
         ConcertStatus $status = ConcertStatus::Pending,
         ?string $notes = null,
         ?User $createdBy = null,
+        ?string $startTime = null,
     ): Concert {
         if (null !== $reference->getConcert()) {
             throw new \InvalidArgumentException(
@@ -91,6 +93,7 @@ final readonly class ConcertCreator
         }
         $concert = new Concert($date, $venue, $city, $sheet, $band, $createdBy);
         $concert->updateDetails($date, $venue, $city, $status, $notes);
+        $concert->setStartTime($startTime);
         $this->entityManager->persist($concert);
         $this->availability->initialize($concert);
 

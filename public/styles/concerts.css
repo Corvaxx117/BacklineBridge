@@ -1,0 +1,42 @@
+.concert-group {
+    margin-bottom: 2.5rem;
+}
+
+.concert-group-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.concert-group-heading h2 {
+    font-size: 1.35rem;
+}
+
+.concert-date-block {
+    display: grid;
+    justify-items: start;
+    gap: 0.5rem;
+}
+
+.concert-period-badge {
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    background: var(--border);
+    color: var(--text);
+    font-size: 0.75rem;
+    font-weight: 650;
+}
+
+.concert-card--past {
+    border-left-width: 4px;
+    background: var(--background);
+}
+
+.concert-group-empty {
+    padding: 1.5rem;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+}

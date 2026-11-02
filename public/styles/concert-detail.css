@@ -1,0 +1,277 @@
+/* Vue d’ensemble : réponses personnelles d’abord, détails à la demande. */
+.availability-panel .panel-header {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 20px 24px;
+}
+
+.availability-panel .panel-header h2 {
+    font-size: 18px;
+}
+
+.availability-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+}
+
+.availability-summary .availability-counter {
+    color: var(--text);
+}
+
+.availability-pending,
+.availability-summary .availability-complete {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    font-size: 12px;
+}
+
+.availability-pending {
+    color: var(--warning-text);
+}
+
+.availability-panel .availability-alert {
+    margin: 0 24px 16px;
+    overflow-wrap: anywhere;
+}
+
+.availability-panel .availability-response,
+.availability-details {
+    margin: 0 24px;
+    padding: 0;
+    border-top: 1px solid var(--border);
+}
+
+.availability-response > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 62px;
+    padding-block: 10px;
+    font-size: 13px;
+    cursor: pointer;
+    list-style: none;
+}
+
+.availability-response > summary::-webkit-details-marker {
+    display: none;
+}
+
+.availability-response > summary > span:first-child {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-weight: 600;
+}
+
+.availability-response-action {
+    color: var(--accent-text);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.availability-response > summary:focus-visible,
+.availability-details > summary:focus-visible,
+.concert-disclosure > summary:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: -3px;
+    border-radius: 6px;
+}
+
+.availability-response .availability-form {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px 20px;
+    padding-bottom: 20px;
+}
+
+.availability-response .availability-form > .button {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+}
+
+.availability-response .availability-comment,
+.availability-response .availability-form > ul {
+    grid-column: 1 / -1;
+}
+
+.availability-response .availability-choices {
+    gap: 8px;
+}
+
+.availability-response .availability-choice {
+    min-height: 44px;
+    padding: 10px 12px;
+}
+
+.availability-response .availability-choice:has(input[value='unavailable']:checked) {
+    border-color: var(--danger-border);
+    background: var(--danger-bg);
+    color: var(--danger-text);
+}
+
+.availability-response .availability-choice:has(input[value='pending']:checked) {
+    border-color: var(--warning-border);
+    background: var(--warning-bg);
+    color: var(--warning-text);
+}
+
+.availability-details > summary {
+    padding-block: 14px;
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.availability-details .availability-roster {
+    padding: 0;
+}
+
+.availability-help {
+    padding-block: 12px 18px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.concert-disclosure {
+    margin: 16px 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    scroll-margin-top: 24px;
+    overflow: hidden;
+}
+
+.concert-disclosure > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 68px;
+    padding: 20px 24px;
+    border: 0;
+    cursor: pointer;
+    list-style: none;
+}
+
+.concert-disclosure > summary::-webkit-details-marker {
+    display: none;
+}
+
+.concert-disclosure > summary::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    border-right: 1.5px solid var(--text-muted);
+    border-bottom: 1.5px solid var(--text-muted);
+    transform: translateY(-2px) rotate(45deg);
+}
+
+.concert-disclosure[open] > summary {
+    border-bottom: 1px solid var(--border);
+}
+
+.concert-disclosure[open] > summary::after {
+    transform: translateY(2px) rotate(225deg);
+}
+
+.concert-disclosure > summary h2 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 16px;
+    min-width: 0;
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.concert-section-meta {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: normal;
+}
+
+.concert-disclosure .panel-header {
+    justify-content: flex-end;
+    padding: 20px 24px;
+}
+
+.concert-disclosure .concert-tools {
+    margin: 0;
+    padding: 20px 24px;
+    border: 0;
+}
+
+.concert-disclosure .technical-heading {
+    flex-wrap: wrap;
+    padding: 0 24px 20px;
+}
+
+.concert-disclosure .technical-heading p {
+    flex: 1 1 100%;
+}
+
+.concert-disclosure .calendar-panel,
+.concert-disclosure .bit-concert-source {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.concert-disclosure .stage-panel,
+.concert-disclosure .technical-panel {
+    border-inline: 0;
+    border-radius: 0;
+}
+
+@media (max-width: 720px) {
+    .availability-panel .panel-header,
+    .concert-disclosure > summary,
+    .concert-disclosure .panel-header,
+    .concert-disclosure .concert-tools {
+        padding: 18px 16px;
+    }
+
+    .availability-panel .availability-response,
+    .availability-details {
+        margin-inline: 16px;
+    }
+
+    .availability-panel .availability-alert {
+        margin-inline: 16px;
+    }
+
+    .availability-response .availability-form {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .availability-response .availability-form > .button {
+        grid-column: 1;
+        grid-row: auto;
+        width: 100%;
+    }
+
+    .availability-response .availability-choice {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+
+    .concert-disclosure > summary h2 {
+        flex-direction: column;
+        gap: 4px;
+        font-size: 16px;
+    }
+
+    .concert-disclosure .technical-heading {
+        padding-inline: 16px;
+    }
+}
