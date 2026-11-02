@@ -43,6 +43,7 @@ final class CreateAction extends AbstractController
                 $input->status,
                 $input->notes,
                 $user,
+                $input->startTime,
             );
             $this->addFlash(
                 'success',

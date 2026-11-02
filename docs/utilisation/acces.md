@@ -21,7 +21,7 @@ Le code est valable 30 jours et utilisable une seule fois. Un formulaire refusé
 | Romain, booker | Consulter | Modifier | Aucun accès | Toutes, en lecture |
 | Salle invitée | Lire la version partagée et répondre | Aucun accès interne | Aucun accès | Aucune |
 
-Musiciens et ingénieur son ont le rôle **Responsable**. Le profil **Musicien** ouvre en plus la trésorerie. Romain a le rôle **Booker**. Ces droits sont vérifiés sur le serveur.
+Musiciens et ingénieur son ont le rôle **Responsable**. Le profil **Musicien** ouvre en plus la trésorerie. Les six comptes internes peuvent consulter l’[agenda commun](agenda.md), nommé **Avee Mana Partagé** ; seuls les quatre musiciens peuvent y ajouter un concert depuis BacklineBridge. Romain a le rôle **Booker**. Ces droits sont vérifiés sur le serveur.
 
 Les six membres de l’équipe accèdent aussi au [To Do partagé](taches.md) pour créer et répartir les missions du groupe. Les salles invitées n’y ont pas accès.
 
@@ -49,4 +49,4 @@ Pour préparer les vrais comptes, suivre [l’initialisation privée](../exploit
 
 La capsule en bas à droite contient un **switch soleil/lune** pour passer du clair au sombre. Le bouton **écran** réactive le mode automatique ; il est coloré lorsque ce mode est actif. Ces commandes restent accessibles sur téléphone, sur la page de connexion et dans l’espace salle.
 
-**Automatique** suit le thème du téléphone ou de l’ordinateur. Le choix est mémorisé dans ce navigateur, sans modifier le compte ; chaque appareil garde sa préférence. Les PDF utilisent leur présentation imprimable.
+**Automatique** suit le thème du téléphone ou de l’ordinateur. Le choix est mémorisé dans ce navigateur, sans modifier le compte ; chaque appareil garde sa préférence. Le calendrier suit également le thème choisi. Les PDF utilisent leur présentation imprimable.

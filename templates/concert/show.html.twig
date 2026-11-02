@@ -27,7 +27,9 @@
             <p class="hero-description">
                 <time datetime="{{ concert.date|date('Y-m-d') }}">
                     {{ concert.date|date('d/m/Y') }}
-                </time> · {{ concert.city }}
+                </time>{% if concert.startTime %}
+                    à {{ concert.startTime }}
+                {% endif %}· {{ concert.city }}
                 <span class="status-badge status-{{ concert.status.value }}">
                     {{ concert.status.label }}
                 </span>
@@ -50,6 +52,9 @@
         {% endif %}
     </section>
     {{ include('concert/import/bandsintown/_source.html.twig') }}
+    {% if is_granted('BAND_CALENDAR', concert.band) %}
+        {{ include('concert/calendar/_panel.html.twig') }}
+    {% endif %}
     <nav class="concert-section-links" aria-label="Aller à une section du concert">
         <a href="#concert-contacts">Contacts <span>{{ contacts|length }}</span></a>
         <a href="#concert-documents">Documents <span>{{ documents|length }}</span></a>

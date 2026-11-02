@@ -53,3 +53,34 @@ for (const [name, palette] of [
         }
     });
 }
+
+const calendarCss = readFileSync(
+    new URL('../../public/styles/calendar-grid.css', import.meta.url),
+    'utf8',
+);
+const calendarTokens = Object.fromEntries(
+    [...calendarCss.matchAll(/--(fc-classic-[\w-]+):\s*var\(--([\w-]+)\);/g)].map((match) => [
+        match[1],
+        match[2],
+    ]),
+);
+for (const [name, palette] of [
+    ['clair', light],
+    ['sombre', dark],
+]) {
+    test(`les dates et événements du calendrier restent lisibles en mode ${name}`, () => {
+        for (const [foreground, background] of [
+            ['fc-classic-foreground', 'fc-classic-background'],
+            ['fc-classic-faint-foreground', 'fc-classic-background'],
+            ['fc-classic-muted-foreground', 'fc-classic-background'],
+            ['fc-classic-event-contrast', 'fc-classic-event'],
+        ]) {
+            const values = [
+                luminance(palette[calendarTokens[foreground]]),
+                luminance(palette[calendarTokens[background]]),
+            ].sort((a, b) => a - b);
+            const ratio = (values[1] + 0.05) / (values[0] + 0.05);
+            assert.ok(ratio >= 4.5, `${foreground} sur ${background} : ${ratio.toFixed(2)}:1`);
+        }
+    });
+}

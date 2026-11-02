@@ -1,0 +1,99 @@
+/* Agenda du groupe : liste lisible sur ordinateur et mobile. */
+.calendar-panel,
+.calendar-event,
+.calendar-empty {
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--background);
+}
+
+.calendar-panel,
+.calendar-heading,
+.calendar-panel-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.calendar-panel {
+    margin: 1.5rem 0;
+}
+
+.calendar-panel h2,
+.calendar-event h3 {
+    margin: 0 0 0.5rem;
+}
+
+.calendar-panel p,
+.calendar-event p {
+    margin: 0.35rem 0 0;
+}
+
+.calendar-panel-actions {
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.calendar-panel-actions form {
+    margin: 0;
+}
+
+.calendar-list {
+    display: grid;
+    gap: 0.75rem;
+    margin: 1.25rem 0;
+    padding: 0;
+    list-style: none;
+}
+
+.calendar-event {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.calendar-event-date {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.calendar-event-date time {
+    font-weight: 700;
+}
+
+.calendar-event-copy {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+    .calendar-panel,
+    .calendar-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .calendar-event {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.75rem;
+    }
+
+    .calendar-panel-actions {
+        width: 100%;
+        flex-shrink: 1;
+    }
+
+    .calendar-panel-actions form,
+    .calendar-panel-actions .button {
+        width: 100%;
+    }
+}
+
+.calendar-link {
+    color: var(--accent-text);
+    font-size: 0.85rem;
+    font-weight: 650;
+    text-underline-offset: 3px;
+}

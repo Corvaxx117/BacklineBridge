@@ -33,6 +33,7 @@ final readonly class ConcertUpdater
             $input->status,
             $input->notes,
         );
+        $concert->setStartTime($input->startTime);
         if ($dateChanged) {
             $this->availability->resetForNewDate($concert);
         }

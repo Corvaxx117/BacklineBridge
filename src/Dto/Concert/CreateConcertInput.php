@@ -16,6 +16,9 @@ final class CreateConcertInput
     #[Assert\NotNull(message: 'Indique la date du concert.')]
     public ?\DateTimeImmutable $date = null;
 
+    #[Assert\Regex(pattern: '/^(?:[01][0-9]|2[0-3]):[0-5][0-9]$/D', message: 'Indique une heure valide.')]
+    public ?string $startTime = null;
+
     #[Assert\NotBlank(message: 'Indique le nom de la salle.')]
     #[Assert\Length(
         max: 150,
@@ -41,6 +44,7 @@ final class CreateConcertInput
         $input = new self();
         $input->revision = (string) $concert->getRevision();
         $input->date = $concert->getDate();
+        $input->startTime = $concert->getStartTime();
         $input->venue = $concert->getVenue();
         $input->city = $concert->getCity();
         $input->status = $concert->getStatus();

@@ -1,0 +1,3 @@
+
+# Conserver la distribution officielle sans retouche de présentation.
+/public/vendor/fullcalendar/** -whitespace

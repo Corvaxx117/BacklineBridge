@@ -44,6 +44,25 @@ services:
               max_duration: 12
               max_redirects: 0
 
+    App\Integration\GoogleCalendar\GoogleCalendarGateway:
+        alias: App\Integration\GoogleCalendar\GoogleCalendarClient
+
+    App\Integration\GoogleCalendar\GoogleAccessTokenProvider:
+        alias: App\Integration\GoogleCalendar\ServiceAccountTokenProvider
+
+    # Client isolé du profiler : les événements et le jeton Google restent privés.
+    google_calendar.http_client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: ['Symfony\Component\HttpClient\HttpClient', 'create']
+        autowire: false
+        autoconfigure: false
+        arguments:
+            - base_uri: 'https://www.googleapis.com/calendar/v3/'
+              headers: { Accept: 'application/json' }
+              timeout: 5
+              max_duration: 12
+              max_redirects: 0
+
 when@test:
     services:
         App\Service\Document\DocumentStorage:
