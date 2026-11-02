@@ -4,7 +4,7 @@ Chaque concert possède son propre dossier. Modifier Lyon ne modifie ni Nantes n
 
 ## Lire le dossier
 
-Les disponibilités et les notes pratiques apparaissent en premier. Les sections **Documents**, **Contacts**, **Conditions**, **Dossier technique** et **Google Agenda** sont repliées : cliquer sur leur titre pour les ouvrir. Les liens directs et les retours de formulaire ouvrent la section concernée.
+Les disponibilités et les notes pratiques apparaissent en premier. Les sections **Setlist**, **Documents**, **Contacts**, **Conditions**, **Dossier technique** et **Google Agenda** sont repliées : cliquer sur leur titre pour les ouvrir. Les liens directs et les retours de formulaire ouvrent la section concernée.
 
 ## Créer et compléter une date
 
@@ -27,6 +27,10 @@ Tout commence à confirmer, même pour le créateur. Changer la date remet les d
 
 **Concert validé, membres disponibles et matériel confirmé sont trois informations différentes.**
 
+## Setlist du concert
+
+L’encart **Setlist** reste fermé pour laisser la place aux informations pratiques. Les quatre musiciens peuvent y importer la référence du groupe ou préparer une version propre à la date ; toute l’équipe peut la consulter. Voir le guide [Setlists](setlists.md). Elle est exclue des PDF et des espaces salle.
+
 ## Contacts et documents de la date
 
 La section **Contacts du concert** contient les personnes à joindre : nom, rôle, e-mail, téléphone et précisions facultatives. Ajouter plusieurs interlocuteurs, puis utiliser les liens pour leur écrire ou les appeler. Les coordonnées sont internes à l’équipe ; elles ne sont pas intégrées aux invitations de salle ni au PDF technique.
@@ -39,7 +43,7 @@ Dans **Documents du concert**, ajouter une fiche reçue en PDF ou le lien d’un
 
 Les responsables disposent du lien **Supprimer le concert**, en bas de son dossier. Une page présente les conséquences avant confirmation.
 
-La suppression est définitive : dossier technique de cette date, contacts, conditions, disponibilités, invitations et réponses de la salle sont retirés. Les documents restent dans la bibliothèque du groupe. La référence technique et les autres concerts sont conservés.
+La suppression est définitive : dossier technique de cette date, contacts, conditions, disponibilités, setlist, invitations et réponses de la salle sont retirés. Les documents restent dans la bibliothèque du groupe. La référence technique et les autres concerts sont conservés.
 
 Une suppression dans BacklineBridge ne supprime pas l’événement Bandsintown. Il pourra être réimporté. Un concert modifié depuis l’ouverture de la confirmation doit être relu avant suppression.
 

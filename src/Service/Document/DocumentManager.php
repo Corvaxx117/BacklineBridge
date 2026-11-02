@@ -92,6 +92,7 @@ final readonly class DocumentManager
                 }
                 throw $exception;
             }
+            $this->storage->invalidateUsage($document->getBand());
             if (null !== $staged && !unlink($staged)) {
                 throw new \RuntimeException('Le document a été retiré, mais son fichier doit être nettoyé.');
             }

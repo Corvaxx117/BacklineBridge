@@ -6,14 +6,12 @@
 
 {% block page_assets %}
     {% if configured %}
-        <link rel="stylesheet" href="/vendor/fullcalendar/skeleton.css" />
-        <link rel="stylesheet" href="/vendor/fullcalendar/theme.css" />
-        <link rel="stylesheet" href="/vendor/fullcalendar/palette.css" />
-        <link rel="stylesheet" href="/styles/calendar-grid.css" />
-        <script src="/vendor/fullcalendar/fullcalendar.js" defer></script>
-        <script src="/vendor/fullcalendar/theme.js" defer></script>
-        <script src="/vendor/fullcalendar/fr.js" defer></script>
-        <script src="/scripts/calendar.js" defer></script>
+        <link rel="stylesheet" href="{{ asset('/vendor/fullcalendar/skeleton.css') }}" />
+        <link rel="stylesheet" href="{{ asset('/vendor/fullcalendar/theme.css') }}" />
+        <link rel="stylesheet" href="{{ asset('/vendor/fullcalendar/palette.css') }}" />
+        <link rel="stylesheet" href="{{ asset('/styles/calendar-grid.css') }}" />
+        <script src="{{ asset('/vendor/fullcalendar/fullcalendar.js') }}" defer></script>
+        <script src="{{ asset('/scripts/calendar.js') }}" defer></script>
     {% endif %}
 {% endblock %}
 

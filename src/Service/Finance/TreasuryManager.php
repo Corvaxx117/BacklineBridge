@@ -16,6 +16,7 @@ use App\Enum\StockMovementKind;
 use App\Enum\TreasuryEntryKind;
 use App\Repository\TreasuryRepository;
 use App\Service\Money\EuroAmount;
+use App\Service\Security\MusicianAccess;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;

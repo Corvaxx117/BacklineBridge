@@ -11,7 +11,7 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 
 final readonly class TechnicalPdfResponseFactory
 {
-    public function __construct(private TechnicalPdfRenderer $renderer)
+    public function __construct(private TechnicalPdfCache $renderer)
     {
     }
 

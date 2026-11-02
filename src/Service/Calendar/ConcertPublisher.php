@@ -12,7 +12,7 @@ use App\Integration\GoogleCalendar\Dto\PublicationResult;
 use App\Integration\GoogleCalendar\Exception\GoogleCalendarUnavailable;
 use App\Integration\GoogleCalendar\GoogleCalendarConfiguration;
 use App\Integration\GoogleCalendar\GoogleCalendarGateway;
-use App\Service\Finance\MusicianAccess;
+use App\Service\Security\MusicianAccess;
 
 final readonly class ConcertPublisher
 {

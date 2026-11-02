@@ -1,3 +1,4 @@
+import { build } from 'esbuild';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -5,9 +6,6 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const checking = process.argv.includes('--check');
 const files = {
-    'all/global.js': 'fullcalendar.js',
-    'locales/fr/global.js': 'fr.js',
-    'themes/classic/global.js': 'theme.js',
     'skeleton.css': 'skeleton.css',
     'themes/classic/theme.css': 'theme.css',
     'themes/classic/palette.css': 'palette.css',
@@ -31,3 +29,23 @@ for (const [source, destination] of Object.entries(files)) {
 console.log(
     checking ? 'Fichiers FullCalendar conformes au verrou npm.' : 'Fichiers FullCalendar copiés.',
 );
+
+const bundle = await build({
+    entryPoints: [resolve(root, 'tools/frontend/calendar-entry.mjs')],
+    bundle: true,
+    minify: true,
+    format: 'iife',
+    globalName: 'FullCalendar',
+    target: ['es2020'],
+    write: false,
+    legalComments: 'inline',
+});
+const target = resolve(root, 'public/vendor/fullcalendar/fullcalendar.js');
+const output = bundle.outputFiles[0].contents;
+if (checking) {
+    if (!(await readFile(target)).equals(Buffer.from(output))) {
+        throw new Error('Régénérer le calendrier avec npm run calendar:assets.');
+    }
+} else {
+    await writeFile(target, output);
+}

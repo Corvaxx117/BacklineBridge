@@ -175,7 +175,7 @@ final class GoogleCalendarTest extends TestCase
 
     public function testCredentialsOutsidePublicAreRequiredBeforeNetworkAccess(): void
     {
-        $provider = new ServiceAccountTokenProvider($this->configuration(), sys_get_temp_dir());
+        $provider = new ServiceAccountTokenProvider($this->configuration(), sys_get_temp_dir(), new \Symfony\Component\Cache\Adapter\ArrayAdapter(), new \GuzzleHttp\Client());
         $this->expectException(GoogleCalendarUnavailable::class);
         $provider->token();
     }
@@ -186,7 +186,7 @@ final class GoogleCalendarTest extends TestCase
         self::assertNotFalse($path);
         try {
             file_put_contents($path, '{"type":"external_account","token_uri":"https://evil.test"}');
-            $provider = new ServiceAccountTokenProvider($this->configuration($path), dirname(__DIR__, 3).'/public');
+            $provider = new ServiceAccountTokenProvider($this->configuration($path), dirname(__DIR__, 3).'/public', new \Symfony\Component\Cache\Adapter\ArrayAdapter(), new \GuzzleHttp\Client());
             $this->expectException(GoogleCalendarUnavailable::class);
             $provider->token();
         } finally {
@@ -200,11 +200,49 @@ final class GoogleCalendarTest extends TestCase
         self::assertNotFalse($path);
         try {
             file_put_contents($path, '{}');
-            $provider = new ServiceAccountTokenProvider($this->configuration($path), dirname($path));
+            $provider = new ServiceAccountTokenProvider($this->configuration($path), dirname($path), new \Symfony\Component\Cache\Adapter\ArrayAdapter(), new \GuzzleHttp\Client());
             $this->expectException(GoogleCalendarUnavailable::class);
             $provider->token();
         } finally {
             unlink($path);
+        }
+    }
+
+    public function testTokenIsSharedBetweenRequestsRenewedAndCredentialRemovalIsRespected(): void
+    {
+        $path = tempnam(sys_get_temp_dir(), 'bb-google-cache-');
+        self::assertNotFalse($path);
+        $key = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA]);
+        self::assertNotFalse($key);
+        openssl_pkey_export($key, $pem);
+        file_put_contents($path, json_encode([
+            'type' => 'service_account', 'client_email' => 'audit@synthetic.iam.gserviceaccount.com',
+            'private_key' => $pem, 'private_key_id' => str_repeat('a', 40),
+            'token_uri' => 'https://oauth2.googleapis.com/token',
+        ], JSON_THROW_ON_ERROR));
+        $cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
+        $responses = new \GuzzleHttp\Handler\MockHandler([
+            new \GuzzleHttp\Psr7\Response(200, [], '{"access_token":"fictif-1","expires_in":3600,"token_type":"Bearer"}'),
+            new \GuzzleHttp\Psr7\Response(200, [], '{"access_token":"fictif-2","expires_in":3600,"token_type":"Bearer"}'),
+        ]);
+        $http = new \GuzzleHttp\Client(['handler' => \GuzzleHttp\HandlerStack::create($responses)]);
+        $provider = fn (): ServiceAccountTokenProvider => new ServiceAccountTokenProvider(
+            $this->configuration($path), dirname(__DIR__, 3).'/public', $cache, $http,
+        );
+        try {
+            self::assertSame('fictif-1', $provider()->token());
+            self::assertSame('fictif-1', $provider()->token());
+            self::assertCount(1, $responses);
+            $cache->clear();
+            self::assertSame('fictif-2', $provider()->token());
+            self::assertCount(0, $responses);
+            unlink($path);
+            $this->expectException(GoogleCalendarUnavailable::class);
+            $provider()->token();
+        } finally {
+            if (is_file($path)) {
+                unlink($path);
+            }
         }
     }
 

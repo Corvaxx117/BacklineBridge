@@ -8,6 +8,8 @@ use App\Entity\Band;
 use App\Entity\BandDocument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 final readonly class DocumentStorage
 {
@@ -16,6 +18,7 @@ final readonly class DocumentStorage
         private string $directory,
         #[Autowire(env: 'int:DOCUMENT_STORAGE_QUOTA_MB')]
         private int $quotaMegabytes,
+        #[Autowire(service: 'cache.document_usage')] private CacheInterface $cache,
     ) {
         if ($quotaMegabytes < 1 || $quotaMegabytes > 2048) {
             throw new \InvalidArgumentException('Le quota des documents doit être compris entre 1 et 2048 Mo.');
@@ -28,6 +31,25 @@ final readonly class DocumentStorage
     }
 
     public function usedBytes(Band $band): int
+    {
+        return $this->cache->get($this->usageKey($band), function (ItemInterface $item) use ($band): int {
+            $item->expiresAfter(15);
+
+            return $this->exactUsedBytes($band);
+        });
+    }
+
+    public function invalidateUsage(Band $band): void
+    {
+        $this->cache->delete($this->usageKey($band));
+    }
+
+    private function usageKey(Band $band): string
+    {
+        return 'documents.'.hash('sha256', $this->directory).'.'.$band->getId();
+    }
+
+    private function exactUsedBytes(Band $band): int
     {
         $directory = $this->directory.'/'.$band->getId();
         if (!is_dir($directory)) {
@@ -76,7 +98,7 @@ final readonly class DocumentStorage
         if ($size > 10 * 1024 * 1024 || '%PDF-' !== file_get_contents($file->getPathname(), false, null, 0, 5)) {
             throw new \DomainException('Choisis un fichier PDF valide de 10 Mo maximum.');
         }
-        if ($this->usedBytes($band) + $size > $this->getQuotaBytes()) {
+        if ($this->exactUsedBytes($band) + $size > $this->getQuotaBytes()) {
             throw new \DomainException('Le quota de PDF du groupe est atteint. Retire un ancien PDF ou ajoute un lien externe.');
         }
         $directory = $this->directory.'/'.$band->getId();
@@ -87,6 +109,8 @@ final readonly class DocumentStorage
             unlink($directory.'/'.$key);
             throw new \RuntimeException('Impossible de protéger le PDF.');
         }
+
+        $this->invalidateUsage($band);
 
         return $key;
     }
@@ -107,6 +131,7 @@ final readonly class DocumentStorage
 
     public function discard(BandDocument $document): void
     {
+        $this->invalidateUsage($document->getBand());
         $path = $this->path($document);
         if (is_file($path) && !unlink($path)) {
             throw new \RuntimeException('Impossible de retirer le PDF du stockage.');

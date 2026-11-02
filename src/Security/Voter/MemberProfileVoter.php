@@ -10,7 +10,7 @@ use App\Enum\BandRole;
 use App\Enum\MemberKind;
 use App\Repository\BandMembershipRepository;
 use App\Repository\MemberProfileRepository;
-use App\Service\Finance\MusicianAccess;
+use App\Service\Security\MusicianAccess;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;

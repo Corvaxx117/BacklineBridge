@@ -12,7 +12,7 @@ Git conserve l’historique local ; un push l’envoie sur GitHub. La mise en li
 
 Au départ, les trois branches pointent sur la même version vérifiée. **Une branche ne crée ni site ni base de données.** Changer de branche sur le Mac ne change pas automatiquement son fichier SQLite. Ne pas essayer une migration risquée sur la seule copie de données réelles.
 
-Parcours : `feat/...` ou `fix/...` → `develop` → `staging` → `main`. La démo de portfolio peut conserver une version stable de `main`, indépendamment du travail en cours.
+Parcours : `feat/...`, `fix/...` ou `perf/...` → `develop` → `staging` → `main`. La démo de portfolio peut conserver une version stable de `main`, indépendamment du travail en cours.
 
 ## Travailler sur un changement
 
@@ -43,6 +43,7 @@ Format : **`type(sujet facultatif): description courte`**. Décrire une seule in
 | --- | --- | --- |
 | `feat` | Fonction ajoutée | `feat(bandsintown): valide les concerts importés` |
 | `fix` | Bug corrigé | `fix(plan): rapproche les toms` |
+| `perf` | Réduire les requêtes ou les transferts sans changement fonctionnel | `perf(concerts): allège les lectures des cartes` |
 | `refactor` | Organisation du code sans changement fonctionnel | `refactor(concerts): extrait la création dans un service` |
 | `style` | Présentation du code | `style: applique les règles Symfony` |
 | `test` | Tests | `test(auth): couvre les codes expirés` |

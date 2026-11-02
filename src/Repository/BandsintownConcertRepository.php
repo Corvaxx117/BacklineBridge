@@ -30,6 +30,21 @@ final class BandsintownConcertRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /** @return list<array{artist_id: string, event_id: string, concert_id: int}> */
+    public function identitiesForBand(Band $band): array
+    {
+        $rows = $this->getEntityManager()->getConnection()->fetchAllAssociative(
+            'SELECT artist_id, event_id, concert_id FROM bandsintown_concert WHERE band_id = ?',
+            [$band->getId()],
+        );
+
+        return array_map(static fn (array $row): array => [
+            'artist_id' => $row['artist_id'],
+            'event_id' => $row['event_id'],
+            'concert_id' => (int) $row['concert_id'],
+        ], $rows);
+    }
+
     public function forConcert(Concert $concert): ?BandsintownConcert
     {
         return $this->findOneBy(['concert' => $concert]);
