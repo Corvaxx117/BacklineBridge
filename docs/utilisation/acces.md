@@ -2,6 +2,10 @@
 
 L’équipe utilise des comptes personnels. Les salles reçoivent un lien limité à un dossier technique.
 
+## Se repérer
+
+La navigation donne accès à **Concerts**, **Agenda** et **Fiche technique**, la référence du groupe. **Le groupe** rassemble To Do, Documents, Équipe et liens, ainsi que Trésorerie et stock pour les musiciens. Sur téléphone, ouvrir d’abord **Menu**.
+
 ## Première connexion
 
 1. Ouvrir **Première connexion** et choisir son nom.

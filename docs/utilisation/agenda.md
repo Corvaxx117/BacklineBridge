@@ -14,7 +14,7 @@ Les changements faits dans Google apparaissent sous cinq minutes. Le calendrier 
 
 ## Ajouter un concert
 
-Les quatre musiciens peuvent utiliser **Ajouter à Google Agenda** dans le dossier d’un concert. Marty et Romain peuvent consulter l’agenda ; ce changement ne leur donne pas le droit d’y publier depuis BacklineBridge. Cela fonctionne pour un concert créé à la main ou importé de Bandsintown.
+Les quatre musiciens peuvent utiliser **Ajouter à Google Agenda** dans la section **Google Agenda** du dossier d’un concert. Marty et Romain peuvent consulter l’agenda ; ce changement ne leur donne pas le droit d’y publier depuis BacklineBridge. Cela fonctionne pour un concert créé à la main ou importé de Bandsintown.
 
 - L’heure renseignée dans le concert est utilisée ; sans horaire, le début est fixé à **20 h**.
 - La durée proposée est de **1 heure**, ajustable ensuite dans Google.

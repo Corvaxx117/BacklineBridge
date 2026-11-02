@@ -48,6 +48,8 @@ jobs:
         run: |
           node --check public/scripts/calendar.js
           node --check public/scripts/theme.js
+          node --check public/scripts/navigation.js
+          node --check public/scripts/concert-details.js
 
       - name: Run frontend tests
         run: npm run test:frontend

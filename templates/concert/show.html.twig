@@ -4,8 +4,12 @@
     {{ concert.venue }} — {{ concert.date|date('d/m/Y') }} · {{ app_name }}
 {% endblock %}
 
+{% block page_assets %}
+    <link rel="stylesheet" href="/styles/concert-detail.css" />
+    <script src="/scripts/concert-details.js" defer></script>
+{% endblock %}
+
 {% block body %}
-    {% set role = band_role(concert.band) %}
     <a class="back-link" href="{{ path('app_concert_index') }}">
         <span aria-hidden="true">←</span>Revenir aux concerts
     </a>
@@ -51,58 +55,6 @@
             </a>
         {% endif %}
     </section>
-    {{ include('concert/import/bandsintown/_source.html.twig') }}
-    {% if is_granted('BAND_CALENDAR', concert.band) %}
-        {{ include('concert/calendar/_panel.html.twig') }}
-    {% endif %}
-    <nav class="concert-section-links" aria-label="Aller à une section du concert">
-        <a href="#concert-contacts">Contacts <span>{{ contacts|length }}</span></a>
-        <a href="#concert-documents">Documents <span>{{ documents|length }}</span></a>
-        <a href="#dossier-technique">Dossier technique</a>
-    </nav>
-    <nav class="concert-tools" aria-label="Préparation avec la salle">
-        <a
-            class="button button-secondary"
-            href="{{
-            path(
-                'app_sheet_pdf',
-                {
-                    id: sheet.id
-                }
-            )
-            }}"
-        >
-            Télécharger la fiche PDF
-        </a>
-        <a
-            class="button button-secondary"
-            href="{{
-            path(
-                'app_concert_responses',
-                {
-                    id: concert.id
-                }
-            )
-            }}"
-        >
-            Réponses de la salle
-        </a>
-        {% if is_granted('CONCERT_SHARE', concert) %}
-            <a
-                class="button button-primary"
-                href="{{
-                path(
-                    'app_concert_invitations',
-                    {
-                        id: concert.id
-                    }
-                )
-                }}"
-            >
-                Inviter la salle
-            </a>
-        {% endif %}
-    </nav>
     {{
         include(
             'concert/_availability.html.twig',
@@ -139,107 +91,6 @@
             </p>
         </section>
     {% endif %}
-    {% if canViewConditions %}
-        <section class="conditions-panel" aria-labelledby="conditions-title">
-            <div class="panel-header">
-                <div>
-                    <p class="eyebrow">
-                        Organisation et rémunération
-                    </p>
-                    <h2 id="conditions-title">Conditions du concert</h2>
-                </div>
-                <a
-                    class="button button-secondary"
-                    href="{{
-                    path(
-                        'app_concert_conditions',
-                        {
-                            id: concert.id
-                        }
-                    )
-                    }}"
-                >
-                    {{ conditions ? 'Modifier les conditions' : 'Compléter les conditions' }}
-                </a>
-            </div>
-            <dl class="conditions-grid">
-                <div>
-                    <dt>
-                        Hébergement
-                    </dt>
-                    <dd>{{ conditions ? conditions.accommodation.label : 'À confirmer' }}</dd>
-                </div>
-                <div>
-                    <dt>
-                        Frais de transport
-                    </dt>
-                    <dd>{{ conditions ? conditions.transportCoverage.label : 'À confirmer' }}</dd>
-                </div>
-                <div>
-                    <dt>
-                        Montant convenu
-                    </dt>
-                    <dd>
-                        {{ conditions and conditions.feeCents is not null
-                            ? ((conditions.feeCents / 100)|number_format(2, ',', ' ')) ~ ' €'
-                            : 'À confirmer' }}
-                    </dd>
-                </div>
-                <div>
-                    <dt>
-                        Cadre de rémunération
-                    </dt>
-                    <dd>{{ conditions ? conditions.paymentFramework.label : 'À confirmer' }}</dd>
-                </div>
-                <div>
-                    <dt>
-                        Moyen de paiement
-                    </dt>
-                    <dd>{{ conditions ? conditions.paymentMethod.label : 'À confirmer' }}</dd>
-                </div>
-                <div>
-                    <dt>
-                        Rémunération de l’ingé son
-                    </dt>
-                    <dd>
-                        {{ conditions ? conditions.engineerPayment.label : 'À confirmer' }}{% if
-                            conditions %}
-                            <span class="condition-amount">
-                                {{ conditions.engineerPaymentFramework.label }}
-                            </span>
-                        {% endif %}
-                        {% if conditions and conditions.engineerFeeCents is not null %}
-                            <span class="condition-amount">
-                                {{ (conditions.engineerFeeCents / 100)|number_format(2, ',', ' ') }} €
-                            </span>
-                        {% endif %}
-                    </dd>
-                </div>
-                {% if conditions and conditions.notes %}
-                    <div class="field-full">
-                        <dt>
-                            Précisions
-                        </dt>
-                        <dd>{{ conditions.notes|nl2br }}</dd>
-                    </div>
-                {% endif %}
-            </dl>
-            <p class="panel-footer">
-                Le statut de la date ne vaut pas confirmation du matériel ni validation de toutes
-                les conditions.
-            </p>
-        </section>
-    {% endif %}
-    {{
-        include(
-            'concert/contact/_panel.html.twig',
-            {
-                concert: concert,
-                contacts: contacts
-            },
-            with_context: false
-        )
-    }}
     {{
         include(
             'concert/document/_panel.html.twig',
@@ -250,14 +101,88 @@
             with_context: false
         )
     }}
+    {{
+        include(
+            'concert/contact/_panel.html.twig',
+            {
+                concert: concert,
+                contacts: contacts
+            },
+            with_context: false
+        )
+    }}
+    {% if canViewConditions %}
+        {{
+            include(
+                'concert/_conditions.html.twig',
+                {
+                    concert: concert,
+                    conditions: conditions
+                },
+                with_context: false
+            )
+        }}
+    {% endif %}
     <details
         id="dossier-technique"
-        class="technical-dossier"
-        {{ not role or role.value != 'booker' ? 'open' : '' }}
+        class="technical-dossier concert-disclosure"
+        data-concert-section
     >
-        <summary>
-            Dossier technique <span>{{ lines|length }} sources</span>
-        </summary>
+        {{
+            include(
+                'concert/_section_summary.html.twig',
+                {
+                    title: 'Dossier technique',
+                    titleId: 'technical-dossier-title',
+                    meta: (lines|length) ~ ' sources · plan et matériel'
+                },
+                with_context: false
+            )
+        }}
+        <nav class="concert-tools" aria-label="Préparation avec la salle">
+            <a
+                class="button button-secondary"
+                href="{{
+                path(
+                    'app_sheet_pdf',
+                    {
+                        id: sheet.id
+                    }
+                )
+                }}"
+            >
+                Télécharger la fiche PDF
+            </a>
+            <a
+                class="button button-secondary"
+                href="{{
+                path(
+                    'app_concert_responses',
+                    {
+                        id: concert.id
+                    }
+                )
+                }}"
+            >
+                Réponses de la salle
+            </a>
+            {% if is_granted('CONCERT_SHARE', concert) %}
+                <a
+                    class="button button-primary"
+                    href="{{
+                    path(
+                        'app_concert_invitations',
+                        {
+                            id: concert.id
+                        }
+                    )
+                    }}"
+                >
+                    Inviter la salle
+                </a>
+            {% endif %}
+        </nav>
+
         <div class="technical-heading">
             <p>
                 Le patch peut être adapté pour cette date, indépendamment de la fiche du groupe.
@@ -338,6 +263,38 @@
             )
         }}
     </details>
+    {% if is_granted('BAND_CALENDAR', concert.band) %}
+        <details id="concert-calendar-section" class="concert-disclosure" data-concert-section>
+            {{
+                include(
+                    'concert/_section_summary.html.twig',
+                    {
+                        title: 'Google Agenda',
+                        titleId: 'concert-calendar-section-title',
+                        meta: calendarName
+                    },
+                    with_context: false
+                )
+            }}
+            {{ include('concert/calendar/_panel.html.twig') }}
+        </details>
+    {% endif %}
+    {% if bandsintownSource %}
+        <details id="concert-bandsintown" class="concert-disclosure" data-concert-section>
+            {{
+                include(
+                    'concert/_section_summary.html.twig',
+                    {
+                        title: 'Annonce Bandsintown',
+                        titleId: 'concert-bandsintown-title',
+                        meta: 'Adresse et billetterie'
+                    },
+                    with_context: false
+                )
+            }}
+            {{ include('concert/import/bandsintown/_source.html.twig') }}
+        </details>
+    {% endif %}
     {% if is_granted('CONCERT_DELETE', concert) %}
         <div class="concert-management">
             <p>

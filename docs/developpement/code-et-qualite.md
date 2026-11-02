@@ -16,7 +16,7 @@ Les contrôleurs reçoivent les actions ; les services appliquent les règles ; 
 | `templates/pdf/`, `src/Service/Pdf/` | PDF et dessin du plan, avec Dompdf |
 | `migrations/`, `tests/` | Évolution des tables et vérifications automatiques |
 
-Les adaptations aux petits écrans sont regroupées dans `public/styles/responsive.css`. `navigation.js` gère le menu repliable ; `stage-viewer.js` cadre et zoome le plan sans modifier ses coordonnées enregistrées.
+Les adaptations aux petits écrans sont regroupées dans `public/styles/responsive.css`. `navigation.js` gère le menu mobile et le sous-menu « Le groupe » (fermeture par Échap ou clic extérieur) ; `stage-viewer.js` cadre et zoome le plan sans modifier ses coordonnées enregistrées.
 
 Les contacts et documents passent par `Controller/Concert/Contact/` et `Controller/Document/`, avec des DTO de saisie et des services dédiés. `DocumentStorage` garde les PDF hors de `public/`, contrôle leur taille et sérialise les changements de fichiers avec un verrou partagé par la sauvegarde. Les formulaires vérifient le type réel du fichier avec Symfony Mime. `DocumentVoter` vérifie l’accès au groupe avant chaque lecture ou retrait.
 
@@ -96,3 +96,7 @@ Les fichiers FullCalendar sont copiés dans `public/vendor/fullcalendar/` et ver
 Le composant `theme/_switcher.html.twig`, placé hors de la navigation, affiche un switch accessible au clavier et un bouton de retour au mode automatique. `theme.css` gère sa capsule flottante et respecte la réduction des animations.
 
 Le changement émet `backlinebridge:themechange` ; le calendrier y répond en mettant à jour sa palette. Les tests `npm run test:frontend` couvrent la mémorisation, les changements système, les onglets et le stockage désactivé. Ils sont également exécutés dans la CI.
+
+## Vue d’ensemble du concert
+
+`concert/show.html.twig` privilégie la réponse personnelle et les notes. Les sections secondaires utilisent des éléments HTML `details` : ouverture au clavier et fonctionnement sans JavaScript. `concert-details.js` ouvre la section visée par un lien direct ou un retour de formulaire. Les styles propres à cette page sont dans `concert-detail.css`. La présentation ne modifie ni les droits ni les données enregistrées.

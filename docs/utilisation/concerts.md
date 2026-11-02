@@ -2,6 +2,10 @@
 
 Chaque concert possède son propre dossier. Modifier Lyon ne modifie ni Nantes ni la référence du groupe.
 
+## Lire le dossier
+
+Les disponibilités et les notes pratiques apparaissent en premier. Les sections **Documents**, **Contacts**, **Conditions**, **Dossier technique** et **Google Agenda** sont repliées : cliquer sur leur titre pour les ouvrir. Les liens directs et les retours de formulaire ouvrent la section concernée.
+
 ## Créer et compléter une date
 
 1. Ouvrir **Concerts → Créer un concert** : date, salle, ville et notes pratiques facultatives.
@@ -16,6 +20,8 @@ Le nom du créateur est enregistré. Une ancienne date sans auteur indique « Cr
 ## Répondre aux disponibilités
 
 Les quatre musiciens et Marty répondent pour eux-mêmes : **Disponible**, **Indisponible** ou **À confirmer**, avec une précision facultative. Romain consulte les réponses.
+
+Le formulaire personnel est ouvert tant que la réponse reste **À confirmer**. Après réponse, **Modifier** permet de la changer. **Les réponses de l’équipe** affiche les commentaires et dates de réponse ; une indisponibilité reste signalée même lorsque ce détail est fermé.
 
 Tout commence à confirmer, même pour le créateur. Changer la date remet les disponibilités et leurs précisions à zéro ; changer la salle ou les notes les conserve. Le compteur porte sur les responsables ayant un compte dans le groupe.
 
@@ -71,7 +77,7 @@ Si quelqu’un modifie un dossier pendant ta saisie, recharger avant de confirme
 
 ## Inviter une salle
 
-1. Depuis le concert, ouvrir **Inviter la salle**.
+1. Dans le concert, ouvrir **Dossier technique → Inviter la salle**.
 2. Nommer le destinataire et choisir 7, 30 ou 90 jours.
 3. Publier puis transmettre le lien. L’application n’envoie pas d’e-mail.
 
