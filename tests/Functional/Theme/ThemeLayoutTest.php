@@ -16,7 +16,7 @@ final class ThemeLayoutTest extends VenueTestCase
         $html = $this->client->getResponse()->getContent();
         self::assertLessThan(strpos($html, '/styles/tokens.css'), strpos($html, '/scripts/theme.js'));
         self::assertLessThan(strpos($html, '/styles/app.css'), strpos($html, '/styles/tokens.css'));
-        self::assertSelectorNotExists('script[src="/scripts/theme.js"][defer]');
+        self::assertSelectorNotExists('script[src^="/scripts/theme.js?v="][defer]');
     }
 
     public function testTheLoginPageHasTheSameThemeControl(): void
@@ -41,7 +41,7 @@ final class ThemeLayoutTest extends VenueTestCase
         self::assertSelectorCount(1, 'button[data-theme-auto][aria-pressed]');
         self::assertSelectorNotExists('header [data-theme-control]');
         self::assertSelectorNotExists('select[data-theme-choice]');
-        self::assertSelectorExists('link[href="/styles/tokens.css"]');
-        self::assertSelectorExists('script[src="/scripts/theme.js"]');
+        self::assertSelectorExists('link[href^="/styles/tokens.css?v="]');
+        self::assertSelectorExists('script[src^="/scripts/theme.js?v="]');
     }
 }

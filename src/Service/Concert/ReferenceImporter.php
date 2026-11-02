@@ -6,8 +6,8 @@ namespace App\Service\Concert;
 
 use App\Dto\Concert\ReferenceImportInput;
 use App\Entity\Concert;
-use App\Entity\PatchLine;
 use App\Entity\TechnicalSheet;
+use App\Service\Patch\PatchLineCopier;
 use App\Service\Stage\StagePatchLinks;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -17,6 +17,7 @@ final readonly class ReferenceImporter
         private EntityManagerInterface $entityManager,
         private ReferenceImportPreview $previews,
         private StagePatchLinks $stageLinks,
+        private PatchLineCopier $copier,
     ) {
     }
 
@@ -78,15 +79,7 @@ final readonly class ReferenceImporter
                 continue;
             }
             $channel = $source->getChannelNumber();
-            $line = $existing[$channel] ?? new PatchLine()->inheritSourceKey($source);
-            $line
-                ->inheritSourceKey($source)
-                ->setChannelNumber($channel)
-                ->setSourceName($source->getSourceName())
-                ->setPreferredMicrophone($source->getPreferredMicrophone())
-                ->setStand($source->getStand())
-                ->setNotes($source->getNotes())
-                ->setSection($source->getSection());
+            $line = $this->copier->copy($source, $existing[$channel] ?? null);
             $sheet->addLine($line);
             unset($existing[$channel]);
         }

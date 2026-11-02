@@ -27,6 +27,8 @@ Le code est valable 30 jours et utilisable une seule fois. Un formulaire refusé
 
 Musiciens et ingénieur son ont le rôle **Responsable**. Le profil **Musicien** ouvre en plus la trésorerie. Les six comptes internes peuvent consulter l’[agenda commun](agenda.md), nommé **Avee Mana Partagé** ; seuls les quatre musiciens peuvent y ajouter un concert depuis BacklineBridge. Romain a le rôle **Booker**. Ces droits sont vérifiés sur le serveur.
 
+Les [setlists](setlists.md) sont consultables par les six membres de l’équipe ; seuls les quatre musiciens peuvent les modifier. Elles restent invisibles aux salles.
+
 Les six membres de l’équipe accèdent aussi au [To Do partagé](taches.md) pour créer et répartir les missions du groupe. Les salles invitées n’y ont pas accès.
 
 Les rôles `editor` et `viewer` servent aussi aux essais : modification du patch sans suppression pour le premier, lecture pour le second, sans gestion des conditions privées.

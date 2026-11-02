@@ -38,6 +38,23 @@ final class CalendarWorkspaceTest extends VenueTestCase
         static::getContainer()->get('cache.google_calendar')->clear();
     }
 
+    public function testReadFailuresAreCachedBrieflyAndInvalidationAllowsRetry(): void
+    {
+        $this->configure();
+        $gateway = $this->createMock(GoogleCalendarGateway::class);
+        $gateway->expects(self::exactly(2))->method('events')
+            ->willThrowException(new GoogleCalendarUnavailable('Erreur Google fictive.'));
+        static::getContainer()->set(GoogleCalendarGateway::class, $gateway);
+        $url = '/groupes/'.$this->bandId.'/agenda/evenements?start=2026-12-01&end=2026-12-31';
+        $this->client->request('GET', $url);
+        self::assertResponseStatusCodeSame(503);
+        $this->client->request('GET', $url);
+        self::assertResponseStatusCodeSame(503);
+        static::getContainer()->get(\App\Service\Calendar\CalendarReader::class)->invalidate();
+        $this->client->request('GET', $url);
+        self::assertResponseStatusCodeSame(503);
+    }
+
     private function configure(string $bandId = ''): void
     {
         static::getContainer()->set(GoogleCalendarConfiguration::class, new GoogleCalendarConfiguration(

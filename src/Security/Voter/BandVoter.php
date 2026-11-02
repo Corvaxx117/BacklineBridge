@@ -8,7 +8,7 @@ use App\Entity\Band;
 use App\Entity\User;
 use App\Enum\BandRole;
 use App\Repository\BandMembershipRepository;
-use App\Service\Finance\MusicianAccess;
+use App\Service\Security\MusicianAccess;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 final class BandVoter extends Voter
 {
     public const TREASURY = 'BAND_TREASURY';
+    public const SETLIST = 'BAND_SETLIST';
     public const CALENDAR = 'BAND_CALENDAR';
     public const CALENDAR_PUBLISH = 'BAND_CALENDAR_PUBLISH';
     public const VIEW = 'BAND_VIEW';
@@ -41,6 +42,7 @@ final class BandVoter extends Voter
                 [
                     self::VIEW,
                     self::TREASURY,
+                    self::SETLIST,
                     self::CALENDAR,
                     self::CALENDAR_PUBLISH,
                     self::EDIT_PATCH,
@@ -70,7 +72,7 @@ final class BandVoter extends Voter
 
         return match ($attribute) {
             self::VIEW, self::CALENDAR => true,
-            self::TREASURY, self::CALENDAR_PUBLISH => $this->musicians->allows($user, $subject),
+            self::TREASURY, self::CALENDAR_PUBLISH, self::SETLIST => $this->musicians->allows($user, $subject),
             self::EDIT_PATCH => $role->canEdit(),
             self::DELETE_PATCH, self::MANAGE_TECHNICAL => BandRole::Manager === $role,
             self::PLAN_CONCERT, self::CONDITIONS => $role->canPlanConcerts(),

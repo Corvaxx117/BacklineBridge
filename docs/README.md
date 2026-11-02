@@ -8,6 +8,7 @@ Choisir le guide correspondant à la tâche. Chaque sujet possède un seul guide
 | --- | --- |
 | Se connecter, changer son mot de passe, comprendre les droits | [Comptes et accès](utilisation/acces.md) |
 | Préparer une date, le plan, le matériel, inviter la salle et télécharger un PDF | [Concerts et dossier technique](utilisation/concerts.md) |
+| Définir les morceaux du groupe et les adapter à une date | [Setlists](utilisation/setlists.md) |
 | Suivre l’argent, le merch et les profils | [Espace groupe](utilisation/groupe.md) |
 | Récupérer les annonces de l’artiste | [Bandsintown](utilisation/bandsintown.md) |
 | Répartir les missions et suivre leur avancement | [To Do](utilisation/taches.md) |
@@ -20,6 +21,7 @@ Choisir le guide correspondant à la tâche. Chaque sujet possède un seul guide
 | --- | --- |
 | Installer, démarrer et rafraîchir VS Code | [Installation](developpement/installation.md) |
 | Retrouver le code, le présenter et le vérifier | [Code et qualité](developpement/code-et-qualite.md) |
+| Alléger les lectures, versionner les fichiers et lancer les tests navigateur | [Performances](developpement/performance.md) |
 | Travailler avec les branches et nommer les commits | [Git](developpement/git.md) |
 | Ouvrir SQLite dans DBeaver | [Base de données](developpement/base-de-donnees.md) |
 

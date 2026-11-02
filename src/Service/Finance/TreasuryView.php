@@ -32,12 +32,12 @@ final readonly class TreasuryView
                 'expense' => 0,
             ];
         }
-        foreach ($this->treasury->chartEntries($band, $first) as $entry) {
-            $key = $entry->getOccurredOn()->format('Y-m');
+        foreach ($this->treasury->monthlyTotals($band, $first) as $entry) {
+            $key = $entry['month'];
             if (isset($months[$key])) {
                 $months[$key][
-                    TreasuryEntryKind::Income === $entry->getKind() ? 'income' : 'expense'
-                ] += $entry->getAmountCents();
+                    TreasuryEntryKind::Income->value === $entry['kind'] ? 'income' : 'expense'
+                ] += $entry['amount'];
             }
         }
         $accounts = $this->treasury->accounts($band);

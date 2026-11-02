@@ -24,3 +24,5 @@ framework:
             cache.google_calendar:
                 adapter: cache.adapter.filesystem
                 tags: true
+            cache.document_usage:
+                adapter: cache.adapter.filesystem
