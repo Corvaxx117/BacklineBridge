@@ -25,7 +25,7 @@ Tout commence à confirmer, même pour le créateur. Changer la date remet les d
 
 La section **Contacts du concert** contient les personnes à joindre : nom, rôle, e-mail, téléphone et précisions facultatives. Ajouter plusieurs interlocuteurs, puis utiliser les liens pour leur écrire ou les appeler. Les coordonnées sont internes à l’équipe ; elles ne sont pas intégrées aux invitations de salle ni au PDF technique.
 
-Les responsables, le tourneur et les profils techniques peuvent ajouter, modifier et retirer un contact. Un formulaire périmé ne remplace pas une modification plus récente.
+Les responsables, le booker et les profils techniques peuvent ajouter, modifier et retirer un contact. Un formulaire périmé ne remplace pas une modification plus récente.
 
 Dans **Documents du concert**, ajouter une fiche reçue en PDF ou le lien d’un Google Doc, d’un fichier Drive, etc. Ces ajouts apparaissent aussi dans l’onglet commun [Documents](documents.md). La limite d’un PDF est de 10 Mo.
 

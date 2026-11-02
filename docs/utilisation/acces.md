@@ -21,7 +21,7 @@ Le code est valable 30 jours et utilisable une seule fois. Un formulaire refusé
 | Romain, booker | Consulter | Modifier | Aucun accès | Toutes, en lecture |
 | Salle invitée | Lire la version partagée et répondre | Aucun accès interne | Aucun accès | Aucune |
 
-Musiciens et ingénieur son ont le rôle **Responsable**. Le profil **Musicien** ouvre en plus la trésorerie. Romain a le rôle **Tourneur**. Ces droits sont vérifiés sur le serveur.
+Musiciens et ingénieur son ont le rôle **Responsable**. Le profil **Musicien** ouvre en plus la trésorerie. Romain a le rôle **Booker**. Ces droits sont vérifiés sur le serveur.
 
 Les six membres de l’équipe accèdent aussi au [To Do partagé](taches.md) pour créer et répartir les missions du groupe. Les salles invitées n’y ont pas accès.
 

@@ -40,7 +40,7 @@ final class BookingTest extends DatabaseTestCase
         self::assertResponseStatusCodeSame(303);
         $crawler = $this->client->followRedirect();
         self::assertSelectorTextContains('.status-badge', 'Validé');
-        self::assertSelectorTextContains('.role-badge', 'Tourneur');
+        self::assertSelectorTextContains('.role-badge', 'Booker');
         self::assertSelectorExists('.technical-dossier:not([open])');
         self::assertSelectorNotExists('.patch-table a.edit-link');
         self::assertSelectorTextContains('.concert-notes', 'Repas prévu sur place.');
