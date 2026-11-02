@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -39,6 +40,15 @@ final class ConcertType extends AbstractType
                 'widget' => 'single_text',
                 'input' => 'datetime_immutable',
                 'invalid_message' => 'Indique une date valide.',
+            ])
+            ->add('startTime', TimeType::class, [
+                'label' => 'Heure du concert (facultatif)',
+                'widget' => 'single_text',
+                'input' => 'string',
+                'input_format' => 'H:i',
+                'required' => false,
+                'invalid_message' => 'Indique une heure valide.',
+                'help' => 'Sans horaire renseigné, l’ajout à Google Agenda utilisera 20 h.',
             ])
             ->add('venue', TextType::class, [
                 'label' => 'Salle',

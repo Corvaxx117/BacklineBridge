@@ -24,7 +24,7 @@ Le résultat indique les nombres d’annonces disponibles, à venir et écartée
 
 ## Choisir les concerts
 
-1. En responsable ou tourneur, ouvrir **Concerts → Importer Bandsintown**.
+1. En responsable ou booker, ouvrir **Concerts → Importer Bandsintown**.
 2. Choisir dates passées, à venir ou toutes, puis charger l’aperçu.
 3. Cocher les dates à ajouter ou les annonces à rattacher à une date déjà saisie.
 4. Confirmer la sélection, jusqu’à 100 concerts.

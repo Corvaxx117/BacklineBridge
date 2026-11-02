@@ -1,0 +1,109 @@
+<section class="calendar-shell" data-calendar-shell hidden aria-label="{{ calendarName }}">
+    <div class="calendar-toolbar">
+        <div class="calendar-navigation" role="group" aria-label="Changer de période">
+            <button
+                class="button button-secondary calendar-arrow"
+                type="button"
+                data-calendar-previous
+                aria-label="Période précédente"
+            >
+                ←
+            </button>
+            <button class="button button-secondary" type="button" data-calendar-today>
+                Aujourd’hui
+            </button>
+            <button
+                class="button button-secondary calendar-arrow"
+                type="button"
+                data-calendar-next
+                aria-label="Période suivante"
+            >
+                →
+            </button>
+        </div>
+        <h2 data-calendar-title aria-live="polite">Calendrier</h2>
+        <div class="calendar-view-switch" role="group" aria-label="Affichage du calendrier">
+            <button
+                class="button button-secondary"
+                type="button"
+                data-calendar-view="dayGridMonth"
+                aria-pressed="true"
+            >
+                Mois
+            </button>
+            <button
+                class="button button-secondary"
+                type="button"
+                data-calendar-view="timeGridWeek"
+                aria-pressed="false"
+            >
+                Semaine
+            </button>
+            <button
+                class="button button-secondary"
+                type="button"
+                data-calendar-view="listMonth"
+                aria-pressed="false"
+            >
+                Liste
+            </button>
+        </div>
+    </div>
+    <p class="flash flash-error" data-calendar-error role="alert" hidden></p>
+    <button class="button button-secondary" type="button" data-calendar-retry hidden>
+        Réessayer
+    </button>
+    <div
+        class="calendar-viewport"
+        tabindex="0"
+        aria-label="Calendrier, défilement horizontal possible en vue semaine"
+    >
+        <div
+            data-calendar-grid
+            class="calendar-grid"
+            data-events-url="{{
+            path(
+                'app_calendar_events',
+                {
+                    id: band.id
+                }
+            )
+            }}"
+            data-timezone="{{ timezone }}"
+            data-today="{{ today }}"
+            aria-busy="true"
+        ></div>
+    </div>
+    <p class="calendar-mobile-hint" data-calendar-mobile-hint hidden>
+        En vue Semaine, fais glisser le calendrier pour parcourir les jours.
+    </p>
+    <p class="calendar-status" data-calendar-status role="status">
+        Chargement des événements…
+    </p>
+</section>
+<dialog class="calendar-dialog" data-calendar-dialog aria-labelledby="calendar-event-title">
+    <form method="dialog" class="calendar-dialog-close">
+        <button class="button button-secondary" type="submit">Fermer</button>
+    </form>
+    <p class="eyebrow">
+        {{ calendarName }}
+    </p>
+    <h2 id="calendar-event-title" data-event-title></h2>
+    <dl>
+        <dt>
+            Date et horaire
+        </dt><dd data-event-date></dd>
+        <dt>
+            Lieu
+        </dt><dd data-event-location></dd>
+    </dl>
+    <a
+        class="button button-primary"
+        data-event-url
+        target="_blank"
+        rel="noopener noreferrer"
+        hidden
+    >
+        Ouvrir dans Google Agenda ↗
+    </a>
+</dialog>

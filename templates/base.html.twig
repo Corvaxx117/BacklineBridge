@@ -3,18 +3,23 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="theme-color" content="#152b38" />
         <title>
             {% block title %}
                 {{ app_name }} — Fiche technique
             {% endblock %}
         </title>
+        {{ include('theme/_head.html.twig', {}, with_context: false) }}
         <link rel="stylesheet" href="/styles/app.css" />
         <link rel="stylesheet" href="/styles/responsive.css" />
+        <link rel="stylesheet" href="/styles/navigation.css" />
         <link rel="stylesheet" href="/styles/collaboration.css" />
         <link rel="stylesheet" href="/styles/tasks.css" />
+        <link rel="stylesheet" href="/styles/calendar.css" />
         <script src="/scripts/stage-viewer.js" defer></script>
         <script src="/scripts/navigation.js" defer></script>
+        {% block page_assets %}
+
+        {% endblock %}
     </head>
     <body>
         <a class="skip-link" href="#contenu">Aller au contenu</a>
@@ -26,7 +31,7 @@
                     aria-label="{{ app_name }}, accueil"
                 >
                     {{ include('branding/_mark.html.twig', {}, with_context: false) }}
-                    <span>{{ app_name }}<span class="brand-caption">DOSSIER TECHNIQUE</span></span>
+                    <span>{{ app_name }}<span class="brand-caption">ESPACE DU GROUPE</span></span>
                 </a>
                 {% if app.user %}
                     {% set currentBand =
@@ -43,147 +48,22 @@
                                 : sheet is defined ? sheet.band : null
                         )
                     %}
-                    <button
-                        type="button"
-                        class="nav-toggle"
-                        data-navigation-toggle
-                        aria-controls="primary-navigation"
-                        aria-expanded="false"
-                        hidden
-                    >
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            aria-hidden="true"
-                        >
-                            <path d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                        <span data-navigation-label>Menu</span>
-                    </button>
-                    <nav
-                        id="primary-navigation"
-                        class="site-nav"
-                        aria-label="Navigation principale"
-                    >
-                        <a
-                            href="{{ path('app_patch_index') }}"
-                            aria-current="{{
-                            app.request.attributes.get('_route') starts with 'app_patch_'
-                                and (sheet is not defined or sheet.concert is null)
-                                ? 'page'
-                                : 'false'
-                            }}"
-                        >
-                            Fiche du groupe
-                        </a>
-                        <a
-                            href="{{ path('app_concert_index') }}"
-                            aria-current="{{
-                            app.request.attributes.get('_route') starts with 'app_concert_'
-                                or (sheet is defined and sheet.concert is not null)
-                                ? 'page'
-                                : 'false'
-                            }}"
-                        >
-                            Concerts
-                        </a>
-                        {% if currentBand %}
-                            <a
-                                href="{{
-                                path(
-                                    'app_task_index',
-                                    {
-                                        id: currentBand.id
-                                    }
-                                )
-                                }}"
-                                aria-current="{{
-                                app.request.attributes.get('_route') starts with 'app_task_'
-                                    ? 'page'
-                                    : 'false'
-                                }}"
-                            >
-                                To Do
-                            </a>
-                            <a
-                                href="{{
-                                path(
-                                    'app_document_index',
-                                    {
-                                        id: currentBand.id
-                                    }
-                                )
-                                }}"
-                                aria-current="{{
-                                app.request.attributes.get('_route') starts with 'app_document_'
-                                    ? 'page'
-                                    : 'false'
-                                }}"
-                            >
-                                Documents
-                            </a>
-                            <a
-                                href="{{
-                                path(
-                                    'app_profile_team',
-                                    {
-                                        id: currentBand.id
-                                    }
-                                )
-                                }}"
-                                aria-current="{{
-                                app.request.attributes.get('_route') starts with 'app_profile_'
-                                    ? 'page'
-                                    : 'false'
-                                }}"
-                            >
-                                Équipe & liens
-                            </a>
-                            {% if is_granted('BAND_TREASURY', currentBand) %}
-                                <a
-                                    href="{{
-                                    path(
-                                        'app_treasury_index',
-                                        {
-                                            id: currentBand.id
-                                        }
-                                    )
-                                    }}"
-                                    aria-current="{{
-                                    app.request.attributes.get('_route') starts with 'app_treasury_'
-                                        or app.request.attributes.get('_route')
-                                            starts with 'app_stock_'
-                                        ? 'page'
-                                        : 'false'
-                                    }}"
-                                >
-                                    Trésorerie & stock
-                                </a>
-                            {% endif %}
-                        {% endif %}
-                        <span class="session-info">
-                            <a
-                                class="session-name"
-                                href="{{ path('app_account_password') }}"
-                                title="Changer mon mot de passe"
-                            >
-                                {{ app.user.displayName }}
-                            </a>
-                            {% if currentRole %}
-                                <span class="role-badge">{{ currentRole.label }}</span>
-                            {% endif %}
-                        </span>
-                        <form action="{{ path('app_logout') }}" method="post" class="logout-form">
-                            <input
-                                type="hidden"
-                                name="_csrf_token"
-                                value="{{ csrf_token('logout') }}"
-                            />
-                            <button type="submit">Se déconnecter</button>
-                        </form>
-                    </nav>
+                    {{
+                        include(
+                            'navigation/_primary.html.twig',
+                            {
+                                currentBand: currentBand,
+                                currentRole: currentRole,
+                                referenceActive: app.request.attributes.get('_route')
+                                    starts with 'app_patch_'
+                                    and (sheet is not defined or sheet.concert is null),
+                                concertActive: app.request.attributes.get('_route')
+                                    starts with 'app_concert_'
+                                    or (sheet is defined and sheet.concert is not null)
+                            },
+                            with_context: false
+                        )
+                    }}
                 {% endif %}
             </div>
         </header>
@@ -241,5 +121,6 @@
                 </p>
             </div>
         </footer>
+        {{ include('theme/_switcher.html.twig', {}, with_context: false) }}
     </body>
 </html>

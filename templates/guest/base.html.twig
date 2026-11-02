@@ -9,6 +9,7 @@
                 Espace salle · {{ app_name }}
             {% endblock %}
         </title>
+        {{ include('theme/_head.html.twig', {}, with_context: false) }}
         <link rel="stylesheet" href="/styles/app.css" />
         <link rel="stylesheet" href="/styles/responsive.css" />
         <link rel="stylesheet" href="/styles/venue-reply.css" />
@@ -57,5 +58,6 @@
                 </p>
             </div>
         </footer>
+        {{ include('theme/_switcher.html.twig', {}, with_context: false) }}
     </body>
 </html>

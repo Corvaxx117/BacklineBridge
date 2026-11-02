@@ -1,0 +1,132 @@
+/* La capsule reste accessible sans encombrer la navigation. */
+.theme-control[hidden] {
+    display: none !important;
+}
+
+.theme-control {
+    position: fixed;
+    z-index: 20;
+    right: max(24px, env(safe-area-inset-right));
+    bottom: calc(24px + env(safe-area-inset-bottom));
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-muted);
+    box-shadow: var(--shadow);
+}
+
+.theme-control button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    color: inherit;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.theme-control button:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
+}
+
+.theme-control svg {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+}
+
+.theme-switch {
+    position: relative;
+    width: 76px;
+    gap: 14px;
+    background: var(--surface-muted);
+}
+
+.theme-switch-thumb {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    transition: transform 180ms ease;
+}
+
+.theme-switch[aria-checked='true'] .theme-switch-thumb {
+    transform: translateX(32px);
+}
+
+.theme-switch[aria-checked='false'] svg:first-of-type,
+.theme-switch[aria-checked='true'] svg:last-of-type {
+    color: var(--on-strong);
+}
+
+.theme-control-divider {
+    width: 1px;
+    height: 20px;
+    margin-inline: 2px;
+    background: var(--border);
+}
+
+.theme-auto {
+    width: 44px;
+    background: transparent;
+}
+
+.theme-auto:hover {
+    background: var(--surface-hover);
+}
+
+.theme-auto[aria-pressed='true'] {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+}
+
+/* La barre de réponse de la salle mesure déjà sa propre hauteur. */
+.guest-has-reply-tools .theme-control {
+    bottom: calc(var(--reply-save-height, 110px) + 16px);
+}
+
+/* Le bas de page reste dégagé lorsque la capsule est visible. */
+body:has(.theme-control:not([hidden])) .site-footer {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+}
+
+body:has(.theme-control:not([hidden])) .page-shell:has(.stage-editor) {
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 720px) {
+    .theme-control {
+        right: max(16px, env(safe-area-inset-right));
+        bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-switch-thumb {
+        transition: none;
+    }
+}
+
+@media print {
+    .theme-control {
+        display: none;
+    }
+
+    body:has(.theme-control) .site-footer,
+    body:has(.theme-control) .page-shell:has(.stage-editor) {
+        padding-bottom: 0;
+    }
+}

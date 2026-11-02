@@ -41,6 +41,9 @@ class MemberProfile
         #[ORM\Column(length: 20, enumType: MemberKind::class)] private MemberKind $kind,
     ) {
         $this->publicId = bin2hex(random_bytes(16));
+        if (MemberKind::Booker === $kind) {
+            $this->function = $kind->label();
+        }
     }
 
     public function attachUser(User $user): void

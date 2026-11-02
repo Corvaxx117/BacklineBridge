@@ -1,0 +1,70 @@
+<li class="concert-card{{ past ? ' concert-card--past' : '' }}">
+    <div class="concert-date-block">
+        <time class="concert-date" datetime="{{ concert.date|date('Y-m-d') }}">
+            {{ concert.date|date('d/m/Y') }}
+        </time>
+        {% if past %}
+            <span class="concert-period-badge">Passé</span>
+        {% endif %}
+    </div>
+    <div class="concert-card-copy">
+        <p class="eyebrow">
+            {{ concert.patchSheet.bandName }}
+        </p>
+        <h3>
+            <a
+                href="{{
+                path(
+                    'app_concert_show',
+                    {
+                        id: concert.id
+                    }
+                )
+                }}"
+            >
+                {{ concert.venue }}
+            </a>
+        </h3>
+        <p>
+            {{ concert.city }}
+            <span class="status-badge status-{{ concert.status.value }}">
+                {{ concert.status.label }}
+            </span>
+        </p>
+        <p class="concert-creator">
+            {{ concert.createdByName
+                ? 'Créé par ' ~ concert.createdByName
+                : 'Créateur non renseigné' }}
+        </p>
+        {% if not past and is_granted('CONCERT_RESPOND_AVAILABILITY', concert) %}
+            {% set myStatus = myAvailabilities[concert.id].status|default(null) %}
+            <a
+                class="concert-availability-link"
+                href="{{
+                path(
+                    'app_concert_show',
+                    {
+                        id: concert.id
+                    }
+                )
+                }}#disponibilites"
+            >
+                Ma disponibilité : {{ myStatus ? myStatus.label : 'À confirmer' }}
+            </a>
+        {% endif %}
+    </div>
+    <a
+        class="button button-secondary"
+        href="{{
+        path(
+            'app_concert_show',
+            {
+                id: concert.id
+            }
+        )
+        }}"
+        aria-label="Ouvrir le concert à {{ concert.venue }} du {{ concert.date|date('d/m/Y') }}"
+    >
+        Ouvrir le dossier <span aria-hidden="true">→</span>
+    </a>
+</li>

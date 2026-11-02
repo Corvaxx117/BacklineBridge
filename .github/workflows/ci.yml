@@ -41,6 +41,19 @@ jobs:
       - name: Install formatting tools
         run: npm ci --ignore-scripts
 
+      - name: Check local calendar assets
+        run: npm run calendar:assets:check
+
+      - name: Check frontend JavaScript syntax
+        run: |
+          node --check public/scripts/calendar.js
+          node --check public/scripts/theme.js
+          node --check public/scripts/navigation.js
+          node --check public/scripts/concert-details.js
+
+      - name: Run frontend tests
+        run: npm run test:frontend
+
       - name: Check formatting
         run: npm run format:check
 

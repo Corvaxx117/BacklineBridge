@@ -27,7 +27,7 @@ enum BandRole: string
             self::Manager => 'Responsable',
             self::Editor => 'Régie technique',
             self::Viewer => 'Lecture seule',
-            self::Booker => 'Tourneur',
+            self::Booker => 'Booker',
         };
     }
 }

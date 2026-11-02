@@ -1,12 +1,24 @@
-<section id="concert-contacts" class="collaboration-panel" aria-labelledby="contacts-title">
-    <div class="panel-header">
-        <div>
-            <p class="eyebrow">
-                Les bonnes personnes, au bon endroit
-            </p>
-            <h2 id="contacts-title">Contacts du concert</h2>
-        </div>
-        {% if is_granted('CONCERT_CONTACTS', concert) %}
+<details
+    id="concert-contacts"
+    class="collaboration-panel concert-disclosure"
+    aria-labelledby="contacts-title"
+    data-concert-section
+>
+    {{
+        include(
+            'concert/_section_summary.html.twig',
+            {
+                title: 'Contacts du concert',
+                titleId: 'contacts-title',
+                meta: contacts|length
+                    ? (contacts|length) ~ ((contacts|length) == 1 ? ' contact' : ' contacts')
+                    : 'Aucun contact'
+            },
+            with_context: false
+        )
+    }}
+    {% if is_granted('CONCERT_CONTACTS', concert) %}
+        <div class="panel-header">
             <a
                 class="button button-secondary"
                 href="{{
@@ -20,12 +32,11 @@
             >
                 Ajouter un contact
             </a>
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
     {% if contacts is empty %}
         <p class="collaboration-empty">
-            Régie, organisation, label, connaissance… Garde ici les coordonnées utiles pour cette
-            date.
+            Aucun contact ajouté pour cette date.
         </p>
     {% else %}
         <ul class="collaboration-grid" aria-label="Contacts du concert">
@@ -95,4 +106,4 @@
             {% endfor %}
         </ul>
     {% endif %}
-</section>
+</details>

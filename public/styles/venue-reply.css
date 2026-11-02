@@ -22,7 +22,7 @@
     cursor: pointer;
 }
 .reply-notices > summary:focus-visible {
-    outline: 3px solid #b44c2f;
+    outline: 3px solid var(--focus-ring);
     outline-offset: 3px;
 }
 .reply-respondent {
@@ -48,29 +48,29 @@
     justify-content: center;
     min-height: 44px;
     padding: 10px 14px;
-    border: 1px solid #b6c4bb;
+    border: 1px solid var(--border-strong);
     border-radius: 6px;
-    background: var(--white);
-    color: var(--ink);
+    background: var(--surface);
+    color: var(--text);
     font: inherit;
     font-size: 14px;
     cursor: pointer;
 }
 .reply-filter-options button:focus-visible {
-    outline: 3px solid #b44c2f;
+    outline: 3px solid var(--focus-ring);
     outline-offset: 3px;
 }
 .reply-filter-options button[aria-pressed='true'] {
-    border-color: var(--ink);
-    background: var(--ink);
-    color: var(--white);
+    border-color: var(--border-strong);
+    background: var(--strong-bg);
+    color: var(--on-strong);
 }
 .reply-filter-options [data-reply-pending-count] {
     flex: 0 0 auto;
     min-width: 22px;
     padding: 2px 6px;
     border-radius: 12px;
-    background: #ffffff26;
+    background: var(--header-pill);
     font-size: 12px;
     font-weight: 700;
     text-align: center;
@@ -78,7 +78,7 @@
 .reply-filters p {
     flex: 1 1 280px;
     margin: 0;
-    color: #586a62;
+    color: var(--text-muted);
     font-size: 13px;
     line-height: 1.6;
 }
@@ -104,9 +104,9 @@
     z-index: 30;
     inset: auto 0 0;
     padding: 14px 24px calc(14px + env(safe-area-inset-bottom, 0px));
-    border-top: 1px solid #c9d2ca;
-    background: #fffefa;
-    box-shadow: 0 -4px 20px #152b3814;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: 0 -4px 20px var(--shadow-color);
 }
 .reply-save-inner {
     display: flex;
@@ -120,13 +120,13 @@
     display: grid;
     gap: 4px;
     min-width: 0;
-    color: #50615b;
+    color: var(--text-muted);
     font-size: 13px;
     line-height: 1.5;
     overflow-wrap: anywhere;
 }
 .reply-save-summary strong {
-    color: var(--ink);
+    color: var(--text);
     font-size: 15px;
 }
 .reply-save-inner .button {

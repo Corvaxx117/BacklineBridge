@@ -2,6 +2,10 @@
 
 Chaque concert possède son propre dossier. Modifier Lyon ne modifie ni Nantes ni la référence du groupe.
 
+## Lire le dossier
+
+Les disponibilités et les notes pratiques apparaissent en premier. Les sections **Documents**, **Contacts**, **Conditions**, **Dossier technique** et **Google Agenda** sont repliées : cliquer sur leur titre pour les ouvrir. Les liens directs et les retours de formulaire ouvrent la section concernée.
+
 ## Créer et compléter une date
 
 1. Ouvrir **Concerts → Créer un concert** : date, salle, ville et notes pratiques facultatives.
@@ -17,6 +21,8 @@ Le nom du créateur est enregistré. Une ancienne date sans auteur indique « Cr
 
 Les quatre musiciens et Marty répondent pour eux-mêmes : **Disponible**, **Indisponible** ou **À confirmer**, avec une précision facultative. Romain consulte les réponses.
 
+Le formulaire personnel est ouvert tant que la réponse reste **À confirmer**. Après réponse, **Modifier** permet de la changer. **Les réponses de l’équipe** affiche les commentaires et dates de réponse ; une indisponibilité reste signalée même lorsque ce détail est fermé.
+
 Tout commence à confirmer, même pour le créateur. Changer la date remet les disponibilités et leurs précisions à zéro ; changer la salle ou les notes les conserve. Le compteur porte sur les responsables ayant un compte dans le groupe.
 
 **Concert validé, membres disponibles et matériel confirmé sont trois informations différentes.**
@@ -25,7 +31,7 @@ Tout commence à confirmer, même pour le créateur. Changer la date remet les d
 
 La section **Contacts du concert** contient les personnes à joindre : nom, rôle, e-mail, téléphone et précisions facultatives. Ajouter plusieurs interlocuteurs, puis utiliser les liens pour leur écrire ou les appeler. Les coordonnées sont internes à l’équipe ; elles ne sont pas intégrées aux invitations de salle ni au PDF technique.
 
-Les responsables, le tourneur et les profils techniques peuvent ajouter, modifier et retirer un contact. Un formulaire périmé ne remplace pas une modification plus récente.
+Les responsables, le booker et les profils techniques peuvent ajouter, modifier et retirer un contact. Un formulaire périmé ne remplace pas une modification plus récente.
 
 Dans **Documents du concert**, ajouter une fiche reçue en PDF ou le lien d’un Google Doc, d’un fichier Drive, etc. Ces ajouts apparaissent aussi dans l’onglet commun [Documents](documents.md). La limite d’un PDF est de 10 Mo.
 
@@ -71,7 +77,7 @@ Si quelqu’un modifie un dossier pendant ta saisie, recharger avant de confirme
 
 ## Inviter une salle
 
-1. Depuis le concert, ouvrir **Inviter la salle**.
+1. Dans le concert, ouvrir **Dossier technique → Inviter la salle**.
 2. Nommer le destinataire et choisir 7, 30 ou 90 jours.
 3. Publier puis transmettre le lien. L’application n’envoie pas d’e-mail.
 
@@ -100,3 +106,9 @@ Le plan s’ouvre en vue d’ensemble. Utiliser **+ / −** pour zoomer, faire d
 **Télécharger la fiche PDF** reprend le plan enregistré, le patch, le matériel demandé et les notes techniques. Enregistrer le plan avant de télécharger.
 
 Le PDF exclut les conditions privées, les disponibilités et les entrées supprimées. Celui de la salle utilise la copie partagée ; ses réponses ne remplacent pas les demandes du groupe. Les liens expirés ou révoqués ne permettent plus de télécharger.
+
+## Dates à venir et historique
+
+La liste place les **Concerts à venir** en premier, par date croissante. Les **Concerts passés** apparaissent ensuite, du plus récent au plus ancien, avec un badge **Passé**. Leurs dossiers restent consultables.
+
+La séparation se fait au changement de jour dans le fuseau Europe/Paris. Une date d’aujourd’hui reste dans les dates à venir : l’application ne connaît pas encore l’heure réelle de fin du concert. Le statut **En attente / Validé** reste indépendant du passage de la date.
