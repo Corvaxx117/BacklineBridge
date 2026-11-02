@@ -275,3 +275,18 @@
         padding-inline: 16px;
     }
 }
+
+/* Repères visuels communs aux titres, dans le même esprit que la setlist. */
+.concert-section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.concert-section-icon {
+    width: 19px;
+    height: 19px;
+    flex: 0 0 19px;
+    color: var(--accent-text);
+}

@@ -1,6 +1,17 @@
 <summary>
     <h2 id="{{ titleId }}">
-        <span>{{ title }}</span>
+        <span class="concert-section-label">
+            {{
+                include(
+                    'concert/_section_icon.html.twig',
+                    {
+                        icon: icon
+                    },
+                    with_context: false
+                )
+            }}
+            <span>{{ title }}</span>
+        </span>
         <span class="concert-section-meta">{{ meta }}</span>
     </h2>
 </summary>

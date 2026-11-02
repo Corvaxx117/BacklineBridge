@@ -70,7 +70,18 @@
     {% if concert.notes %}
         <section class="concert-notes" aria-labelledby="concert-notes-title">
             <div class="concert-notes-heading">
-                <h2 id="concert-notes-title">Notes</h2>
+                <h2 id="concert-notes-title" class="concert-section-label">
+                    {{
+                        include(
+                            'concert/_section_icon.html.twig',
+                            {
+                                icon: 'notes'
+                            },
+                            with_context: false
+                        )
+                    }}
+                    <span>Notes</span>
+                </h2>
                 {% if is_granted('CONCERT_UPDATE', concert) %}
                     <a
                         class="edit-link"
@@ -145,6 +156,7 @@
                 'concert/_section_summary.html.twig',
                 {
                     title: 'Dossier technique',
+                    icon: 'technical',
                     titleId: 'technical-dossier-title',
                     meta: (lines|length) ~ ' sources · plan et matériel'
                 },
@@ -282,6 +294,7 @@
                     'concert/_section_summary.html.twig',
                     {
                         title: 'Google Agenda',
+                        icon: 'calendar',
                         titleId: 'concert-calendar-section-title',
                         meta: calendarName
                     },
@@ -298,6 +311,7 @@
                     'concert/_section_summary.html.twig',
                     {
                         title: 'Annonce Bandsintown',
+                        icon: 'bandsintown',
                         titleId: 'concert-bandsintown-title',
                         meta: 'Adresse et billetterie'
                     },

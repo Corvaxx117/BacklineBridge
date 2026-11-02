@@ -2,7 +2,18 @@
 {% set unavailable = availability.rows|filter(person => person.status.value == 'unavailable') %}
 <section class="availability-panel" id="disponibilites" aria-labelledby="availability-title">
     <div class="panel-header">
-        <h2 id="availability-title">Disponibilités</h2>
+        <h2 id="availability-title" class="concert-section-label">
+            {{
+                include(
+                    'concert/_section_icon.html.twig',
+                    {
+                        icon: 'availability'
+                    },
+                    with_context: false
+                )
+            }}
+            <span>Disponibilités</span>
+        </h2>
         <div class="availability-summary">
             <span class="availability-counter">
                 {{ availability.counts.available }} / {{ availability.total }} disponibles
