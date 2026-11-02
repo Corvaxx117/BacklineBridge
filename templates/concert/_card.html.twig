@@ -9,7 +9,7 @@
     </div>
     <div class="concert-card-copy">
         <p class="eyebrow">
-            {{ concert.patchSheet.bandName }}
+            {{ concert.bandName }}
         </p>
         <h3>
             <a
@@ -36,8 +36,8 @@
                 ? 'Créé par ' ~ concert.createdByName
                 : 'Créateur non renseigné' }}
         </p>
-        {% if not past and is_granted('CONCERT_RESPOND_AVAILABILITY', concert) %}
-            {% set myStatus = myAvailabilities[concert.id].status|default(null) %}
+        {% if not past and concert.canRespond %}
+            {% set myStatus = concert.myStatus %}
             <a
                 class="concert-availability-link"
                 href="{{

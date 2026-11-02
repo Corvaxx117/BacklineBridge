@@ -1,3 +1,12 @@
+import { clone, serialize, createHistory } from './stage/history.mjs?v=afa1e5023e95ab81';
+import {
+    clamp,
+    round,
+    rotation,
+    createTransform,
+    frameUpdate,
+} from './stage/geometry.mjs?v=0dce2c0c6e9239d5';
+
 (() => {
     const form = document.querySelector('[data-stage-editor]');
     if (!form) return;
@@ -40,8 +49,7 @@
         ]),
     );
     const nodes = new Map();
-    const undoStack = [];
-    const redoStack = [];
+    const history = createHistory();
     let nextId = 1;
     let selectedId = null;
     let textBefore = null;
@@ -50,9 +58,6 @@
     let dirty = false;
     const initiallyUnsaved = form.dataset.stageUnsaved === 'true';
 
-    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-    const round = (value, precision = 1) => Math.round(value * 10 ** precision) / 10 ** precision;
-    const rotation = (value) => round(((value % 360) + 360) % 360);
     const read = (row, key, fallback = '') =>
         row.querySelector(`[name$="[${key}]"]`)?.value ?? fallback;
     const readNumber = (row, key, fallback) => {
@@ -72,9 +77,7 @@
             ...(row.querySelector('select[name$="[patchSources][]"]')?.selectedOptions ?? []),
         ].map((option) => option.value),
     }));
-    const serialize = (list) => JSON.stringify(list.map(({ id, ...item }) => item));
     const saved = serialize(items);
-    const clone = (value) => JSON.parse(JSON.stringify(value));
     const capture = () => ({ items: clone(items), selectedId });
     const selected = () => items.find((item) => item.id === selectedId);
 
@@ -82,8 +85,8 @@
         dirty = initiallyUnsaved || serialize(items) !== saved;
         status.textContent = dirty ? 'Modifications à enregistrer' : 'Aucune modification';
         status.classList.toggle('is-dirty', dirty);
-        form.querySelector('[data-stage-action="undo"]').disabled = undoStack.length === 0;
-        form.querySelector('[data-stage-action="redo"]').disabled = redoStack.length === 0;
+        form.querySelector('[data-stage-action="undo"]').disabled = !history.canUndo();
+        form.querySelector('[data-stage-action="redo"]').disabled = !history.canRedo();
         for (const button of palette.values()) {
             button.disabled = items.length >= MAX_ITEMS;
             button.draggable = false;
@@ -94,11 +97,7 @@
     }
 
     function commit(before) {
-        if (serialize(before.items) !== serialize(items)) {
-            undoStack.push(before);
-            if (undoStack.length > 60) undoStack.shift();
-            redoStack.length = 0;
-        }
+        history.record(before, capture());
         updateStatus();
     }
 
@@ -273,16 +272,12 @@
         const before = capture();
         const start = { ...item };
         const rect = board.getBoundingClientRect();
-        const center = {
-            x: rect.left + (start.x / 100) * rect.width,
-            y: rect.top + (start.y / 100) * rect.height,
-        };
         const startPoint = { x: event.clientX, y: event.clientY };
-        const initialAngle = Math.atan2(event.clientY - center.y, event.clientX - center.x);
-        const initialDistance = Math.max(
-            1,
-            Math.hypot(event.clientX - center.x, event.clientY - center.y),
-        );
+        const transform = createTransform(start, rect, startPoint);
+        const frame = frameUpdate(() => {
+            paint(item);
+            updateContext();
+        });
         const handle = event.currentTarget;
         handle.focus({ preventScroll: true });
         handle.setPointerCapture(event.pointerId);
@@ -292,34 +287,11 @@
             if (!moved && Math.hypot(e.clientX - startPoint.x, e.clientY - startPoint.y) < 3)
                 return;
             moved = true;
-            if (mode === 'move') {
-                item.x = round(
-                    clamp(start.x + ((e.clientX - startPoint.x) / rect.width) * 100, 2, 98),
-                );
-                item.y = round(
-                    clamp(start.y + ((e.clientY - startPoint.y) / rect.height) * 100, 2, 98),
-                );
-            } else if (mode === 'rotate') {
-                let angle =
-                    start.rotation +
-                    ((Math.atan2(e.clientY - center.y, e.clientX - center.x) - initialAngle) *
-                        180) /
-                        Math.PI;
-                if (e.shiftKey) angle = Math.round(angle / 15) * 15;
-                item.rotation = rotation(angle);
-            } else {
-                item.scale = round(
-                    clamp(
-                        (start.scale * Math.hypot(e.clientX - center.x, e.clientY - center.y)) /
-                            initialDistance,
-                        0.5,
-                        2.5,
-                    ),
-                    2,
-                );
-            }
-            paint(item);
-            updateContext();
+            Object.assign(
+                item,
+                transform({ x: e.clientX, y: e.clientY, shiftKey: e.shiftKey }, mode),
+            );
+            frame.request();
         }
         function end(e) {
             if (e.pointerId !== event.pointerId) return;
@@ -328,10 +300,12 @@
             handle.removeEventListener('pointercancel', end);
             if (handle.hasPointerCapture(e.pointerId)) handle.releasePointerCapture(e.pointerId);
             if (e.type === 'pointercancel') {
+                frame.cancel();
                 items = before.items;
                 selectedId = before.selectedId;
                 render();
             } else {
+                frame.flush();
                 commit(before);
                 if (moved) announce(`${item.label} : modification effectuée.`);
             }
@@ -453,12 +427,9 @@
 
     function undo(redo = false) {
         finishText();
-        const source = redo ? redoStack : undoStack;
-        const destination = redo ? undoStack : redoStack;
-        if (!source.length) return;
-        destination.push(capture());
-        const snapshot = source.pop();
-        items = clone(snapshot.items);
+        const snapshot = redo ? history.redo(capture()) : history.undo(capture());
+        if (!snapshot) return;
+        items = snapshot.items;
         selectedId = snapshot.selectedId;
         render();
         announce(redo ? 'Action rétablie.' : 'Action annulée.');

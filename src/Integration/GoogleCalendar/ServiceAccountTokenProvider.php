@@ -6,41 +6,39 @@ namespace App\Integration\GoogleCalendar;
 
 use App\Integration\GoogleCalendar\Exception\GoogleCalendarUnavailable;
 use Google\Auth\Credentials\ServiceAccountCredentials;
+use Google\Auth\FetchAuthTokenCache;
 use Google\Auth\HttpHandler\HttpHandlerFactory;
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class ServiceAccountTokenProvider implements GoogleAccessTokenProvider
 {
-    private ?string $accessToken = null;
-
     public function __construct(
         private readonly GoogleCalendarConfiguration $configuration,
         #[Autowire('%kernel.project_dir%/public')] private readonly string $publicDirectory,
+        #[Autowire(service: 'cache.google_tokens')] private readonly CacheItemPoolInterface $cache,
+        #[Autowire(service: 'google_auth.http_client')] private readonly ClientInterface $http,
     ) {
     }
 
     public function token(): string
     {
-        if (null !== $this->accessToken) {
-            return $this->accessToken;
-        }
         $key = $this->credentials();
         try {
             $credentials = new ServiceAccountCredentials(
                 'https://www.googleapis.com/auth/calendar.events',
                 $key,
             );
-            $token = $credentials->fetchAuthToken(HttpHandlerFactory::build(new Client([
-                'connect_timeout' => 3,
-                'timeout' => 8,
-                'allow_redirects' => false,
-            ]), false));
+            $cached = new FetchAuthTokenCache($credentials, [
+                'prefix' => 'bb.'.hash('sha256', $key['client_email'].':'.$key['private_key_id']),
+            ], $this->cache);
+            $token = $cached->fetchAuthToken(HttpHandlerFactory::build($this->http, false));
             if (!is_string($token['access_token'] ?? null) || '' === $token['access_token']) {
                 throw new \UnexpectedValueException();
             }
 
-            return $this->accessToken = $token['access_token'];
+            return $token['access_token'];
         } catch (\Throwable) {
             // Ni réponse Google ni exception précédente : elles peuvent contenir des secrets.
             throw new GoogleCalendarUnavailable('La connexion à Google Agenda a échoué. Vérifie la clé du compte de service.');

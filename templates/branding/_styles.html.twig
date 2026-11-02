@@ -1,0 +1,40 @@
+{% set route = app.request.attributes.get('_route')|default('') %}
+{% set technical = route
+    in [
+        'app_patch_index',
+        'app_concert_show',
+        'app_stage_edit',
+        'app_equipment_edit',
+        'app_concert_reference_import',
+        'app_concert_invitations',
+        'app_concert_responses',
+        'app_guest_workspace'
+    ]
+%}
+<link rel="stylesheet" href="{{ asset('/styles/app.css') }}" />
+{% if technical %}
+    <link rel="stylesheet" href="{{ asset('/styles/technical.css') }}" />
+{% endif %}
+<link rel="stylesheet" href="{{ asset('/styles/branding.css') }}" />
+{% if route starts with 'app_concert_' or technical %}
+    <link rel="stylesheet" href="{{ asset('/styles/concert-team.css') }}" />
+{% endif %}
+{% if
+    route starts with 'app_treasury_'
+        or route starts with 'app_stock_'
+        or route starts with 'app_profile_'
+        or route starts with 'app_activation_'
+        or route starts with 'app_account_'
+        or route starts with 'app_task_'
+        or route starts with 'app_document_'
+        or route starts with 'app_concert_bandsintown_'
+        or route == 'app_concert_show' %}
+    <link rel="stylesheet" href="{{ asset('/styles/group.css') }}" />
+{% endif %}
+{% if route starts with 'app_concert_bandsintown_' or route == 'app_concert_show' %}
+    <link rel="stylesheet" href="{{ asset('/styles/bandsintown.css') }}" />
+{% endif %}
+<link rel="stylesheet" href="{{ asset('/styles/responsive.css') }}" />
+{% if technical %}
+    <script src="{{ asset('/scripts/stage-viewer.js') }}" defer></script>
+{% endif %}

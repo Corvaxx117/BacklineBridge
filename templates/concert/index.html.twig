@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block page_assets %}
-    <link rel="stylesheet" href="/styles/concerts.css" />
+    <link rel="stylesheet" href="{{ asset('/styles/concerts.css') }}" />
 {% endblock %}
 
 {% block body %}
@@ -89,8 +89,7 @@
                                 'concert/_card.html.twig',
                                 {
                                     concert: concert,
-                                    past: false,
-                                    myAvailabilities: myAvailabilities
+                                    past: false
                                 },
                                 with_context: false
                             )
@@ -115,8 +114,7 @@
                                 'concert/_card.html.twig',
                                 {
                                     concert: concert,
-                                    past: true,
-                                    myAvailabilities: myAvailabilities
+                                    past: true
                                 },
                                 with_context: false
                             )

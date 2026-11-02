@@ -21,6 +21,7 @@ Choisir le guide correspondant à la tâche. Chaque sujet possède un seul guide
 | --- | --- |
 | Installer, démarrer et rafraîchir VS Code | [Installation](developpement/installation.md) |
 | Retrouver le code, le présenter et le vérifier | [Code et qualité](developpement/code-et-qualite.md) |
+| Alléger les lectures, versionner les fichiers et lancer les tests navigateur | [Performances](developpement/performance.md) |
 | Travailler avec les branches et nommer les commits | [Git](developpement/git.md) |
 | Ouvrir SQLite dans DBeaver | [Base de données](developpement/base-de-donnees.md) |
 

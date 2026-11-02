@@ -11,7 +11,7 @@ use App\Entity\Setlist;
 use App\Entity\TechnicalSheet;
 use App\Entity\User;
 use App\Repository\SetlistRepository;
-use App\Service\Finance\MusicianAccess;
+use App\Service\Security\MusicianAccess;
 use App\ValueObject\SetlistContent;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;

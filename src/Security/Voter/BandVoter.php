@@ -8,7 +8,7 @@ use App\Entity\Band;
 use App\Entity\User;
 use App\Enum\BandRole;
 use App\Repository\BandMembershipRepository;
-use App\Service\Finance\MusicianAccess;
+use App\Service\Security\MusicianAccess;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;

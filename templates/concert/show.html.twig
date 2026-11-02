@@ -5,9 +5,9 @@
 {% endblock %}
 
 {% block page_assets %}
-    <link rel="stylesheet" href="/styles/concert-detail.css" />
-    <link rel="stylesheet" href="/styles/setlist.css" />
-    <script src="/scripts/concert-details.js" defer></script>
+    <link rel="stylesheet" href="{{ asset('/styles/concert-detail.css') }}" />
+    <link rel="stylesheet" href="{{ asset('/styles/setlist.css') }}" />
+    <script src="{{ asset('/scripts/concert-details.js') }}" defer></script>
 {% endblock %}
 
 {% block body %}

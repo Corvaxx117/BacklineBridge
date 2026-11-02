@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Finance;
+namespace App\Service\Security;
 
 use App\Entity\Band;
 use App\Entity\User;

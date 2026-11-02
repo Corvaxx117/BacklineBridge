@@ -14,7 +14,7 @@
     Importer la setlist · {{ app_name }}
 {% endblock %}
 {% block page_assets %}
-    <link rel="stylesheet" href="/styles/setlist.css" />
+    <link rel="stylesheet" href="{{ asset('/styles/setlist.css') }}" />
 {% endblock %}
 {% block body %}
     <a class="back-link" href="{{ returnUrl }}">← Revenir au concert</a>

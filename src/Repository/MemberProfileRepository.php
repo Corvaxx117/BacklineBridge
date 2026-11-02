@@ -8,13 +8,14 @@ use App\Entity\Band;
 use App\Entity\MemberProfile;
 use App\Entity\User;
 use App\Enum\MemberKind;
+use App\Service\Security\ReadRequestCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /** @extends ServiceEntityRepository<MemberProfile> */
 final class MemberProfileRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, private readonly ReadRequestCache $reads)
     {
         parent::__construct($registry, MemberProfile::class);
     }
@@ -32,7 +33,10 @@ final class MemberProfileRepository extends ServiceEntityRepository
 
     public function isMusician(User $user, Band $band): bool
     {
-        return MemberKind::Musician === $this->forUser($user, $band)?->getKind();
+        return $this->reads->remember(
+            'musician.'.$user->getId().'.'.$band->getId(),
+            fn (): bool => MemberKind::Musician === $this->forUser($user, $band)?->getKind(),
+        );
     }
 
     /** @return list<MemberProfile> */

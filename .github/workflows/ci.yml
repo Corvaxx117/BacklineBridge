@@ -44,12 +44,11 @@ jobs:
       - name: Check local calendar assets
         run: npm run calendar:assets:check
 
+      - name: Check asset versions
+        run: npm run assets:check
+
       - name: Check frontend JavaScript syntax
-        run: |
-          node --check public/scripts/calendar.js
-          node --check public/scripts/theme.js
-          node --check public/scripts/navigation.js
-          node --check public/scripts/concert-details.js
+        run: npm run lint:frontend
 
       - name: Run frontend tests
         run: npm run test:frontend
@@ -149,3 +148,34 @@ jobs:
             var/coverage/clover.xml
           retention-days: 7
           if-no-files-found: warn
+
+  browser:
+    name: Browser regression checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, fileinfo, iconv, intl, mbstring, pdo_sqlite, sodium, dom, xml
+          tools: composer:v2
+          coverage: none
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: browser-report
+          path: |
+            var/browser/report/
+            var/browser/results/
+          retention-days: 7
