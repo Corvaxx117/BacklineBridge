@@ -41,6 +41,12 @@ jobs:
       - name: Install formatting tools
         run: npm ci --ignore-scripts
 
+      - name: Check frontend JavaScript syntax
+        run: node --check public/scripts/theme.js
+
+      - name: Run frontend tests
+        run: npm run test:frontend
+
       - name: Check formatting
         run: npm run format:check
 

@@ -3,7 +3,8 @@
     "private": true,
     "scripts": {
         "format": "prettier --write . --ignore-unknown",
-        "format:check": "prettier --check . --ignore-unknown"
+        "format:check": "prettier --check . --ignore-unknown",
+        "test:frontend": "node --test tests/Frontend/*.test.mjs"
     },
     "devDependencies": {
         "@zackad/prettier-plugin-twig": "^0.17.0",

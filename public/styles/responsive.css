@@ -6,10 +6,10 @@
     gap: 8px;
     min-height: 44px;
     padding: 10px 12px;
-    border: 1px solid #75848b;
+    border: 1px solid var(--header-border);
     border-radius: 6px;
     background: transparent;
-    color: var(--white);
+    color: var(--on-strong);
     font-size: 14px;
 }
 .nav-toggle svg {
@@ -22,8 +22,8 @@
     flex-wrap: wrap;
     gap: 8px;
     padding: 10px 16px;
-    border-bottom: 1px solid var(--line);
-    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
 }
 .stage-zoom-controls button {
     display: inline-flex;
@@ -32,10 +32,10 @@
     min-width: 44px;
     min-height: 44px;
     padding: 8px 12px;
-    border: 1px solid var(--line);
+    border: 1px solid var(--border);
     border-radius: 6px;
-    background: var(--white);
-    color: var(--ink);
+    background: var(--surface);
+    color: var(--text);
     font-size: 14px;
 }
 .stage-zoom-controls button:disabled {
@@ -43,8 +43,8 @@
     cursor: default;
 }
 .stage-zoom-controls button[aria-pressed='true'] {
-    background: #eaf0e8;
-    border-color: #9cae9e;
+    background: var(--success-bg);
+    border-color: var(--border-strong);
 }
 .stage-zoom-controls output {
     min-width: 48px;
@@ -91,7 +91,7 @@
         gap: 8px 12px;
         align-items: stretch;
         padding-top: 12px;
-        border-top: 1px solid #ffffff24;
+        border-top: 1px solid var(--header-line);
     }
     .site-nav[data-collapsed='true'] {
         display: none;
@@ -106,7 +106,7 @@
         overflow-wrap: anywhere;
     }
     .site-nav > a[aria-current='page'] {
-        background: #ffffff0d;
+        background: var(--header-selected);
     }
     .site-nav .session-info {
         display: flex;
@@ -398,7 +398,7 @@
     }
     .ledger-table-stacked tr {
         padding: 12px;
-        border: 1px solid var(--line);
+        border: 1px solid var(--border);
         border-radius: 8px;
     }
     .ledger-table-stacked td {
@@ -411,7 +411,7 @@
     }
     .ledger-table-stacked td::before {
         content: attr(data-label);
-        color: var(--muted);
+        color: var(--text-muted);
         font-size: 12px;
     }
     .ledger-table-stacked td[colspan] {
@@ -490,7 +490,7 @@
         width: 100%;
         max-width: 100%;
         border: 0;
-        border-top: 1px solid var(--line);
+        border-top: 1px solid var(--border);
         border-radius: 0;
         box-shadow: none;
         gap: 8px;

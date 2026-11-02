@@ -44,3 +44,9 @@ L’identifiant figure dans l’URL du profil. La commande écrit un nouveau fic
 La démo demande d’abord des identifiants communs, puis un compte personnel. Les accès sont conservés sur le Mac dans `var/private/alwaysdata/ACCES-DEMO.md`, hors Git. Cette protection commune concerne aussi les liens de salle.
 
 Pour préparer les vrais comptes, suivre [l’initialisation privée](../exploitation/initialisation-groupe.md).
+
+## Apparence
+
+La capsule en bas à droite contient un **switch soleil/lune** pour passer du clair au sombre. Le bouton **écran** réactive le mode automatique ; il est coloré lorsque ce mode est actif. Ces commandes restent accessibles sur téléphone, sur la page de connexion et dans l’espace salle.
+
+**Automatique** suit le thème du téléphone ou de l’ordinateur. Le choix est mémorisé dans ce navigateur, sans modifier le compte ; chaque appareil garde sa préférence. Les PDF utilisent leur présentation imprimable.

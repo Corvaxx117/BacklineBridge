@@ -76,3 +76,13 @@ Exercice possible, encore à réaliser : proposer le prochain numéro de canal �
 ## To Do du groupe
 
 `BandTask` appartient au groupe, sans relation avec un concert. `TaskManager` gère les écritures ; `TaskVoter` contrôle la modification et la suppression. Le responsable est un `MemberProfile`, y compris avant activation de son compte. Les formulaires limitent le choix au même groupe. Les mises à jour vérifient la révision et les suppressions incluent cette révision dans la requête SQL.
+
+## Thèmes clair et sombre
+
+`public/styles/tokens.css` définit les palettes sémantiques : fonds, texte, bordures, actions et statuts. Utiliser ces variables dans les styles des composants. Les illustrations du plan gardent leurs couleurs propres.
+
+`theme.js`, chargé avant les feuilles de style par le composant Twig `theme/_head.html.twig`, applique le choix dès le premier affichage. La préférence `auto`, `light` ou `dark` est mémorisée sous `backlinebridge.theme` dans le navigateur. Sans JavaScript, l’interface claire reste utilisable. Aucun accès au compte ou à la base n’est nécessaire.
+
+Le composant `theme/_switcher.html.twig`, placé hors de la navigation, affiche un switch accessible au clavier et un bouton de retour au mode automatique. `theme.css` gère sa capsule flottante et respecte la réduction des animations.
+
+Le changement émet `backlinebridge:themechange`. Les tests `npm run test:frontend` couvrent la mémorisation, les changements système, les onglets et le stockage désactivé. Ils sont également exécutés dans la CI.
