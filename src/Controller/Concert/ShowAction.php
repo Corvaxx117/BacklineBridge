@@ -13,6 +13,7 @@ use App\Integration\GoogleCalendar\GoogleCalendarConfiguration;
 use App\Repository\BandDocumentRepository;
 use App\Repository\BandsintownConcertRepository;
 use App\Repository\PatchLineRepository;
+use App\Repository\SetlistRepository;
 use App\Security\Voter\ConcertVoter;
 use App\Service\Concert\ConcertAvailabilityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,6 +34,7 @@ final class ShowAction extends AbstractController
     public function __invoke(
         #[MapEntity(id: 'id')] Concert $concert,
         PatchLineRepository $lines,
+        SetlistRepository $setlists,
         EntityManagerInterface $entityManager,
         #[CurrentUser] User $user,
         ConcertAvailabilityManager $availability,
@@ -45,6 +47,8 @@ final class ShowAction extends AbstractController
 
         return $this->render('concert/show.html.twig', [
             'concert' => $concert,
+            'setlist' => $setlists->forSheet($concert->getPatchSheet()),
+            'referenceSetlist' => $setlists->forSheet($concert->getBand()->getReferenceSheet()),
             'calendarConfigured' => $calendar->isConfiguredFor($concert->getBand()),
             'calendarName' => $calendar->name(),
             'calendarTimezone' => $calendar->isConfiguredFor($concert->getBand()) ? $calendar->timezone()->getName() : null,

@@ -1,0 +1,131 @@
+{% extends 'base.html.twig' %}
+{% set returnUrl =
+    path(
+        'app_concert_show',
+        {
+            id: concert.id,
+            _fragment: 'setlist'
+        }
+    )
+%}
+{% set sourceTracks = reference ? reference.tracks : [] %}
+{% set currentTracks = current ? current.tracks : [] %}
+{% block title %}
+    Importer la setlist · {{ app_name }}
+{% endblock %}
+{% block page_assets %}
+    <link rel="stylesheet" href="/styles/setlist.css" />
+{% endblock %}
+{% block body %}
+    <a class="back-link" href="{{ returnUrl }}">← Revenir au concert</a>
+    <section class="form-heading" aria-labelledby="page-title">
+        <p class="eyebrow">
+            {{ concert.venue }} · {{ concert.date|date('d/m/Y') }}
+        </p>
+        <h1 id="page-title">Importer la référence<span class="title-period">.</span></h1>
+        <p>
+            Les titres seront copiés pour ce concert. Les changements futurs de la référence ne
+            modifieront pas cette copie.
+        </p>
+    </section>
+    <div class="setlist-comparison">
+        <section class="setlist-preview" aria-labelledby="setlist-source-title">
+            <h2 id="setlist-source-title">La référence à importer</h2>
+            {{
+                include(
+                    'setlist/_tracks.html.twig',
+                    {
+                        tracks: sourceTracks,
+                        emptyMessage: 'La setlist de référence est vide.'
+                    },
+                    with_context: false
+                )
+            }}
+        </section>
+        {% if currentTracks is not empty %}
+            <section class="setlist-preview" aria-labelledby="setlist-current-title">
+                <h2 id="setlist-current-title">Dans ce concert actuellement</h2>
+                {{
+                    include(
+                        'setlist/_tracks.html.twig',
+                        {
+                            tracks: currentTracks
+                        },
+                        with_context: false
+                    )
+                }}
+            </section>
+        {% endif %}
+    </div>
+    <section class="form-panel setlist-editor">
+        {{
+            form_start(
+                form,
+                {
+                    attr: {
+                        class: 'setlist-import-form',
+                        novalidate: 'novalidate'
+                    }
+                }
+            )
+        }}
+        {% if form.vars.errors|length %}
+            <div class="form-error-summary" role="alert">
+                {{ form_errors(form) }}
+            </div>
+        {% endif %}
+        {% if conflict %}
+            <p class="setlist-reload">
+                <a
+                    href="{{
+                    path(
+                        'app_setlist_import',
+                        {
+                            id: concert.id
+                        }
+                    )
+                    }}"
+                >
+                    Recharger l’aperçu
+                </a>
+            </p>
+        {% endif %}
+        {% if sourceTracks is not empty %}
+            {% if form.confirmReplacement is defined %}
+                <div class="setlist-confirmation">
+                    <label>
+                        {{ form_widget(form.confirmReplacement) }}
+                        <span>{{ form.confirmReplacement.vars.label }}</span>
+                    </label>
+                    {{ form_errors(form.confirmReplacement) }}
+                </div>
+            {% endif %}
+            <div class="setup-actions">
+                <button type="submit" class="button button-primary">
+                    {{ currentTracks is empty
+                        ? 'Importer la setlist'
+                        : 'Remplacer la setlist du concert' }}
+                </button>
+                <a class="button button-secondary" href="{{ returnUrl }}">Annuler</a>
+            </div>
+        {% else %}
+            <div class="setup-actions">
+                <a
+                    class="button button-primary"
+                    href="{{
+                    path(
+                        'app_setlist_edit',
+                        {
+                            id: concert.band.referenceSheet.id
+                        }
+                    )
+                    }}"
+                >
+                    Définir la référence
+                </a>
+                <a class="button button-secondary" href="{{ returnUrl }}">Revenir au concert</a>
+            </div>
+        {% endif %}
+        {{ form_end(form) }}
+    </section>
+{% endblock %}

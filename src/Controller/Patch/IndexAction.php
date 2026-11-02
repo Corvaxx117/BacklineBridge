@@ -7,6 +7,7 @@ namespace App\Controller\Patch;
 use App\Entity\PatchLine;
 use App\Entity\User;
 use App\Repository\PatchLineRepository;
+use App\Repository\SetlistRepository;
 use App\Repository\TechnicalSheetRepository;
 use App\Security\Voter\TechnicalSheetVoter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,6 +22,7 @@ final class IndexAction extends AbstractController
         #[CurrentUser] User $user,
         TechnicalSheetRepository $sheets,
         PatchLineRepository $lines,
+        SetlistRepository $setlists,
     ): Response {
         $sheet =
             $sheets->findReferenceForUser($user) ??
@@ -33,6 +35,7 @@ final class IndexAction extends AbstractController
 
         return $this->render('patch/index.html.twig', [
             'sheet' => $sheet,
+            'setlist' => $setlists->forSheet($sheet),
             'lines' => $patchLines,
             'sectionCount' => count($sections),
         ]);
