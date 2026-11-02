@@ -9,6 +9,7 @@
                 Espace salle · {{ app_name }}
             {% endblock %}
         </title>
+        {{ include('branding/_favicon.html.twig', {}, with_context: false) }}
         {{ include('theme/_head.html.twig', {}, with_context: false) }}
         <link rel="stylesheet" href="/styles/app.css" />
         <link rel="stylesheet" href="/styles/responsive.css" />
