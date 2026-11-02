@@ -1,0 +1,132 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ calendarName }} · {{ app_name }}
+{% endblock %}
+
+{% block page_assets %}
+    {% if configured %}
+        <link rel="stylesheet" href="/vendor/fullcalendar/skeleton.css" />
+        <link rel="stylesheet" href="/vendor/fullcalendar/theme.css" />
+        <link rel="stylesheet" href="/vendor/fullcalendar/palette.css" />
+        <link rel="stylesheet" href="/styles/calendar-grid.css" />
+        <script src="/vendor/fullcalendar/fullcalendar.js" defer></script>
+        <script src="/vendor/fullcalendar/theme.js" defer></script>
+        <script src="/vendor/fullcalendar/fr.js" defer></script>
+        <script src="/scripts/calendar.js" defer></script>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+            <p class="eyebrow">
+                {{ band.name }} / Agenda Google
+            </p>
+            <h1 id="page-title">Agenda<span class="title-period">.</span></h1>
+            <p class="hero-description">
+                Les événements de l’agenda « {{ calendarName }} » : concerts, répétitions et rendez-vous
+                du groupe.
+            </p>
+        </div>
+    </section>
+    {% if not configured %}
+        <section class="calendar-empty" aria-labelledby="calendar-setup-title">
+            <h2 id="calendar-setup-title">L’agenda du groupe n’est pas encore connecté</h2>
+            <p>
+                Une fois la connexion configurée, les événements de l’agenda Google apparaîtront
+                ici.
+            </p>
+        </section>
+    {% else %}
+        {{ include('calendar/_grid.html.twig') }}
+        {% if error %}
+            <div class="flash flash-error" role="alert">
+                {{ error }}
+            </div>
+            <a
+                class="button button-secondary"
+                href="{{
+                path(
+                    'app_calendar_index',
+                    {
+                        id: band.id
+                    }
+                )
+                }}"
+            >
+                Réessayer
+            </a>
+        {% endif %}
+        <details class="calendar-fallback" data-calendar-fallback open>
+            <summary>
+                Consulter la liste simple des événements
+            </summary>
+            {% if listing %}
+                <div class="calendar-heading">
+                    <h2>Événements de la période</h2>
+                    <p class="muted">
+                        Actualisé à {{ listing.fetchedAt|date('H:i', timezone) }} · {{ timezone }}
+                    </p>
+                </div>
+                {% if listing.events is empty %}
+                    <p class="calendar-empty">
+                        Aucun événement prévu sur cette période.
+                    </p>
+                {% else %}
+                    <ol class="calendar-list">
+                        {% for event in listing.events %}
+                            <li class="calendar-event">
+                                <div class="calendar-event-date">
+                                    <time datetime="{{ event.start|date('Y-m-d', timezone) }}">
+                                        {{ event.start|date('d/m/Y', timezone) }}
+                                    </time>
+                                    {% if
+                                        (event.start|date('Y-m-d', timezone))
+                                            != (event.end|date('Y-m-d', timezone)) %}
+                                        <span>au {{ event.end|date('d/m/Y', timezone) }}</span>
+                                    {% endif %}
+                                    <span class="muted">
+                                        {{ event.allDay
+                                            ? 'Toute la journée'
+                                            : (event.start|date('H:i', timezone)) ~ ' – '
+                                                ~ (event.end|date('H:i', timezone)) }}
+                                    </span>
+                                </div>
+                                <div class="calendar-event-copy">
+                                    <h3>{{ event.title }}</h3>
+                                    {% if event.location %}
+                                        <p>
+                                            {{ event.location }}
+                                        </p>
+                                    {% endif %}
+                                </div>
+                                {% if event.url %}
+                                    <a
+                                        class="calendar-link"
+                                        href="{{ event.url }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        Ouvrir dans Google<span class="visually-hidden">
+                                            : {{ event.title }}
+                                        </span> ↗
+                                    </a>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ol>
+                {% endif %}
+                {% if listing.hasMore %}
+                    <p>
+                        Cette liste est limitée aux 1 000 premiers événements de la période.
+                    </p>
+                {% endif %}
+            {% endif %}
+        </details>
+        <p class="field-hint">
+            Les changements effectués dans Google apparaissent ici sous cinq minutes. Les
+            répétitions et réunions se modifient dans Google Agenda.
+        </p>
+    {% endif %}
+{% endblock %}

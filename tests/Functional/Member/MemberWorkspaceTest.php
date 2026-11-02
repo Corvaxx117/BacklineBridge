@@ -133,7 +133,7 @@ final class MemberWorkspaceTest extends DatabaseTestCase
         $uri = '/premiere-connexion/'.$profile->getPublicId();
         $this->client->request('GET', '/premiere-connexion');
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('select', 'Membre à activer');
+        self::assertSelectorTextContains('form select', 'Membre à activer');
         self::assertStringNotContainsString(
             'pending@example.test',
             $this->client->getResponse()->getContent(),

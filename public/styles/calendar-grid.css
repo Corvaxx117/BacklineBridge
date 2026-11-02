@@ -1,0 +1,206 @@
+.calendar-shell[hidden],
+.calendar-shell [hidden],
+.calendar-dialog [hidden] {
+    display: none !important;
+}
+
+/* Les couleurs de la bibliothèque suivent celles de BacklineBridge. */
+.calendar-shell,
+.calendar-shell [data-color-scheme] {
+    --fc-classic-primary: var(--accent);
+    --fc-classic-primary-foreground: var(--on-strong);
+    --fc-classic-event: var(--accent);
+    --fc-classic-event-contrast: var(--on-strong);
+    --fc-classic-background: var(--surface);
+    --fc-classic-faint: var(--surface-muted);
+    --fc-classic-muted: var(--surface-hover);
+    --fc-classic-strong: var(--border);
+    --fc-classic-foreground: var(--text);
+    --fc-classic-border: var(--border);
+    --fc-classic-strong-border: var(--border-strong);
+    --fc-classic-faint-foreground: var(--text-muted);
+    --fc-classic-muted-foreground: var(--text-muted);
+    --fc-classic-today: var(--accent-soft);
+    --fc-classic-highlight: var(--accent-highlight);
+    --fc-classic-now: var(--accent-text);
+    --fc-classic-button: var(--strong-bg);
+    --fc-classic-button-border: var(--text);
+    --fc-classic-button-foreground: var(--on-strong);
+}
+
+.calendar-shell {
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+}
+
+.calendar-toolbar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.calendar-toolbar h2 {
+    margin: 0;
+    text-align: center;
+    text-transform: capitalize;
+    font-size: 1.3rem;
+}
+
+.calendar-navigation,
+.calendar-view-switch {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.calendar-toolbar .button {
+    min-height: 44px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.85rem;
+}
+
+.calendar-toolbar .calendar-arrow {
+    min-width: 44px;
+    padding-inline: 0.6rem;
+    font-size: 1.1rem;
+}
+
+.calendar-view-switch [aria-pressed='true'] {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--on-strong);
+}
+
+.calendar-viewport {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+}
+
+.calendar-grid {
+    min-width: 0;
+}
+
+.calendar-grid--week {
+    min-width: 700px;
+}
+
+.bb-calendar-event {
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.bb-calendar-event-title {
+    font-weight: 600;
+}
+
+.bb-calendar-day-header {
+    color: var(--text);
+}
+
+.calendar-status {
+    margin: 1rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.calendar-mobile-hint {
+    display: none;
+}
+
+.calendar-fallback {
+    margin-top: 1.5rem;
+}
+
+.calendar-fallback summary {
+    padding: 0.75rem 0;
+    color: var(--accent-text);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.calendar-dialog {
+    width: min(540px, calc(100% - 32px));
+    max-height: calc(100% - 32px);
+    overflow-y: auto;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    color: var(--text);
+}
+
+.calendar-dialog::backdrop {
+    background: var(--overlay);
+}
+
+.calendar-dialog h2 {
+    margin-top: 0;
+    overflow-wrap: anywhere;
+}
+
+.calendar-dialog dl {
+    display: grid;
+    gap: 0.5rem;
+    margin-block: 1.5rem;
+}
+
+.calendar-dialog dt {
+    font-weight: 700;
+}
+
+.calendar-dialog dd {
+    margin: 0 0 0.75rem;
+    overflow-wrap: anywhere;
+}
+
+.calendar-dialog-close {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 1050px) {
+    .calendar-toolbar {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .calendar-toolbar h2 {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        text-align: left;
+    }
+}
+
+@media (max-width: 760px) {
+    .calendar-shell {
+        padding: 1rem 0.65rem;
+    }
+
+    .calendar-toolbar {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.85rem;
+    }
+
+    .calendar-toolbar h2 {
+        font-size: 1.15rem;
+    }
+
+    .calendar-view-switch .button {
+        flex: 1;
+    }
+
+    .calendar-mobile-hint {
+        display: block;
+        margin: 0.75rem 0 0;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+    }
+
+    .bb-calendar-event {
+        font-size: 0.7rem;
+    }
+}

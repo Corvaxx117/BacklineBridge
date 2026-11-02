@@ -71,3 +71,7 @@ Desktop.ini
 
 # Réglages PHPStan personnels ; la configuration partagée reste versionnée.
 /phpstan.neon
+
+# Clés Google téléchargées : les conserver dans var/private/google-calendar/.
+/*service-account*.json
+/*credentials*.json

@@ -91,10 +91,14 @@ final readonly class ConcertImporter
                         $event->city,
                         ConcertStatus::Validated,
                         createdBy: $user,
+                        startTime: $event->localTime,
                     );
                     ++$created;
                 } else {
                     $concert->confirm();
+                    if (null === $concert->getStartTime()) {
+                        $concert->setStartTime($event->localTime);
+                    }
                     ++$linked;
                     $occupied[$concert->getId()] = true;
                 }

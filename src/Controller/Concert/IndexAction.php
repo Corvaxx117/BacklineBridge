@@ -25,11 +25,23 @@ final class IndexAction extends AbstractController
     ): Response {
         $reference = $sheets->findReferenceForUser($user);
         $dates = $concerts->findForUser($user);
+        $today = new \DateTimeImmutable('today', new \DateTimeZone('Europe/Paris'));
+        $upcoming = [];
+        $past = [];
+        foreach ($dates as $concert) {
+            if ($concert->getDate()->format('Y-m-d') < $today->format('Y-m-d')) {
+                $past[] = $concert;
+            } else {
+                $upcoming[] = $concert;
+            }
+        }
 
         return $this->render('concert/index.html.twig', [
             'concerts' => $dates,
+            'upcomingConcerts' => $upcoming,
+            'pastConcerts' => array_reverse($past),
             'band' => $reference?->getBand(),
-            'myAvailabilities' => $availability->forUserAndConcerts($user, $dates),
+            'myAvailabilities' => $availability->forUserAndConcerts($user, $upcoming),
             'canCreate' => null !== $reference
                 && $this->isGranted(BandVoter::PLAN_CONCERT, $reference->getBand()),
         ]);

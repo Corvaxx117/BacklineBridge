@@ -11,12 +11,12 @@ Les contrôleurs reçoivent les actions ; les services appliquent les règles ; 
 | `src/Entity/`, `src/Repository/` | Données et recherches |
 | `src/Form/`, `src/Dto/`, `src/Validator/` | Saisie et vérifications |
 | `src/Security/Voter/` | Autorisations côté serveur |
-| `src/Integration/Bandsintown/` | Client API et lecture des réponses |
+| `src/Integration/Bandsintown/`, `src/Integration/GoogleCalendar/` | Clients API et lecture des réponses |
 | `templates/`, `public/styles/`, `public/scripts/` | Pages, styles et interactions |
 | `templates/pdf/`, `src/Service/Pdf/` | PDF et dessin du plan, avec Dompdf |
 | `migrations/`, `tests/` | Évolution des tables et vérifications automatiques |
 
-Les adaptations aux petits écrans sont regroupées dans `public/styles/responsive.css`. `navigation.js` gère le menu repliable ; `stage-viewer.js` cadre et zoome le plan sans modifier ses coordonnées enregistrées.
+Les adaptations aux petits écrans sont regroupées dans `public/styles/responsive.css`. `navigation.js` gère le menu mobile et le sous-menu « Le groupe » (fermeture par Échap ou clic extérieur) ; `stage-viewer.js` cadre et zoome le plan sans modifier ses coordonnées enregistrées.
 
 Les contacts et documents passent par `Controller/Concert/Contact/` et `Controller/Document/`, avec des DTO de saisie et des services dédiés. `DocumentStorage` garde les PDF hors de `public/`, contrôle leur taille et sérialise les changements de fichiers avec un verrou partagé par la sauvegarde. Les formulaires vérifient le type réel du fichier avec Symfony Mime. `DocumentVoter` vérifie l’accès au groupe avant chaque lecture ou retrait.
 
@@ -51,7 +51,7 @@ composer audit --locked
 | `composer test` | Résultats des règles et parcours |
 | `npm run format:check` | Présentation des fichiers hors PHP |
 
-PHPStan est au niveau **8 pour l’application et les scripts**, **5 pour les tests**. Il n’y a pas de liste globale d’erreurs masquées. Les tests utilisent leurs propres bases temporaires et des réponses Bandsintown fictives ; ils ne touchent pas au compte réel.
+PHPStan est au niveau **8 pour l’application et les scripts**, **5 pour les tests**. Il n’y a pas de liste globale d’erreurs masquées. Les tests utilisent leurs propres bases temporaires et des réponses Bandsintown et Google fictives ; ils ne touchent pas au compte réel.
 
 ## Contrôles GitHub
 
@@ -76,3 +76,27 @@ Exercice possible, encore à réaliser : proposer le prochain numéro de canal �
 ## To Do du groupe
 
 `BandTask` appartient au groupe, sans relation avec un concert. `TaskManager` gère les écritures ; `TaskVoter` contrôle la modification et la suppression. Le responsable est un `MemberProfile`, y compris avant activation de son compte. Les formulaires limitent le choix au même groupe. Les mises à jour vérifient la révision et les suppressions incluent cette révision dans la requête SQL.
+
+## Agenda Google
+
+`CalendarReader` consulte la période demandée et conserve les réponses cinq minutes. Les vues Mois, Semaine et Liste utilisent FullCalendar Standard, sous licence MIT. La consultation est ouverte aux comptes internes du groupe ; le droit de publication est distinct et réservé aux musiciens. Le flux JSON vérifie les droits et limite chaque consultation à 62 jours ; l’ajout d’un concert invalide les différentes périodes en cache. `ConcertPublisher` ajoute volontairement un concert, après vérification du profil musicien. Les contrôleurs restent séparés par action. Le client Google et l’authentification sont remplacés par des doubles de test.
+
+Le compte de service reçoit uniquement les droits accordés par le partage Google. La bibliothèque officielle `google/auth` gère sa signature et l’obtention du jeton. Les appels ne passent pas par le profiler Symfony. La clé reste hors de `public` et de Git.
+
+L’identifiant envoyé à Google est calculé à partir du groupe, du concert et de `GOOGLE_CALENDAR_NAMESPACE`. Après un doublon HTTP 409, le client relit l’événement et vérifie son marqueur privé ; il ne fait jamais de mise à jour ou de suppression. L’identifiant d’installation doit rester stable. La synchronisation dans les deux sens est hors du périmètre actuel.
+
+Les fichiers FullCalendar sont copiés dans `public/vendor/fullcalendar/` et versionnés pour être déployés sans Node.js sur le serveur. Notre code d’interface reste dans `public/scripts/calendar.js` et `public/styles/calendar-grid.css`. Après une mise à jour npm de FullCalendar, lancer `npm run calendar:assets`. La CI vérifie leur conformité au verrou npm avec `npm run calendar:assets:check`. Les fichiers tiers conservent leur licence et sont exclus de Prettier.
+
+## Thèmes clair et sombre
+
+`public/styles/tokens.css` définit les palettes sémantiques : fonds, texte, bordures, actions et statuts. Utiliser ces variables dans les styles des composants. Les illustrations du plan gardent leurs couleurs propres.
+
+`theme.js`, chargé avant les feuilles de style par le composant Twig `theme/_head.html.twig`, applique le choix dès le premier affichage. La préférence `auto`, `light` ou `dark` est mémorisée sous `backlinebridge.theme` dans le navigateur. Sans JavaScript, l’interface claire reste utilisable. Aucun accès au compte ou à la base n’est nécessaire.
+
+Le composant `theme/_switcher.html.twig`, placé hors de la navigation, affiche un switch accessible au clavier et un bouton de retour au mode automatique. `theme.css` gère sa capsule flottante et respecte la réduction des animations.
+
+Le changement émet `backlinebridge:themechange` ; le calendrier y répond en mettant à jour sa palette. Les tests `npm run test:frontend` couvrent la mémorisation, les changements système, les onglets et le stockage désactivé. Ils sont également exécutés dans la CI.
+
+## Vue d’ensemble du concert
+
+`concert/show.html.twig` privilégie la réponse personnelle et les notes. Les sections secondaires utilisent des éléments HTML `details` : ouverture au clavier et fonctionnement sans JavaScript. `concert-details.js` ouvre la section visée par un lien direct ou un retour de formulaire. Les styles propres à cette page sont dans `concert-detail.css`. La présentation ne modifie ni les droits ni les données enregistrées.
