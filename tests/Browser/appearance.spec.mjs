@@ -9,12 +9,26 @@ const isMoving = (background) =>
             .some((animation) => animation.playState === 'running'),
     );
 
-test('le fond respecte la pause mémorisée et la réduction des animations', async ({ page }) => {
+test('le fond bouge dès l’ouverture et respecte la pause et les animations réduites', async ({
+    page,
+}) => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/connexion');
     const background = page.locator('[data-ambient-background]');
     const toggle = page.getByRole('button', { name: 'Animation de fond', exact: true });
     await expect.poll(() => isMoving(background)).toBe(true);
+    const light = background.locator('.ambient-light-warm');
+    const start = await light.boundingBox();
+    // Vérifier un déplacement visible, pas seulement un moteur déclaré « running ».
+    await expect
+        .poll(
+            async () => {
+                const current = await light.boundingBox();
+                return Math.hypot(current.x - start.x, current.y - start.y);
+            },
+            { timeout: 2500, intervals: [200] },
+        )
+        .toBeGreaterThan(12);
     await toggle.click();
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
     await expect.poll(() => isMoving(background)).toBe(false);

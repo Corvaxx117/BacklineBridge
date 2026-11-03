@@ -22,27 +22,33 @@
     }
 
     function createAnimations() {
-        const paths = [
-            [
-                { transform: 'translate(0, 0) scale(1)', opacity: 0.58 },
-                { transform: 'translate(-12%, 10%) scale(1.12)', opacity: 0.82 },
-                { transform: 'translate(8%, -6%) scale(0.96)', opacity: 0.46 },
-                { transform: 'translate(0, 0) scale(1)', opacity: 0.58 },
-            ],
-            [
-                { transform: 'translate(0, 0) scale(1)', opacity: 0.48 },
-                { transform: 'translate(14%, -12%) scale(1.08)', opacity: 0.74 },
-                { transform: 'translate(-6%, 8%) scale(0.94)', opacity: 0.4 },
-                { transform: 'translate(0, 0) scale(1)', opacity: 0.48 },
-            ],
+        const lights = [
+            {
+                duration: 14000,
+                frames: [
+                    { transform: 'translate(-22%, -12%) scale(0.96)', opacity: 0.5 },
+                    { transform: 'translate(22%, 12%) scale(1.08)', opacity: 0.8 },
+                ],
+            },
+            {
+                duration: 18000,
+                frames: [
+                    { transform: 'translate(20%, 14%) scale(1.06)', opacity: 0.7 },
+                    { transform: 'translate(-20%, -14%) scale(0.94)', opacity: 0.45 },
+                ],
+            },
         ];
-        return [...background.children].map((layer, index) =>
-            layer.animate(paths[index], {
-                duration: index === 0 ? 26000 : 34000,
+        return [...background.children].map((layer, index) => {
+            const { frames, duration } = lights[index];
+            return layer.animate(frames, {
+                duration,
+                // Commencer à mi-parcours évite un fond presque immobile à l’ouverture.
+                delay: -duration / 2,
+                direction: 'alternate',
                 iterations: Infinity,
                 easing: 'ease-in-out',
-            }),
-        );
+            });
+        });
     }
 
     function update() {
