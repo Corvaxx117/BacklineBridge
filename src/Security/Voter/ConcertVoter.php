@@ -60,8 +60,8 @@ final class ConcertVoter extends Voter
             self::CONDITIONS => BandVoter::CONDITIONS,
             self::CONTACTS => BandVoter::COLLABORATE,
             self::DELETE => BandVoter::MANAGE_TECHNICAL,
+            self::RESPOND_AVAILABILITY => BandVoter::RESPOND_AVAILABILITY,
             self::SHARE,
-            self::RESPOND_AVAILABILITY,
             self::IMPORT_REFERENCE => BandVoter::MANAGE_TECHNICAL,
             default => null,
         };

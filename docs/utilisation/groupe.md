@@ -1,6 +1,6 @@
 # Espace groupe
 
-Les quatre musiciens accèdent à **Trésorerie & stock**. Marty et Romain n’y ont pas accès.
+Les quatre musiciens accèdent à **Trésorerie & stock**. L’ingénieur son, le booker et le manager n’y ont pas accès.
 
 ## Stock de merch
 

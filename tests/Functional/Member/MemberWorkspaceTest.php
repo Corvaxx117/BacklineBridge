@@ -122,6 +122,8 @@ final class MemberWorkspaceTest extends DatabaseTestCase
     {
         yield 'Marty own only' => [MemberKind::Engineer, BandRole::Manager, 403];
         yield 'Romain can read' => [MemberKind::Booker, BandRole::Booker, 200];
+        yield 'Manager can read' => [MemberKind::Manager, BandRole::TeamManager, 200];
+        yield 'Manager profile without management access' => [MemberKind::Manager, BandRole::Viewer, 403];
         yield 'Musician can read' => [MemberKind::Musician, BandRole::Manager, 200];
     }
 

@@ -9,6 +9,7 @@ enum MemberKind: string
     case Musician = 'musician';
     case Engineer = 'engineer';
     case Booker = 'booker';
+    case Manager = 'manager';
 
     public function label(): string
     {
@@ -16,6 +17,7 @@ enum MemberKind: string
             self::Musician => 'Membre du groupe',
             self::Engineer => 'Ingénieur son',
             self::Booker => 'Booker',
+            self::Manager => 'Manager',
         };
     }
 }

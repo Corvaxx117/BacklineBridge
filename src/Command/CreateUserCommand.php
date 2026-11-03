@@ -43,7 +43,7 @@ final class CreateUserCommand extends Command
             'role',
             null,
             InputOption::VALUE_REQUIRED,
-            'manager, booker, editor ou viewer.',
+            'manager (responsable), team_manager (manager), booker, editor ou viewer.',
             BandRole::Viewer->value,
         );
     }
@@ -60,7 +60,7 @@ final class CreateUserCommand extends Command
         }
         $role = BandRole::tryFrom((string) $input->getOption('role'));
         if (null === $role) {
-            $io->error('Choisis manager, booker, editor ou viewer.');
+            $io->error('Choisis un rôle proposé dans --help.');
 
             return Command::INVALID;
         }

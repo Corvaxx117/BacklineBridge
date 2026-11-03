@@ -11,7 +11,7 @@ use App\Entity\Setlist;
 use App\Entity\TechnicalSheet;
 use App\Entity\User;
 use App\Repository\SetlistRepository;
-use App\Service\Security\MusicianAccess;
+use App\Service\Security\MusicianOrManagerAccess;
 use App\ValueObject\SetlistContent;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -22,13 +22,13 @@ final readonly class SetlistManager
     public function __construct(
         private EntityManagerInterface $entityManager,
         private SetlistRepository $setlists,
-        private MusicianAccess $musicians,
+        private MusicianOrManagerAccess $editors,
     ) {
     }
 
     public function save(TechnicalSheet $sheet, User $author, SetlistInput $input): void
     {
-        $this->assertMusician($sheet, $author);
+        $this->assertEditor($sheet, $author);
         $current = $this->setlists->forSheet($sheet);
         $this->checkVersion($sheet, $current, $input->revision);
         $this->replace($sheet, $current, SetlistContent::fromText($input->songs), $author);
@@ -38,7 +38,7 @@ final readonly class SetlistManager
     public function importReference(Concert $concert, User $author, ImportSetlistInput $input): void
     {
         $sheet = $concert->getPatchSheet();
-        $this->assertMusician($sheet, $author);
+        $this->assertEditor($sheet, $author);
         $reference = $concert->getBand()->getReferenceSheet();
         // Les lectures et la copie partagent la même transaction SQLite.
         $this->entityManager->getConnection()->transactional(function () use ($reference, $sheet, $author, $input): void {
@@ -71,11 +71,11 @@ final readonly class SetlistManager
         }
     }
 
-    private function assertMusician(TechnicalSheet $sheet, User $user): void
+    private function assertEditor(TechnicalSheet $sheet, User $user): void
     {
         $band = $sheet->getBand();
-        if (null === $band || !$this->musicians->allows($user, $band)) {
-            throw new AccessDeniedException('Seuls les musiciens du groupe peuvent modifier une setlist.');
+        if (null === $band || !$this->editors->allows($user, $band)) {
+            throw new AccessDeniedException('Seuls les musiciens et le manager du groupe peuvent modifier une setlist.');
         }
     }
 
