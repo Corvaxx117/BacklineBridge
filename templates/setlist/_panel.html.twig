@@ -1,6 +1,12 @@
 {% set concert = sheet.concert %}
 {% set tracks = setlist ? setlist.tracks : [] %}
-<details id="setlist" class="setlist-panel" data-concert-section aria-labelledby="setlist-title">
+<details
+    id="setlist"
+    class="setlist-panel"
+    data-concert-section
+    data-sheet-section
+    aria-labelledby="setlist-title"
+>
     <summary>
         <h2 id="setlist-title">
             <svg

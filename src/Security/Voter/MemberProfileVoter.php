@@ -10,7 +10,7 @@ use App\Enum\BandRole;
 use App\Enum\MemberKind;
 use App\Repository\BandMembershipRepository;
 use App\Repository\MemberProfileRepository;
-use App\Service\Security\MusicianAccess;
+use App\Service\Security\MusicianOrManagerAccess;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -23,7 +23,7 @@ final class MemberProfileVoter extends Voter
     public function __construct(
         private readonly BandMembershipRepository $memberships,
         private readonly MemberProfileRepository $profiles,
-        private readonly MusicianAccess $musicians,
+        private readonly MusicianOrManagerAccess $editors,
     ) {
     }
 
@@ -47,7 +47,7 @@ final class MemberProfileVoter extends Voter
         }
 
         return $subject->getUser()?->getId() === $user->getId()
-            || $this->musicians->allows($user, $subject->getBand())
+            || $this->editors->allows($user, $subject->getBand())
             || (BandRole::Booker === $role
                 && MemberKind::Booker ===
                     $this->profiles->forUser($user, $subject->getBand())?->getKind());

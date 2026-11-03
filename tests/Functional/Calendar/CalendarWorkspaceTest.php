@@ -151,6 +151,27 @@ final class CalendarWorkspaceTest extends VenueTestCase
         yield 'minuit explicite' => ['00:00', '00:00'];
     }
 
+    public function testManagerCanPublishToTheSharedCalendar(): void
+    {
+        $this->configure();
+        $concert = $this->concert();
+        $band = $concert->getBand();
+        $user = static::getContainer()->get(UserCreator::class)->create(
+            'manager@example.test', 'Manager test', 'CompteManager2026!', $band, BandRole::TeamManager,
+        );
+        $em = $this->entityManager();
+        $em->persist(new MemberProfile($band, $user, 'Manager test', 'Manager', MemberKind::Manager));
+        $em->flush();
+        $this->client->loginUser($user);
+        $gateway = $this->createMock(GoogleCalendarGateway::class);
+        $gateway->expects(self::once())->method('publish')->willReturn(new PublicationResult(true, null));
+        static::getContainer()->set(GoogleCalendarGateway::class, $gateway);
+        $form = $this->client->request('GET', '/concerts/'.$concert->getId())->filter('#concert-calendar form')->form();
+        self::assertSelectorTextContains('.role-badge', 'Manager');
+        $this->client->submit($form);
+        self::assertResponseStatusCodeSame(303);
+    }
+
     public function testPublicationRequiresPostAndCsrf(): void
     {
         $this->configure();

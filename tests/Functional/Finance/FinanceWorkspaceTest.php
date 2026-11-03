@@ -345,6 +345,8 @@ final class FinanceWorkspaceTest extends DatabaseTestCase
     {
         yield 'Marty' => [BandRole::Manager, MemberKind::Engineer];
         yield 'Romain' => [BandRole::Booker, MemberKind::Booker];
+        yield 'Manager' => [BandRole::TeamManager, MemberKind::Manager];
+        yield 'Manager with a musician profile' => [BandRole::TeamManager, MemberKind::Musician];
         yield 'Manager without a musician profile' => [BandRole::Manager, null];
         yield 'Reader' => [BandRole::Viewer, MemberKind::Musician];
     }

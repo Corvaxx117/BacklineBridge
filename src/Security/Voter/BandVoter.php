@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Enum\BandRole;
 use App\Repository\BandMembershipRepository;
 use App\Service\Security\MusicianAccess;
+use App\Service\Security\MusicianOrManagerAccess;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -27,10 +28,12 @@ final class BandVoter extends Voter
     public const PLAN_CONCERT = 'BAND_PLAN_CONCERT';
     public const CONDITIONS = 'BAND_CONDITIONS';
     public const COLLABORATE = 'BAND_COLLABORATE';
+    public const RESPOND_AVAILABILITY = 'BAND_RESPOND_AVAILABILITY';
 
     public function __construct(
         private readonly BandMembershipRepository $memberships,
         private readonly MusicianAccess $musicians,
+        private readonly MusicianOrManagerAccess $editors,
     ) {
     }
 
@@ -51,6 +54,7 @@ final class BandVoter extends Voter
                     self::CONDITIONS,
                     self::MANAGE_TECHNICAL,
                     self::COLLABORATE,
+                    self::RESPOND_AVAILABILITY,
                 ],
                 true,
             );
@@ -72,9 +76,11 @@ final class BandVoter extends Voter
 
         return match ($attribute) {
             self::VIEW, self::CALENDAR => true,
-            self::TREASURY, self::CALENDAR_PUBLISH, self::SETLIST => $this->musicians->allows($user, $subject),
+            self::TREASURY => $this->musicians->allows($user, $subject),
+            self::CALENDAR_PUBLISH, self::SETLIST => $this->editors->allows($user, $subject),
             self::EDIT_PATCH => $role->canEdit(),
-            self::DELETE_PATCH, self::MANAGE_TECHNICAL => BandRole::Manager === $role,
+            self::DELETE_PATCH, self::MANAGE_TECHNICAL => $role->canManage(),
+            self::RESPOND_AVAILABILITY => BandRole::Manager === $role,
             self::PLAN_CONCERT, self::CONDITIONS => $role->canPlanConcerts(),
             self::COLLABORATE => BandRole::Viewer !== $role,
             default => false,
