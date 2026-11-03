@@ -47,13 +47,17 @@ try {
     $profiles = $em->getRepository(MemberProfile::class)->findAll();
     $cipher = new ProfileCipher($_SERVER['PROFILE_DATA_KEY']);
     $musicians = 0;
+    $managers = 0;
     foreach ($profiles as $profile) {
         $cipher->decrypt($profile);
         if (MemberKind::Musician === $profile->getKind()) {
             ++$musicians;
         }
+        if (MemberKind::Manager === $profile->getKind()) {
+            ++$managers;
+        }
     }
-    if (6 !== count($profiles) || 4 !== $musicians) {
+    if (7 !== count($profiles) || 4 !== $musicians || 1 !== $managers) {
         throw new RuntimeException('Les profils attendus ne sont pas tous présents.');
     }
     $connection = $em->getConnection();
@@ -105,6 +109,7 @@ try {
         'environment' => 'production',
         'profiles' => count($profiles),
         'musicians' => $musicians,
+        'managers' => $managers,
         'database_integrity' => 'ok',
         'pdf_bytes' => strlen($pdf),
         'login_status' => $response->getStatusCode(),

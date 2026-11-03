@@ -187,6 +187,8 @@ final class SetlistTest extends VenueTestCase
         yield 'musicien responsable' => [MemberKind::Musician, BandRole::Manager, true];
         yield 'ingénieur son responsable' => [MemberKind::Engineer, BandRole::Manager, false];
         yield 'booker' => [MemberKind::Booker, BandRole::Booker, false];
+        yield 'manager' => [MemberKind::Manager, BandRole::TeamManager, true];
+        yield 'manager en lecture' => [MemberKind::Manager, BandRole::Viewer, false];
         yield 'musicien en lecture' => [MemberKind::Musician, BandRole::Viewer, false];
         yield 'profil technique' => [MemberKind::Musician, BandRole::Editor, false];
     }

@@ -1,6 +1,6 @@
 # Setlists
 
-La setlist reste interne : les six membres de l’équipe peuvent la lire. **Seuls Julien, Rémi, Franck et Sylou peuvent la modifier.** Elle n’apparaît ni dans l’espace salle, ni dans les invitations, ni dans les PDF techniques.
+La setlist reste interne : toute l’équipe peut la lire. **Les quatre musiciens et le manager peuvent la modifier.** Elle n’apparaît ni dans l’espace salle, ni dans les invitations, ni dans les PDF techniques.
 
 ## Préparer la référence
 

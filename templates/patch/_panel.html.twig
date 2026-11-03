@@ -1,13 +1,10 @@
 {% set canEdit = is_granted('SHEET_EDIT', sheet) %}
 {% set canDelete = is_granted('SHEET_DELETE', sheet) %}
-<section class="patch-panel" aria-labelledby="patch-title">
-    <div class="panel-header">
-        <div>
-            <p class="eyebrow">
-                {{ panelLabel }}
-            </p>
-            <h2 id="patch-title">Patch des entrées</h2>
-            {% if canDelete %}
+{% set embedded = embedded|default(false) %}
+{% set panelContent %}
+    {% if embedded %}
+        {% if canDelete %}
+            <div class="panel-header">
                 <a
                     class="trash-link"
                     href="{{
@@ -21,22 +18,46 @@
                 >
                     Corbeille
                 </a>
-            {% endif %}
-        </div>
-        <div class="patch-stats" aria-label="Résumé du patch">
-            <div>
-                <strong>{{ lines|length }}</strong>
-                <span>{{ (lines|length) == 1 ? 'canal' : 'canaux' }}</span>
             </div>
-            {% if sectionCount is defined %}
-                <span class="stat-divider" aria-hidden="true"></span>
+        {% endif %}
+    {% else %}
+        <div class="panel-header">
+            <div>
+                <p class="eyebrow">
+                    {{ panelLabel }}
+                </p>
+                <h2 id="patch-title">Patch des entrées</h2>
+                {% if canDelete %}
+                    <a
+                        class="trash-link"
+                        href="{{
+                        path(
+                            'app_patch_trash',
+                            {
+                                id: sheet.id
+                            }
+                        )
+                        }}"
+                    >
+                        Corbeille
+                    </a>
+                {% endif %}
+            </div>
+            <div class="patch-stats" aria-label="Résumé du patch">
                 <div>
-                    <strong>{{ sectionCount }}</strong>
-                    <span>{{ sectionCount == 1 ? 'famille' : 'familles' }}</span>
+                    <strong>{{ lines|length }}</strong>
+                    <span>{{ (lines|length) == 1 ? 'canal' : 'canaux' }}</span>
                 </div>
-            {% endif %}
+                {% if sectionCount is defined %}
+                    <span class="stat-divider" aria-hidden="true"></span>
+                    <div>
+                        <strong>{{ sectionCount }}</strong>
+                        <span>{{ sectionCount == 1 ? 'famille' : 'familles' }}</span>
+                    </div>
+                {% endif %}
+            </div>
         </div>
-    </div>
+    {% endif %}
 
     {% if lines is empty %}
         <div class="empty-state">
@@ -178,4 +199,13 @@
             les préférences du groupe.
         </div>
     {% endif %}
-</section>
+{% endset %}
+{% if embedded %}
+    <div class="patch-panel">
+        {{ panelContent }}
+    </div>
+{% else %}
+    <section class="patch-panel" aria-labelledby="patch-title">
+        {{ panelContent }}
+    </section>
+{% endif %}

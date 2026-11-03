@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Command\ImportPrivateBandCommand;
+use App\Entity\BandMembership;
 use App\Entity\MemberProfile;
 use App\Entity\MerchProduct;
 use App\Entity\TreasuryAccount;
 use App\Entity\User;
+use App\Enum\BandRole;
+use App\Enum\MemberKind;
 use App\Tests\DatabaseTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -43,6 +46,13 @@ final class PrivateBandImportTest extends DatabaseTestCase
                     'function' => 'Booker',
                     'administrative' => [],
                 ],
+                [
+                    'name' => 'Manager test',
+                    'kind' => 'manager',
+                    'function' => 'Manager',
+                    'email' => 'manager@example.test',
+                    'administrative' => ['Téléphone' => '0600000000'],
+                ],
             ],
             'accounts' => ['cash' => 15000, 'bank' => 50000],
             'products' => [
@@ -73,8 +83,13 @@ final class PrivateBandImportTest extends DatabaseTestCase
             $em = $this->entityManager();
             $em->clear();
             self::assertSame($password, $em->find(User::class, $this->userId)->getPassword());
-            self::assertSame(2, $em->getRepository(User::class)->count([]));
-            self::assertSame(3, $em->getRepository(MemberProfile::class)->count([]));
+            self::assertSame(3, $em->getRepository(User::class)->count([]));
+            self::assertSame(4, $em->getRepository(MemberProfile::class)->count([]));
+            $manager = $em->getRepository(MemberProfile::class)->findOneBy(['publicName' => 'Manager test']);
+            self::assertInstanceOf(MemberProfile::class, $manager);
+            self::assertSame(MemberKind::Manager, $manager->getKind());
+            self::assertSame(BandRole::TeamManager, $em->getRepository(BandMembership::class)->findOneBy(['user' => $manager->getUser()])->getRole());
+            self::assertStringNotContainsString('0600000000', $manager->getAdministrativeCiphertext());
             self::assertSame(2, $em->getRepository(TreasuryAccount::class)->count([]));
             self::assertSame(1, $em->getRepository(MerchProduct::class)->count([]));
             self::assertSame(
@@ -99,14 +114,15 @@ final class PrivateBandImportTest extends DatabaseTestCase
             );
             self::assertCount(1, $newFiles);
             $codes = json_decode(file_get_contents($newFiles[0]), true);
-            self::assertCount(1, $codes['codes']);
+            self::assertCount(2, $codes['codes']);
             self::assertSame('Engineer test', $codes['codes'][0]['name']);
+            self::assertSame('Manager test', $codes['codes'][1]['name']);
             // Attacher plus tard un booker n'invente aucune coordonnée et ne touche pas aux soldes.
             $data['members'][2]['email'] = 'booker@example.test';
             $data['accounts']['cash'] = 1;
             file_put_contents($file, json_encode($data));
             self::assertSame(0, $command->execute(['file' => $file, '--band' => $this->bandId]));
-            self::assertSame(3, $em->getRepository(User::class)->count([]));
+            self::assertSame(4, $em->getRepository(User::class)->count([]));
             self::assertSame(
                 15000,
                 $em
