@@ -1,4 +1,4 @@
-/* Essai léger : aucun script, aucune boucle et aucun mouvement imposé. */
+/* Retours visuels courts, sans mouvement lorsque le système les réduit. */
 :root {
     --motion-fast: 140ms;
     --motion-duration: 220ms;
@@ -6,33 +6,7 @@
     --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-@media screen {
-    body {
-        isolation: isolate;
-    }
-
-    /* Une surface bornée, sans filtre ni image ; elle reste derrière le contenu. */
-    body::before {
-        content: '';
-        position: fixed;
-        z-index: -1;
-        top: 104px;
-        right: 20px;
-        width: min(36rem, calc(100vw - 40px));
-        aspect-ratio: 1;
-        pointer-events: none;
-        opacity: 0.75;
-        background:
-            radial-gradient(ellipse 38% 38% at 60% 38%, var(--accent-highlight), transparent),
-            radial-gradient(ellipse 38% 38% at 40% 62%, var(--success-bg), transparent);
-    }
-}
-
 @media screen and (prefers-reduced-motion: no-preference) {
-    body::before {
-        animation: bb-ambient-arrive 3.2s var(--motion-ease) backwards;
-    }
-
     .hero-copy,
     .form-heading,
     .flash-success {
@@ -78,6 +52,7 @@
 
     .concert-disclosure > summary,
     .setlist-panel > summary,
+    .sheet-section > summary,
     .site-nav a,
     .nav-group > summary {
         transition:
@@ -87,7 +62,9 @@
 
     .concert-disclosure > summary::after,
     .setlist-panel > summary::after,
-    .nav-chevron {
+    .sheet-section > summary::after,
+    .nav-chevron,
+    .sheet-toggle svg {
         transition: transform var(--motion-duration) var(--motion-ease);
     }
 
@@ -114,7 +91,12 @@
     /* Les autres navigateurs conservent le fonctionnement natif des accordéons. */
     @supports (interpolate-size: allow-keywords) and selector(::details-content) and
         (transition-behavior: allow-discrete) {
-        :is(.concert-disclosure, .setlist-panel, .availability-details)::details-content {
+        :is(
+            .concert-disclosure,
+            .setlist-panel,
+            .availability-details,
+            .sheet-section
+        )::details-content {
             interpolate-size: allow-keywords;
             block-size: 0;
             opacity: 0;
@@ -125,13 +107,18 @@
                 content-visibility var(--motion-duration) allow-discrete;
         }
 
-        :is(.concert-disclosure, .setlist-panel, .availability-details)[open]::details-content {
+        :is(
+                .concert-disclosure,
+                .setlist-panel,
+                .availability-details,
+                .sheet-section
+            )[open]::details-content {
             block-size: auto;
             opacity: 1;
         }
 
         /* Un lien direct doit rester positionné juste, sans attendre la transition. */
-        :is(.concert-disclosure, .setlist-panel, .availability-details):is(
+        :is(.concert-disclosure, .setlist-panel, .availability-details, .sheet-section):is(
                 :target,
                 :has(:target)
             )::details-content {
@@ -157,16 +144,5 @@
     }
     to {
         opacity: 1;
-    }
-}
-
-@keyframes bb-ambient-arrive {
-    from {
-        opacity: 0.15;
-        transform: translate(20px, -12px);
-    }
-    to {
-        opacity: 0.75;
-        transform: none;
     }
 }

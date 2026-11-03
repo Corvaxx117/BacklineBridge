@@ -49,6 +49,10 @@ La mise à jour du cache Apache sur un site existant passe par `php deploy/alway
 
 ## Animations de l’interface
 
-`public/styles/motion.css` regroupe les durées et effets, sans JavaScript ni dépendance. Les apparitions restent courtes ; la lueur de fond s’arrête après 3,2 secondes. Seules les quatre premières cartes de chaque liste apparaissent en léger décalage.
+`motion.css` garde les retours visuels courts. `ambient.css` et `ambient.js` ajoutent deux lumières diffuses, animées par le navigateur avec `transform` et `opacity` : aucune bibliothèque, image ou boucle JavaScript par image. Le script est chargé avec `defer` et les ressources sont versionnées comme les autres fichiers publics.
 
-Le réglage système « Réduire les animations » désactive ces mouvements. L’ouverture progressive des accordéons est réservée aux navigateurs compatibles ; les autres gardent leur ouverture native. L’ouverture d’une section ciblée par un lien direct reste immédiate. Le plan de scène ne reçoit aucune transformation supplémentaire.
+Le bouton pause de la capsule d’apparence mémorise le choix. Le fond s’arrête quand l’onglet est masqué ou pendant l’impression ; « Réduire les animations » désactive les mouvements. L’économiseur de données choisit un fond fixe au premier accès. Les halos restent statiques si JavaScript est indisponible.
+
+Les sections de référence utilisent les éléments natifs `details` et `summary`, avec un raccourci « Tout déplier ». `technical-sections.js`, chargé seulement sur cette page, conserve les sections ouvertes dans l’onglet pendant la navigation. Les liens directs restent prioritaires. L’ouverture animée est réservée aux navigateurs compatibles ; le plan de scène ne reçoit aucune transformation supplémentaire.
+
+[Animation performante](https://web.dev/articles/animations-guide) · [Visibilité de l’onglet](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)

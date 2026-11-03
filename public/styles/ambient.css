@@ -1,0 +1,78 @@
+/* Lumières diffuses : deux petites surfaces, déplacées sans filtre ni dessin continu. */
+.ambient-background {
+    display: none;
+}
+
+.ambient-control[hidden] {
+    display: none !important;
+}
+
+.ambient-control {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ambient-toggle {
+    width: 44px;
+    background: transparent;
+}
+
+.ambient-toggle:hover {
+    background: var(--surface-hover);
+}
+
+.ambient-toggle[aria-pressed='true'] {
+    color: var(--accent-text);
+}
+
+.ambient-toggle[aria-pressed='true'] [data-ambient-play],
+.ambient-toggle[aria-pressed='false'] [data-ambient-pause] {
+    display: none;
+}
+
+@media screen {
+    body {
+        isolation: isolate;
+    }
+
+    .ambient-background {
+        --ambient-warm: var(--accent-soft);
+        --ambient-cool: var(--success-bg);
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+        contain: strict;
+    }
+
+    .ambient-light {
+        position: absolute;
+        width: min(40rem, 110vw);
+        aspect-ratio: 1;
+        pointer-events: none;
+    }
+
+    .ambient-light-warm {
+        top: 2vh;
+        right: -12%;
+        opacity: 0.58;
+        background: radial-gradient(ellipse 46% 42% at center, var(--ambient-warm), transparent);
+    }
+
+    .ambient-light-cool {
+        top: 36vh;
+        left: -12%;
+        opacity: 0.48;
+        background: radial-gradient(ellipse 44% 48% at center, var(--ambient-cool), transparent);
+    }
+}
+
+@supports (color: color-mix(in srgb, red, transparent)) {
+    .ambient-background {
+        --ambient-warm: color-mix(in srgb, var(--accent-text) 24%, transparent);
+        --ambient-cool: color-mix(in srgb, var(--success-text) 22%, transparent);
+    }
+}
