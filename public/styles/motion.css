@@ -1,0 +1,172 @@
+/* Essai léger : aucun script, aucune boucle et aucun mouvement imposé. */
+:root {
+    --motion-fast: 140ms;
+    --motion-duration: 220ms;
+    --motion-enter: 340ms;
+    --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media screen {
+    body {
+        isolation: isolate;
+    }
+
+    /* Une surface bornée, sans filtre ni image ; elle reste derrière le contenu. */
+    body::before {
+        content: '';
+        position: fixed;
+        z-index: -1;
+        top: 104px;
+        right: 20px;
+        width: min(36rem, calc(100vw - 40px));
+        aspect-ratio: 1;
+        pointer-events: none;
+        opacity: 0.75;
+        background:
+            radial-gradient(ellipse 38% 38% at 60% 38%, var(--accent-highlight), transparent),
+            radial-gradient(ellipse 38% 38% at 40% 62%, var(--success-bg), transparent);
+    }
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+    body::before {
+        animation: bb-ambient-arrive 3.2s var(--motion-ease) backwards;
+    }
+
+    .hero-copy,
+    .form-heading,
+    .flash-success {
+        animation: bb-enter var(--motion-enter) var(--motion-ease) backwards;
+    }
+
+    .login-panel {
+        animation: bb-fade-in var(--motion-enter) var(--motion-ease) backwards;
+    }
+
+    /* Limiter le décalage aux premières cartes, même dans une longue liste. */
+    :is(.concert-card, .document-card, .task-card):nth-child(-n + 4) {
+        animation: bb-enter var(--motion-enter) var(--motion-ease) var(--motion-delay, 0ms)
+            backwards;
+    }
+
+    :is(.concert-card, .document-card, .task-card):nth-child(2) {
+        --motion-delay: 30ms;
+    }
+
+    :is(.concert-card, .document-card, .task-card):nth-child(3) {
+        --motion-delay: 60ms;
+    }
+
+    :is(.concert-card, .document-card, .task-card):nth-child(4) {
+        --motion-delay: 90ms;
+    }
+
+    .button,
+    .task-action {
+        transition:
+            transform var(--motion-fast) var(--motion-ease),
+            background-color var(--motion-fast) ease,
+            border-color var(--motion-fast) ease,
+            box-shadow var(--motion-fast) ease;
+    }
+
+    :is(.concert-card, .document-card, .task-card) {
+        transition:
+            transform var(--motion-duration) var(--motion-ease),
+            border-color var(--motion-duration) ease;
+    }
+
+    .concert-disclosure > summary,
+    .setlist-panel > summary,
+    .site-nav a,
+    .nav-group > summary {
+        transition:
+            background-color var(--motion-fast) ease,
+            color var(--motion-fast) ease;
+    }
+
+    .concert-disclosure > summary::after,
+    .setlist-panel > summary::after,
+    .nav-chevron {
+        transition: transform var(--motion-duration) var(--motion-ease);
+    }
+
+    .nav-group[open] > .nav-group-links,
+    .calendar-dialog[open] {
+        animation: bb-enter var(--motion-duration) var(--motion-ease) backwards;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        :is(.button, .task-action):not(:disabled):not([aria-disabled='true']):hover {
+            transform: translateY(-1px);
+        }
+
+        :is(.concert-card, .document-card, .task-card):hover {
+            transform: translateY(-2px);
+            border-color: var(--border-strong);
+        }
+    }
+
+    :is(.button, .task-action):not(:disabled):not([aria-disabled='true']):active {
+        transform: scale(0.985);
+    }
+
+    /* Les autres navigateurs conservent le fonctionnement natif des accordéons. */
+    @supports (interpolate-size: allow-keywords) and selector(::details-content) and
+        (transition-behavior: allow-discrete) {
+        :is(.concert-disclosure, .setlist-panel, .availability-details)::details-content {
+            interpolate-size: allow-keywords;
+            block-size: 0;
+            opacity: 0;
+            overflow: clip;
+            transition:
+                block-size var(--motion-duration) var(--motion-ease),
+                opacity var(--motion-duration) ease,
+                content-visibility var(--motion-duration) allow-discrete;
+        }
+
+        :is(.concert-disclosure, .setlist-panel, .availability-details)[open]::details-content {
+            block-size: auto;
+            opacity: 1;
+        }
+
+        /* Un lien direct doit rester positionné juste, sans attendre la transition. */
+        :is(.concert-disclosure, .setlist-panel, .availability-details):is(
+                :target,
+                :has(:target)
+            )::details-content {
+            transition: none;
+        }
+    }
+}
+
+@keyframes bb-enter {
+    from {
+        opacity: 0.4;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes bb-fade-in {
+    from {
+        opacity: 0.4;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes bb-ambient-arrive {
+    from {
+        opacity: 0.15;
+        transform: translate(20px, -12px);
+    }
+    to {
+        opacity: 0.75;
+        transform: none;
+    }
+}

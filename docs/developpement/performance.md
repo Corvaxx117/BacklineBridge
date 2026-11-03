@@ -46,3 +46,9 @@ Les tests PHP de `tests/Functional/Performance/` limitent le nombre de requêtes
 `npm run test:browser` démarre un serveur local sur le port 8877 avec une base fictive neuve dans `var/browser/`. Les parcours couvrent le plan et la réponse salle, sur ordinateur et mobile. Le serveur de test refuse toute autre base. Les traces d’un échec restent dans `var/browser/report/`, hors Git. En local, Chrome doit être installé ; la CI installe Chromium. `BB_BROWSER_PHP` permet de choisir le chemin de PHP 8.4 si nécessaire.
 
 La mise à jour du cache Apache sur un site existant passe par `php deploy/alwaysdata/update-asset-cache.php`, après la sauvegarde et le transfert du code. Le script préserve l’authentification de la démo et les autres protections, conserve une sauvegarde privée et remplace uniquement son bloc de cache. Voir les [étapes officielles](../exploitation/deploiement-officiel.md).
+
+## Animations de l’interface
+
+`public/styles/motion.css` regroupe les durées et effets, sans JavaScript ni dépendance. Les apparitions restent courtes ; la lueur de fond s’arrête après 3,2 secondes. Seules les quatre premières cartes de chaque liste apparaissent en léger décalage.
+
+Le réglage système « Réduire les animations » désactive ces mouvements. L’ouverture progressive des accordéons est réservée aux navigateurs compatibles ; les autres gardent leur ouverture native. L’ouverture d’une section ciblée par un lien direct reste immédiate. Le plan de scène ne reçoit aucune transformation supplémentaire.
