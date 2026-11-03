@@ -12,21 +12,21 @@ use App\Integration\GoogleCalendar\Dto\PublicationResult;
 use App\Integration\GoogleCalendar\Exception\GoogleCalendarUnavailable;
 use App\Integration\GoogleCalendar\GoogleCalendarConfiguration;
 use App\Integration\GoogleCalendar\GoogleCalendarGateway;
-use App\Service\Security\MusicianAccess;
+use App\Service\Security\MusicianOrManagerAccess;
 
 final readonly class ConcertPublisher
 {
     public function __construct(
         private GoogleCalendarGateway $google,
         private GoogleCalendarConfiguration $configuration,
-        private MusicianAccess $musicians,
+        private MusicianOrManagerAccess $editors,
         private CalendarReader $reader,
     ) {
     }
 
     public function publish(Concert $concert, User $user): PublicationResult
     {
-        $this->musicians->assert($user, $concert->getBand());
+        $this->editors->assert($user, $concert->getBand());
         if (null === $concert->getId() || !$this->configuration->isConfiguredFor($concert->getBand())) {
             throw new GoogleCalendarUnavailable('L’agenda du groupe n’est pas encore connecté.');
         }

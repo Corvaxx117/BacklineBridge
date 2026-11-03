@@ -1,12 +1,14 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ sheet.bandName }} — Patch des entrées · {{ app_name }}
+    {{ sheet.bandName }} — Fiche technique · {{ app_name }}
 {% endblock %}
 
 {% block page_assets %}
     <link rel="stylesheet" href="{{ asset('/styles/setlist.css') }}" />
+    <link rel="stylesheet" href="{{ asset('/styles/reference.css') }}" />
     <script src="{{ asset('/scripts/concert-details.js') }}" defer></script>
+    <script src="{{ asset('/scripts/technical-sections.js') }}" defer></script>
 {% endblock %}
 
 {% block body %}
@@ -20,8 +22,7 @@
         <div class="hero-copy">
             <h1 id="page-title">{{ sheet.bandName }}<span class="title-period">.</span></h1>
             <p class="hero-description">
-                Chaque source, à sa place.<br />Retrouvez et préparez le patch des entrées du
-                groupe.
+                Plan de scène, patch et matériel : la référence du groupe.
             </p>
         </div>
         <div class="hero-actions">
@@ -39,63 +40,159 @@
                 Télécharger la fiche PDF
             </a>
             {% if is_granted('SHEET_EDIT', sheet) %}
-                <a class="button button-primary hero-action" href="{{ path('app_patch_new') }}">
+                <a
+                    class="button button-primary hero-action"
+                    href="{{ path('app_patch_new') }}"
+                    data-sheet-open="sheet-patch"
+                >
                     <span class="button-plus" aria-hidden="true">+</span>Ajouter une source
                 </a>
             {% endif %}
         </div>
     </section>
 
-    {{
-        include(
-            'setlist/_panel.html.twig',
-            {
-                sheet: sheet,
-                setlist: setlist
-            },
-            with_context: false
-        )
-    }}
-    {{
-        include(
-            'stage/_panel.html.twig',
-            {
+    <div class="sheet-toolbar">
+        <button
+            class="text-button sheet-toggle"
+            type="button"
+            data-sheet-toggle
+            aria-expanded="false"
+            hidden
+        >
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                aria-hidden="true"
+            >
+                <path d="m7 8 5 5 5-5M7 13l5 5 5-5" />
+            </svg>
+            <span data-sheet-toggle-label>Tout déplier</span>
+        </button>
+    </div>
+    <div class="sheet-sections" data-sheet-sections data-sheet-id="{{ sheet.id }}">
+        {{
+            include(
+                'setlist/_panel.html.twig',
+                {
+                    sheet: sheet,
+                    setlist: setlist
+                },
+                with_context: false
+            )
+        }}
+        {% embed 'technical/_section.html.twig'
+            with {
+                sectionId: 'sheet-stage',
+                titleId: 'stage-title',
+                sectionTitle: 'Plan de scène',
+                sectionIcon: 'stage',
+                sectionMeta: (sheet.stagePlan|length)
+                    ~ ((sheet.stagePlan|length) == 1 ? ' élément' : ' éléments'),
                 sheet: sheet
-            },
-            with_context: false
-        )
-    }}
-    {{
-        include(
-            'patch/_panel.html.twig',
-            {
+            } only
+        %}
+            {% block content %}
+                {{
+                    include(
+                        'stage/_panel.html.twig',
+                        {
+                            sheet: sheet,
+                            embedded: true
+                        },
+                        with_context: false
+                    )
+                }}
+            {% endblock %}
+        {% endembed %}
+        {% embed 'technical/_section.html.twig'
+            with {
+                sectionId: 'sheet-patch',
+                titleId: 'patch-title',
+                sectionTitle: 'Patch des entrées',
+                sectionIcon: 'technical',
+                sectionMeta: (lines|length) ~ ((lines|length) == 1 ? ' source · ' : ' sources · ')
+                    ~ sectionCount
+                    ~ (sectionCount == 1 ? ' famille' : ' familles'),
                 sheet: sheet,
                 lines: lines,
-                sectionCount: sectionCount,
-                panelLabel: 'Fiche de référence',
-                newSourceUrl: path('app_patch_new')
-            },
-            with_context: false
-        )
-    }}
-
-    {{
-        include(
-            'equipment/_panel.html.twig',
-            {
+                sectionCount: sectionCount
+            } only
+        %}
+            {% block content %}
+                {{
+                    include(
+                        'patch/_panel.html.twig',
+                        {
+                            sheet: sheet,
+                            lines: lines,
+                            sectionCount: sectionCount,
+                            embedded: true,
+                            panelLabel: 'Fiche de référence',
+                            newSourceUrl: path('app_patch_new')
+                        },
+                        with_context: false
+                    )
+                }}
+            {% endblock %}
+        {% endembed %}
+        {% embed 'technical/_section.html.twig'
+            with {
+                sectionId: 'sheet-equipment',
+                titleId: 'equipment-title',
+                sectionTitle: 'Matériel à prévoir',
+                sectionIcon: 'gear',
+                sectionMeta: (sheet.equipmentRequests|length)
+                    ~ ((sheet.equipmentRequests|length) == 1 ? ' demande' : ' demandes'),
                 sheet: sheet
-            },
-            with_context: false
-        )
-    }}
-
-    {{
-        include(
-            'patch/_notices.html.twig',
-            {
-                sheet: sheet
-            },
-            with_context: false
-        )
-    }}
+            } only
+        %}
+            {% block content %}
+                {{
+                    include(
+                        'equipment/_panel.html.twig',
+                        {
+                            sheet: sheet,
+                            embedded: true
+                        },
+                        with_context: false
+                    )
+                }}
+            {% endblock %}
+        {% endembed %}
+        {% if sheet.notices is not empty %}
+            {% embed 'technical/_section.html.twig'
+                with {
+                    sectionId: 'sheet-notes',
+                    titleId: 'notice-title',
+                    sectionTitle: 'Notes techniques',
+                    sectionIcon: 'notes',
+                    sectionMeta: (sheet.notices|length)
+                        ~ ((sheet.notices|length) == 1 ? ' précision' : ' précisions'),
+                    sheet: sheet
+                } only
+            %}
+                {% block content %}
+                    {{
+                        include(
+                            'patch/_notices.html.twig',
+                            {
+                                sheet: sheet,
+                                embedded: true
+                            },
+                            with_context: false
+                        )
+                    }}
+                {% endblock %}
+            {% endembed %}
+        {% else %}
+            <div class="document-origin">
+                <span class="eyebrow">Document d’origine</span>
+                <p>
+                    {{ sheet.documentLabel }}
+                </p>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

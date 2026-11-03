@@ -126,7 +126,11 @@ final class ImportPrivateBandCommand extends Command
                         : $this->em
                             ->getRepository(BandMembership::class)
                             ->findOneBy(['band' => $band, 'user' => $user]);
-                $role = MemberKind::Booker === $kind ? BandRole::Booker : BandRole::Manager;
+                $role = match ($kind) {
+                    MemberKind::Booker => BandRole::Booker,
+                    MemberKind::Manager => BandRole::TeamManager,
+                    default => BandRole::Manager,
+                };
                 if (null === $membership) {
                     $this->em->persist(new BandMembership($band, $user, $role));
                 } else {

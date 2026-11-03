@@ -57,5 +57,6 @@ final class NavigationTest extends DatabaseTestCase
     {
         yield 'Ingénieur son' => [MemberKind::Engineer, BandRole::Manager];
         yield 'Booker' => [MemberKind::Booker, BandRole::Booker];
+        yield 'Manager' => [MemberKind::Manager, BandRole::TeamManager];
     }
 }

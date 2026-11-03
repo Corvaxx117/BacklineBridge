@@ -1,0 +1,39 @@
+<details
+    id="{{ sectionId }}"
+    class="sheet-section"
+    data-sheet-section
+    aria-labelledby="{{ titleId }}"
+>
+    <summary>
+        <h2 id="{{ titleId }}" class="sheet-section-title">
+            <span class="sheet-section-symbol" aria-hidden="true">
+                {% if sectionIcon in ['stage', 'gear'] %}
+                    {{
+                        include(
+                            'equipment/_category_icon.html.twig',
+                            {
+                                icon: sectionIcon
+                            },
+                            with_context: false
+                        )
+                    }}
+                {% else %}
+                    {{
+                        include(
+                            'concert/_section_icon.html.twig',
+                            {
+                                icon: sectionIcon
+                            },
+                            with_context: false
+                        )
+                    }}
+                {% endif %}
+            </span>
+            <span class="sheet-section-name">{{ sectionTitle }}</span>
+            <span class="sheet-section-meta">{{ sectionMeta }}</span>
+        </h2>
+    </summary>
+    {% block content %}
+
+    {% endblock %}
+</details>

@@ -1,27 +1,33 @@
-<section class="technical-panel" aria-labelledby="stage-title">
-    <div class="panel-header">
-        <div>
-            <p class="eyebrow">
-                Implantation et retours
-            </p>
-            <h2 id="stage-title">Plan de scène</h2>
+{% set embedded = embedded|default(false) %}
+{% set canManage = is_granted('SHEET_MANAGE', sheet) %}
+{% set panelContent %}
+    {% if not embedded or canManage %}
+        <div class="panel-header">
+            {% if not embedded %}
+                <div>
+                    <p class="eyebrow">
+                        Implantation et retours
+                    </p>
+                    <h2 id="stage-title">Plan de scène</h2>
+                </div>
+            {% endif %}
+            {% if canManage %}
+                <a
+                    class="button button-secondary"
+                    href="{{
+                    path(
+                        'app_stage_edit',
+                        {
+                            id: sheet.id
+                        }
+                    )
+                    }}"
+                >
+                    Modifier le plan
+                </a>
+            {% endif %}
         </div>
-        {% if is_granted('SHEET_MANAGE', sheet) %}
-            <a
-                class="button button-secondary"
-                href="{{
-                path(
-                    'app_stage_edit',
-                    {
-                        id: sheet.id
-                    }
-                )
-                }}"
-            >
-                Modifier le plan
-            </a>
-        {% endif %}
-    </div>
+    {% endif %}
     {% if sheet.stagePlan %}
         {{
             include(
@@ -37,4 +43,13 @@
             Le plan de scène n’a pas encore été renseigné.
         </p>
     {% endif %}
-</section>
+{% endset %}
+{% if embedded %}
+    <div class="technical-panel">
+        {{ panelContent }}
+    </div>
+{% else %}
+    <section class="technical-panel" aria-labelledby="stage-title">
+        {{ panelContent }}
+    </section>
+{% endif %}

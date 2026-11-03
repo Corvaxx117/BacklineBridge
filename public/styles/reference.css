@@ -1,0 +1,170 @@
+/* La référence se consulte par section ; les documents partagés gardent leur présentation. */
+.sheet-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    min-height: 44px;
+    margin-bottom: 12px;
+}
+
+.sheet-toggle[hidden] {
+    display: none;
+}
+
+.sheet-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    color: var(--accent-text);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.sheet-toggle svg {
+    width: 18px;
+    height: 18px;
+}
+
+.sheet-toggle[aria-expanded='true'] svg {
+    transform: rotate(180deg);
+}
+
+.sheet-sections {
+    display: grid;
+    gap: 16px;
+}
+
+.sheet-section,
+.sheet-sections > .setlist-panel {
+    min-width: 0;
+    margin: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    overflow: hidden;
+    scroll-margin-top: 24px;
+}
+
+.sheet-section > summary {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 68px;
+    padding: 18px 24px;
+    cursor: pointer;
+    list-style: none;
+}
+
+.sheet-section > summary::-webkit-details-marker {
+    display: none;
+}
+
+.sheet-section > summary:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: -3px;
+}
+
+.sheet-section > summary::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    border-right: 1.5px solid var(--text-muted);
+    border-bottom: 1.5px solid var(--text-muted);
+    transform: translateY(-2px) rotate(45deg);
+}
+
+.sheet-section[open] > summary {
+    border-bottom: 1px solid var(--border);
+}
+
+.sheet-section[open] > summary::after {
+    transform: translateY(2px) rotate(225deg);
+}
+
+.sheet-section-title {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.sheet-section-symbol,
+.sheet-section-symbol svg {
+    display: block;
+    width: 19px;
+    height: 19px;
+    flex: 0 0 19px;
+    color: var(--accent-text);
+}
+
+.sheet-section-meta {
+    margin-left: auto;
+    font-weight: 400;
+    letter-spacing: normal;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.sheet-section > :is(.technical-panel, .patch-panel) {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.sheet-section .panel-header {
+    justify-content: flex-end;
+    padding: 16px 24px;
+}
+
+.sheet-section .trash-link {
+    margin: 0;
+}
+
+.sheet-notes-content {
+    padding: 20px 24px;
+}
+
+.sheet-notes-content ul {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding-left: 18px;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.sheet-notes-content .document-origin {
+    margin-bottom: 0;
+}
+
+@media (max-width: 720px) {
+    .sheet-section > summary {
+        gap: 12px;
+        padding: 18px 16px;
+    }
+
+    .sheet-section-title {
+        display: grid;
+        grid-template-columns: 19px minmax(0, 1fr);
+        gap: 6px 12px;
+        font-size: 16px;
+    }
+
+    .sheet-section-meta {
+        grid-column: 2;
+        margin: 0;
+    }
+
+    .sheet-section .panel-header,
+    .sheet-notes-content {
+        padding: 16px;
+    }
+}
