@@ -49,7 +49,7 @@ La mise à jour du cache Apache sur un site existant passe par `php deploy/alway
 
 ## Animations de l’interface
 
-`motion.css` garde les retours visuels courts. `ambient.css` et `ambient.js` ajoutent deux lumières diffuses, animées par le navigateur avec `transform` et `opacity` : aucune bibliothèque, image ou boucle JavaScript par image. Le script est chargé avec `defer` et les ressources sont versionnées comme les autres fichiers publics.
+`motion.css` garde les retours visuels courts. `ambient.js` dessine deux lumières diffuses dans un Canvas, sans bibliothèque ni image à télécharger. Une seule boucle `requestAnimationFrame` limite le dessin à 20 mises à jour par seconde et s’arrête complètement en pause. Le fond est calculé à demi-résolution au maximum, sans adaptation Retina, dans une image plafonnée à 800 × 600 pixels. Il suit les changements de taille et de thème. Le script est chargé avec `defer` et les ressources sont versionnées.
 
 Le bouton pause de la capsule d’apparence mémorise le choix. Le fond s’arrête quand l’onglet est masqué ou pendant l’impression ; « Réduire les animations » désactive les mouvements. L’économiseur de données choisit un fond fixe au premier accès. Les halos restent statiques si JavaScript est indisponible.
 

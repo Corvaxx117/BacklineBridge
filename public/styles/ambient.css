@@ -1,4 +1,4 @@
-/* Lumières diffuses : deux petites surfaces, déplacées sans filtre ni dessin continu. */
+/* Un fond Canvas léger ; les halos CSS restent disponibles sans JavaScript. */
 .ambient-background {
     display: none;
 }
@@ -42,10 +42,24 @@
         display: block;
         position: fixed;
         inset: 0;
-        z-index: -1;
+        z-index: 0;
         overflow: hidden;
         pointer-events: none;
-        contain: strict;
+    }
+
+    /* Le contenu suit le fond dans l’ordre de peinture, sans indice négatif. */
+    body > :is(.site-header, .page-shell, .site-footer) {
+        position: relative;
+    }
+
+    .ambient-canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    .ambient-background[data-ambient-renderer='canvas'] .ambient-light {
+        display: none;
     }
 
     .ambient-light {
