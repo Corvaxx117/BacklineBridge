@@ -33,12 +33,13 @@ final readonly class ConcertCreator
         ?string $startTime = null,
     ): Concert {
         $concert = $this->prepare($reference, $date, $venue, $city, $status, $notes, $createdBy, $startTime);
+        $this->availability->initialize($concert);
         $this->entityManager->flush();
 
         return $concert;
     }
 
-    /** Prépare l’agrégat dans l’unité de travail ; l’appelant valide la transaction. */
+    /** Prépare le dossier sans demande de disponibilité ; l’appelant valide la transaction. */
     public function prepare(
         TechnicalSheet $reference,
         \DateTimeImmutable $date,
@@ -87,7 +88,6 @@ final readonly class ConcertCreator
         $concert->updateDetails($date, $venue, $city, $status, $notes);
         $concert->setStartTime($startTime);
         $this->entityManager->persist($concert);
-        $this->availability->initialize($concert);
 
         return $concert;
     }

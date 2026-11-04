@@ -45,6 +45,11 @@ final class BandsintownConcertRepository extends ServiceEntityRepository
         ], $rows);
     }
 
+    public function isImported(Concert $concert): bool
+    {
+        return $this->count(['concert' => $concert]) > 0;
+    }
+
     public function forConcert(Concert $concert): ?BandsintownConcert
     {
         return $this->findOneBy(['concert' => $concert]);

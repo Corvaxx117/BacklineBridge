@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Security\Voter;
 
 use App\Entity\Concert;
+use App\Repository\BandsintownConcertRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
@@ -23,8 +24,10 @@ final class ConcertVoter extends Voter
     public const DELETE = 'CONCERT_DELETE';
     public const CONTACTS = 'CONCERT_CONTACTS';
 
-    public function __construct(private readonly AccessDecisionManagerInterface $decisions)
-    {
+    public function __construct(
+        private readonly AccessDecisionManagerInterface $decisions,
+        private readonly BandsintownConcertRepository $bandsintown,
+    ) {
     }
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -66,7 +69,11 @@ final class ConcertVoter extends Voter
             default => null,
         };
 
-        return null !== $bandAttribute
-            && $this->decisions->decide($token, [$bandAttribute], $subject->getBand());
+        if (null === $bandAttribute
+            || !$this->decisions->decide($token, [$bandAttribute], $subject->getBand())) {
+            return false;
+        }
+
+        return self::RESPOND_AVAILABILITY !== $attribute || !$this->bandsintown->isImported($subject);
     }
 }

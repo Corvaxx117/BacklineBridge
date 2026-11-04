@@ -105,18 +105,18 @@ final class BandsintownImportTest extends DatabaseTestCase
         self::assertNotSame($this->sheetId, $concert->getPatchSheet()->getId());
         self::assertCount(22, $concert->getPatchSheet()->getLines());
         self::assertSame(
-            1,
+            0,
             $em->getConnection()->fetchOne('SELECT COUNT(*) FROM concert_availability'),
         );
         self::assertSame(1, $em->getRepository(BandsintownConcert::class)->count([]));
-        self::assertSame('pending', $em->getConnection()->fetchOne(
-            'SELECT status FROM concert_availability WHERE concert_id = ?',
-            [$concert->getId()],
-        ));
+
         $this->client->request('GET', '/concerts/'.$concert->getId());
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.bit-concert-source', '20:30');
         self::assertSelectorTextContains('.bit-concert-source', 'Description importée');
+        self::assertSelectorNotExists('#disponibilites');
+        self::assertSelectorNotExists('form[name="concert_availability"]');
+        self::assertSelectorTextContains('[data-engineer-presence]', 'À confirmer');
         $this->client->catchExceptions(true);
         $this->client->request('GET', $uri);
         self::assertResponseStatusCodeSame(404);
@@ -160,6 +160,10 @@ final class BandsintownImportTest extends DatabaseTestCase
         self::assertInstanceOf(ConcertAvailability::class, $savedAvailability);
         self::assertSame(AvailabilityStatus::Available, $savedAvailability->getStatus());
         self::assertSame('Réponse à conserver', $savedAvailability->getComment());
+        $this->client->request('GET', '/concerts/'.$id);
+        self::assertSelectorNotExists('#disponibilites');
+        $this->client->request('GET', '/concerts');
+        self::assertSelectorNotExists('.concert-availability-link');
         $this->preview();
         self::assertSelectorTextContains('.bit-preview-list', 'Déjà importé');
         self::assertSelectorCount(1, '.import-event-choice input');

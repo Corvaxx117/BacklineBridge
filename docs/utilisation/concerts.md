@@ -4,7 +4,7 @@ Chaque concert possède son propre dossier. Modifier Lyon ne modifie ni Nantes n
 
 ## Lire le dossier
 
-Les disponibilités et les notes pratiques apparaissent en premier. Les sections **Setlist**, **Documents**, **Contacts**, **Conditions**, **Dossier technique** et **Google Agenda** sont repliées : cliquer sur leur titre pour les ouvrir. Les liens directs et les retours de formulaire ouvrent la section concernée.
+Les disponibilités des concerts saisis manuellement et les notes pratiques apparaissent en premier. Les sections **Setlist**, **Documents**, **Contacts**, **Conditions**, **Dossier technique** et **Google Agenda** sont repliées : cliquer sur leur titre pour les ouvrir. Les liens directs et les retours de formulaire ouvrent la section concernée.
 
 ## Créer et compléter une date
 
@@ -18,6 +18,8 @@ L’hébergement comprend **Retour à la casa !**. Un montant vide est inconnu ;
 Le nom du créateur est enregistré. Une ancienne date sans auteur indique « Créateur non renseigné ». Les annonces [importées de Bandsintown](bandsintown.md) sont validées automatiquement.
 
 ## Répondre aux disponibilités
+
+Pour les concerts importés de Bandsintown, le groupe est considéré comme disponible : cette section et le rappel dans la liste sont masqués. La présence de Marty se renseigne dans **Conditions → Présence de l’ingé son**. Elle revient à **À confirmer** si la date change.
 
 Les quatre musiciens et Marty répondent pour eux-mêmes : **Disponible**, **Indisponible** ou **À confirmer**, avec une précision facultative. Romain consulte les réponses.
 

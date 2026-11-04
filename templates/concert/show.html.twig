@@ -56,17 +56,19 @@
             </a>
         {% endif %}
     </section>
-    {{
-        include(
-            'concert/_availability.html.twig',
-            {
-                concert: concert,
-                availability: availability,
-                availabilityForm: availabilityForm
-            },
-            with_context: false
-        )
-    }}
+    {% if availability is not null %}
+        {{
+            include(
+                'concert/_availability.html.twig',
+                {
+                    concert: concert,
+                    availability: availability,
+                    availabilityForm: availabilityForm
+                },
+                with_context: false
+            )
+        }}
+    {% endif %}
     {% if concert.notes %}
         <section class="concert-notes" aria-labelledby="concert-notes-title">
             <div class="concert-notes-heading">
@@ -140,7 +142,8 @@
                 'concert/_conditions.html.twig',
                 {
                     concert: concert,
-                    conditions: conditions
+                    conditions: conditions,
+                    showEngineerPresence: bandsintownSource is not null
                 },
                 with_context: false
             )

@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Enum\Accommodation;
 use App\Enum\EngineerPayment;
+use App\Enum\EngineerPresence;
 use App\Enum\PaymentFramework;
 use App\Enum\PaymentMethod;
 use App\Enum\TransportCoverage;
@@ -46,6 +47,19 @@ class ConcertConditions
         options: ['default' => 'unknown'],
     ),]
     private PaymentFramework $engineerPaymentFramework = PaymentFramework::Unknown;
+
+    #[ORM\Column(length: 20, enumType: EngineerPresence::class, options: ['default' => 'unknown'])]
+    private EngineerPresence $engineerPresence = EngineerPresence::Unknown;
+
+    public function getEngineerPresence(): EngineerPresence
+    {
+        return $this->engineerPresence;
+    }
+
+    public function resetEngineerPresence(): void
+    {
+        $this->engineerPresence = EngineerPresence::Unknown;
+    }
 
     public function getEngineerPaymentFramework(): PaymentFramework
     {
@@ -121,6 +135,7 @@ class ConcertConditions
         ?int $feeCents,
         ?int $engineerFeeCents,
         ?string $notes,
+        EngineerPresence $engineerPresence = EngineerPresence::Unknown,
     ): void {
         $this->accommodation = $accommodation;
         $this->transportCoverage = $transportCoverage;
@@ -131,5 +146,6 @@ class ConcertConditions
         $this->feeCents = $feeCents;
         $this->engineerFeeCents = $engineerFeeCents;
         $this->notes = $notes;
+        $this->engineerPresence = $engineerPresence;
     }
 }

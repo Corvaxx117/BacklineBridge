@@ -39,7 +39,10 @@
                     aria-label="{{ app_name }}, accueil"
                 >
                     {{ include('branding/_mark.html.twig', {}, with_context: false) }}
-                    <span>{{ app_name }}<span class="brand-caption">ESPACE DU GROUPE</span></span>
+                    <span class="brand-copy">
+                        <span class="brand-name">{{ app_name }}</span>
+                        <span class="brand-caption">ESPACE DU GROUPE</span>
+                    </span>
                 </a>
                 {% if app.user %}
                     {% set currentBand =
@@ -123,7 +126,7 @@
 
         <footer class="site-footer">
             <div class="footer-inner">
-                <span>{{ app_name }}</span>
+                <span class="footer-brand">{{ app_name }}</span>
                 <p>
                     Une fiche claire. Une scène bien préparée.
                 </p>
