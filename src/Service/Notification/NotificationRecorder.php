@@ -13,6 +13,7 @@ use App\Entity\User;
 use App\Enum\DocumentCategory;
 use App\Enum\NotificationType;
 use App\Repository\BandMembershipRepository;
+use App\Service\Notification\Push\PushQueue;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Clock\ClockInterface;
 
@@ -23,6 +24,7 @@ final readonly class NotificationRecorder
         private EntityManagerInterface $entityManager,
         private BandMembershipRepository $memberships,
         private ClockInterface $clock,
+        private PushQueue $pushQueue,
     ) {
     }
 
@@ -82,6 +84,7 @@ final readonly class NotificationRecorder
                 $recipient->markRead($notification->getCreatedAt());
             }
             $this->entityManager->persist($recipient);
+            $this->pushQueue->record($recipient);
         }
     }
 

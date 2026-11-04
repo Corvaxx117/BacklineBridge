@@ -74,6 +74,11 @@ $concertCreator = new ConcertCreator(
         $em,
         $em->getRepository(App\Entity\BandMembership::class),
         new Symfony\Component\Clock\NativeClock(),
+        new App\Service\Notification\Push\PushQueue(
+            $em,
+            $em->getRepository(App\Entity\PushSubscription::class),
+            new App\Service\Notification\Push\PushConfiguration(false, '', $root, true),
+        ),
     ),
 );
 $author = $creator->create('author@example.test', 'Membre fictif', 'BrowserTest2026!', $band, BandRole::Booker);

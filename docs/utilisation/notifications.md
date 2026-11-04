@@ -19,6 +19,6 @@ Vos propres actions apparaissent déjà lues. L’auteur et la date d’origine 
 
 Seules les notifications des groupes dont vous êtes encore membre sont visibles. Les régisseurs invités ne voient pas cet historique.
 
-## Notifications sur le téléphone
+## Sur téléphone
 
-Cette première étape fournit les notifications dans BacklineBridge. Les push sur téléphone et l’activation par appareil seront ajoutés ensuite, sur cette même base.
+La rubrique **Notifications sur cet appareil**, dans la page de la cloche, permet d’activer ou de couper les push pour cet appareil et d’envoyer un test personnel. L’activation reste facultative. Sur iPhone, ajouter d’abord le site à l’écran d’accueil et ouvrir cette icône. La déconnexion désactive les push de cet appareil. [Installation et dépannage](../exploitation/notifications-push.md).

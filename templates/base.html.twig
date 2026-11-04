@@ -9,6 +9,10 @@
             {% endblock %}
         </title>
         {{ include('branding/_favicon.html.twig', {}, with_context: false) }}
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <meta name="theme-color" content="#152b38" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content="BacklineBridge" />
         {{ include('theme/_head.html.twig', {}, with_context: false) }}
         {{ include('branding/_styles.html.twig', {}, with_context: false) }}
         <link rel="stylesheet" href="{{ asset('/styles/navigation.css') }}" />
@@ -27,6 +31,7 @@
         <script src="{{ asset('/scripts/navigation.js') }}" defer></script>
         {% if app.user %}
             <script src="{{ asset('/scripts/notifications.js') }}" defer></script>
+            <script src="{{ asset('/scripts/pwa.js') }}" defer></script>
         {% endif %}
         {% block page_assets %}
 

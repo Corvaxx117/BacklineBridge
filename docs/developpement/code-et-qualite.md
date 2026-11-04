@@ -115,8 +115,10 @@ Les requêtes ciblées, les caches privés, le découpage des styles et les parc
 
 ## Notifications internes
 
-`NotificationRecorder` ajoute un événement et les destinataires avant le `flush` de l’action métier. Les mêmes transactions protègent donc le concert ou le document et sa notification. Un import Bandsintown enregistre un seul événement pour son lot. Aucun envoi externe n’est effectué à cette étape.
+`NotificationRecorder` ajoute un événement et les destinataires avant le `flush` de l’action métier. Les mêmes transactions protègent donc le concert ou le document et sa notification. Un import Bandsintown enregistre un seul événement pour son lot. L’action HTTP ne contacte aucun relais : `PushQueue` ajoute seulement les envois des appareils volontaires dans la même transaction.
 
 `BandNotification` conserve le type, l’auteur, la date et les libellés utiles ; `NotificationRecipient` conserve la lecture de chacun. Les requêtes filtrent à la fois le destinataire et son adhésion actuelle. Les cibles supprimées sont détachées par clé étrangère, ce qui conserve l’historique.
 
-Les actions de `Controller/Notification/` sont séparées. Les mutations utilisent POST et CSRF, les redirections restent internes et les réponses sont privées, sans cache. La liste affiche vingt éléments par page et charge leurs cibles en une requête. Le compteur utilise une lecture SQL indexée, partagée pendant l’affichage d’une page. `notifications.js` l’interroge à la minute uniquement quand l’onglet est visible ; il s’arrête si la session expire.
+Les actions de `Controller/Notification/` sont séparées. Les mutations utilisent POST ou DELETE avec CSRF, les redirections restent internes et les réponses sont privées, sans cache. La liste affiche vingt éléments par page et charge leurs cibles en une requête. Le compteur utilise une lecture SQL indexée, partagée pendant l’affichage d’une page. `notifications.js` l’interroge à la minute uniquement quand l’onglet est visible ; il s’arrête si la session expire.
+
+`PushSender` traite ensuite cette file via `app:notifications:send`. Il relit les droits, ignore les éléments supprimés ou déjà lus et retente les erreurs temporaires. `WebPushGateway` isole la bibliothèque et le réseau : endpoints limités aux relais des navigateurs, aucun suivi de redirection ni journal d’URL privée. Les tests utilisent un faux relais. Le service worker se limite aux notifications et ne cache aucune donnée privée. [Configuration serveur et essai iPhone](../exploitation/notifications-push.md).

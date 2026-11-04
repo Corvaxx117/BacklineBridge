@@ -42,7 +42,7 @@ for (const file of await files('public/scripts')) {
     }
 }
 const manifest = {};
-for (const directory of ['public/styles', 'public/scripts', 'public/vendor']) {
+for (const directory of ['public/styles', 'public/scripts', 'public/vendor', 'public/icons']) {
     for (const file of await files(directory)) {
         if (!/\.(css|js|mjs|svg|png|ico|woff2?)$/.test(file)) continue;
         const url = `/${relative('public', file)}`;

@@ -6,6 +6,7 @@
 
 {% block page_assets %}
     <link rel="stylesheet" href="{{ asset('/styles/notifications.css') }}" />
+    <script src="{{ asset('/scripts/push-settings.js') }}" type="module"></script>
 {% endblock %}
 
 {% block body %}
@@ -30,6 +31,7 @@
             </form>
         {% endif %}
     </section>
+    {{ include('notification/_push-settings.html.twig', {}, with_context: false) }}
     <nav class="notification-filters" aria-label="Filtrer les notifications">
         <a
             href="{{ path('app_notification_index') }}"
