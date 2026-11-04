@@ -37,6 +37,7 @@ final readonly class ConcertViewBuilder
     /** @return array<string, mixed> */
     public function build(Concert $concert, User $user): array
     {
+        $bandsintownSource = $this->bandsintown->forConcert($concert);
         $calendarConfigured = $this->calendar->isConfiguredFor($concert->getBand());
         $canViewConditions = $this->security->isGranted(ConcertVoter::CONDITIONS, $concert);
 
@@ -51,12 +52,15 @@ final readonly class ConcertViewBuilder
                 ->getRepository(ConcertContact::class)
                 ->findBy(['concert' => $concert], ['name' => 'ASC']),
             'documents' => $this->documents->forConcert($concert),
-            'bandsintownSource' => $this->bandsintown->forConcert($concert),
+            'bandsintownSource' => $bandsintownSource,
             'sheet' => $concert->getPatchSheet(),
             'lines' => $this->lines->findForSheet($concert->getPatchSheet()),
             'canViewConditions' => $canViewConditions,
-            'availability' => $this->availability->roster($concert, $user),
-            'availabilityForm' => $this->security->isGranted(ConcertVoter::RESPOND_AVAILABILITY, $concert)
+            'availability' => null === $bandsintownSource
+                ? $this->availability->roster($concert, $user)
+                : null,
+            'availabilityForm' => null === $bandsintownSource
+                && $this->security->isGranted(ConcertVoter::RESPOND_AVAILABILITY, $concert)
                 ? $this->forms->create(
                     ConcertAvailabilityType::class,
                     $this->availability->inputFor($concert, $user),

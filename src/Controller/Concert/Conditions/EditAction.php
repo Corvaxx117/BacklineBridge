@@ -8,12 +8,14 @@ use App\Dto\Concert\ConcertConditionsInput;
 use App\Entity\Concert;
 use App\Entity\ConcertConditions;
 use App\Form\ConcertConditionsType;
+use App\Repository\BandsintownConcertRepository;
 use App\Security\Voter\ConcertVoter;
 use App\Service\Concert\ConcertConditionsUpdater;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -31,18 +33,29 @@ final class EditAction extends AbstractController
         #[MapEntity(id: 'id')] Concert $concert,
         EntityManagerInterface $entityManager,
         ConcertConditionsUpdater $updater,
+        BandsintownConcertRepository $bandsintown,
     ): Response {
         $this->denyAccessUnlessGranted(ConcertVoter::CONDITIONS, $concert);
         $input = ConcertConditionsInput::fromConditions(
             $entityManager
                 ->getRepository(ConcertConditions::class)
                 ->findOneBy(['concert' => $concert]),
+            $concert->getDate()->format('Y-m-d'),
         );
-        $form = $this->createForm(ConcertConditionsType::class, $input);
+        $form = $this->createForm(ConcertConditionsType::class, $input, [
+            'engineer_presence' => $bandsintown->isImported($concert),
+        ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $updater->save($concert, $input);
+                $this->addFlash('success', 'Les conditions du concert ont été enregistrées.');
+
+                return $this->redirectToRoute(
+                    'app_concert_show',
+                    ['id' => $concert->getId()],
+                    Response::HTTP_SEE_OTHER,
+                );
             } catch (UniqueConstraintViolationException) {
                 $this->addFlash(
                     'error',
@@ -54,14 +67,9 @@ final class EditAction extends AbstractController
                     ['id' => $concert->getId()],
                     Response::HTTP_SEE_OTHER,
                 );
+            } catch (\DomainException $exception) {
+                $form->addError(new FormError($exception->getMessage()));
             }
-            $this->addFlash('success', 'Les conditions du concert ont été enregistrées.');
-
-            return $this->redirectToRoute(
-                'app_concert_show',
-                ['id' => $concert->getId()],
-                Response::HTTP_SEE_OTHER,
-            );
         }
 
         return $this->render(

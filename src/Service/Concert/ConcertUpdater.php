@@ -6,6 +6,8 @@ namespace App\Service\Concert;
 
 use App\Dto\Concert\CreateConcertInput;
 use App\Entity\Concert;
+use App\Entity\ConcertConditions;
+use App\Repository\BandsintownConcertRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
@@ -14,10 +16,11 @@ final readonly class ConcertUpdater
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ConcertAvailabilityManager $availability,
+        private BandsintownConcertRepository $bandsintown,
     ) {
     }
 
-    /** @return bool Si la date a changé et que les disponibilités doivent être redonnées. */
+    /** @return bool Si la date a changé. */
     public function update(Concert $concert, CreateConcertInput $input): bool
     {
         if ($input->revision !== (string) $concert->getRevision()) {
@@ -35,7 +38,11 @@ final readonly class ConcertUpdater
         );
         $concert->setStartTime($input->startTime);
         if ($dateChanged) {
-            $this->availability->resetForNewDate($concert);
+            if (!$this->bandsintown->isImported($concert)) {
+                $this->availability->resetForNewDate($concert);
+            }
+            $this->entityManager->getRepository(ConcertConditions::class)
+                ->findOneBy(['concert' => $concert])?->resetEngineerPresence();
         }
         // La version ORM protège aussi une écriture concurrente après la comparaison ci-dessus.
         // Le concert et la remise à zéro des disponibilités sont enregistrés dans la même transaction.

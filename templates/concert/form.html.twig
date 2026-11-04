@@ -179,8 +179,14 @@
                 dossier.
             </p>
             <p>
-                Les membres du groupe et l’ingé son confirment chacun leur disponibilité. Un
-                changement de date remet leurs réponses à confirmer.
+                {% if availabilityRequired is not defined or availabilityRequired %}
+                    Les membres du groupe et l’ingé son confirment chacun leur disponibilité. Un
+                    changement de date remet leurs réponses à confirmer.
+                {% else %}
+                    Ce concert vient de Bandsintown : le groupe est disponible. La présence de
+                    l’ingé son se renseigne dans les conditions et reste à confirmer si la date
+                    change.
+                {% endif %}
             </p>
         </aside>
     </div>
