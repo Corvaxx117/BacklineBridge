@@ -45,6 +45,10 @@ composer start
 
 La base est `var/backlinebridge.db`. Conserver les clés existantes lors d’une réinstallation : une nouvelle `PROFILE_DATA_KEY` ne déchiffre pas les anciennes fiches.
 
+## Police de l’interface
+
+Les grands titres utilisent DM Serif Display, sous licence libre SIL OFL. Le fichier WOFF2 et sa licence sont inclus dans [public/fonts](../../public/fonts/README.md) : aucune installation ni copie séparée n’est nécessaire.
+
 ## VS Code affiche d’anciennes erreurs
 
 Ouvrir la palette avec `⌘⇧P` :
