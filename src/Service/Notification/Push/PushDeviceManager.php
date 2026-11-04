@@ -76,12 +76,32 @@ final readonly class PushDeviceManager
             throw new ConflictHttpException('Activez d’abord les notifications sur cet appareil.');
         }
         $now = $this->now();
-        if (null !== $device->getLastTestAt() && $device->getLastTestAt() > $now->modify('-1 minute')) {
+        $accepted = $this->em->getConnection()->transactional(function () use ($device, $user, $now): bool {
+            // Un seul clic gagne, même si deux requêtes ont lu l’ancien état de l’appareil.
+            $changed = $this->em->getConnection()->executeStatement(
+                <<<'SQL'
+                    UPDATE push_subscription SET last_test_at = :now
+                    WHERE id = :id AND user_id = :user
+                        AND (last_test_at IS NULL OR last_test_at <= :before)
+                    SQL,
+                [
+                    'now' => $now->format('Y-m-d H:i:s'),
+                    'before' => $now->modify('-1 minute')->format('Y-m-d H:i:s'),
+                    'id' => $device->getId(), 'user' => $user->getId(),
+                ],
+            );
+            if (0 === (int) $changed) {
+                return false;
+            }
+            $device->recordTest($now);
+            $this->em->persist(new PushDelivery($device, $now));
+            $this->em->flush();
+
+            return true;
+        });
+        if (!$accepted) {
             throw new TooManyRequestsHttpException(60, 'Attendez une minute avant un nouveau test.');
         }
-        $device->recordTest($now);
-        $this->em->persist(new PushDelivery($device, $now));
-        $this->em->flush();
     }
 
     private function now(): \DateTimeImmutable

@@ -41,6 +41,26 @@ final class PushDeviceTest extends NotificationPushTestCase
         self::assertSame(0, $this->entityManager()->getRepository(PushDelivery::class)->count([]));
     }
 
+    public function testCooldownIsRespectedEvenIfAnotherRequestChangesTheDeviceAfterItsRead(): void
+    {
+        $this->activate();
+        $em = $this->entityManager();
+        $device = $em->getRepository(PushSubscription::class)->findOneBy([]);
+        self::assertInstanceOf(PushSubscription::class, $device);
+        self::assertNull($device->getLastTestAt());
+        // Une autre requête vient de réserver le test ; l’objet déjà chargé reste ancien.
+        $em->getConnection()->update('push_subscription', [
+            'last_test_at' => $this->clock->now()->format('Y-m-d H:i:s'),
+        ], ['id' => $device->getId()]);
+        $this->pushRequest('POST', '/notifications/appareil/test');
+        self::assertResponseStatusCodeSame(429);
+        self::assertSame(0, $em->getRepository(PushDelivery::class)->count([]));
+        $this->clock->sleep(60);
+        $this->pushRequest('POST', '/notifications/appareil/test');
+        self::assertResponseStatusCodeSame(202);
+        self::assertSame(1, $em->getRepository(PushDelivery::class)->count([]));
+    }
+
     public function testOtherAccountCannotReuseOrDisableAnExistingDevice(): void
     {
         $this->activate();

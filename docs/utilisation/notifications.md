@@ -19,6 +19,20 @@ Vos propres actions apparaissent déjà lues. L’auteur et la date d’origine 
 
 Seules les notifications des groupes dont vous êtes encore membre sont visibles. Les régisseurs invités ne voient pas cet historique.
 
-## Sur téléphone
+## Activer les push
 
-La rubrique **Notifications sur cet appareil**, dans la page de la cloche, permet d’activer ou de couper les push pour cet appareil et d’envoyer un test personnel. L’activation reste facultative. Sur iPhone, ajouter d’abord le site à l’écran d’accueil et ouvrir cette icône. La déconnexion désactive les push de cet appareil. [Installation et dépannage](../exploitation/notifications-push.md).
+Sur le site officiel, ouvrir la cloche, déplier **Notifications sur cet appareil**, puis choisir **Activer sur cet appareil** et accepter la demande du navigateur. Le bouton **Envoyer un test** vérifie uniquement cet appareil.
+
+Sur iPhone, ouvrir le site dans Safari, choisir **Partager → Sur l’écran d’accueil**, puis ouvrir cette icône et se connecter avant l’activation. Sur ordinateur ou Android compatible, l’activation se fait depuis le navigateur.
+
+Le choix se fait sur chaque appareil. Tant que l’autorisation reste accordée et que vous ne vous déconnectez pas, il n’est pas nécessaire de le répéter. Une déconnexion désactive les push de cet appareil ; après reconnexion, un clic permet de les réactiver, sans nouvelle demande système si l’autorisation existe encore.
+
+## Qui reçoit quoi ?
+
+Une nouvelle action est partagée avec les membres actuels du groupe. Les régisseurs invités sont exclus. Les push partent uniquement vers les appareils que ces personnes ont activés. L’auteur garde sa trace dans la cloche, déjà lue, sans recevoir de push pour sa propre action.
+
+L’association repose sur l’identifiant du compte dans BacklineBridge et sur un abonnement propre au navigateur. Ni numéro de téléphone ni inscription à un service externe ne sont nécessaires. Un compte peut activer plusieurs appareils.
+
+Le texte peut apparaître sur l’écran verrouillé : chacun peut régler l’affichage des aperçus sur son appareil. Les informations administratives, les soldes et les stocks ne sont pas inclus dans les push de cette version.
+
+[Installation, sécurité et dépannage](../exploitation/notifications-push.md).
