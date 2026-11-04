@@ -7,11 +7,13 @@ namespace App\Form;
 use App\Dto\Concert\ConcertConditionsInput;
 use App\Enum\Accommodation;
 use App\Enum\EngineerPayment;
+use App\Enum\EngineerPresence;
 use App\Enum\PaymentFramework;
 use App\Enum\PaymentMethod;
 use App\Enum\TransportCoverage;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -41,6 +43,15 @@ final class ConcertConditionsType extends AbstractType
                 'choice_label' => static fn ($choice): string => $choice->label(),
             ]);
         }
+        if ($options['engineer_presence']) {
+            $builder
+                ->add('engineerPresence', EnumType::class, [
+                    'class' => EngineerPresence::class,
+                    'label' => 'Présence de l’ingé son',
+                    'choice_label' => static fn (EngineerPresence $presence): string => $presence->label(),
+                ])
+                ->add('expectedDate', HiddenType::class);
+        }
         foreach (
             [
                 'feeAmount' => 'Montant convenu pour le concert (EUR)',
@@ -68,8 +79,10 @@ final class ConcertConditionsType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => ConcertConditionsInput::class,
+            'engineer_presence' => false,
             'csrf_token_id' => 'concert_conditions',
             'csrf_message' => 'Le formulaire a expiré. Recharge la page puis réessaie.',
         ]);
+        $resolver->setAllowedTypes('engineer_presence', 'bool');
     }
 }

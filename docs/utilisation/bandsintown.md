@@ -29,9 +29,9 @@ Le résultat indique les nombres d’annonces disponibles, à venir et écartée
 3. Cocher les dates à ajouter ou les annonces à rattacher à une date déjà saisie.
 4. Confirmer la sélection, jusqu’à 100 concerts.
 
-**Une annonce Bandsintown est considérée comme validée.** Un nouveau concert est donc validé ; rattacher une annonce valide aussi le concert existant, sans toucher à ses notes, conditions, disponibilités ou dossier technique.
+**Une annonce Bandsintown est considérée comme validée.** Un nouveau concert est donc validé ; rattacher une annonce valide aussi le concert existant, sans toucher à ses notes, conditions ou dossier technique. Les anciennes réponses de disponibilité restent conservées mais ne sont plus demandées ni affichées.
 
-Date, salle et ville servent à la création. Heure locale, adresse, pays, description, artistes et billets sont conservés dans l’encart d’origine. Chaque nouveau dossier technique part de la référence actuelle. Les conditions financières et disponibilités restent à renseigner séparément.
+Date, salle et ville servent à la création. Heure locale, adresse, pays, description, artistes et billets sont conservés dans l’encart d’origine. Chaque nouveau dossier technique part de la référence actuelle. La disponibilité des musiciens est acquise : ces concerts n’affichent ni section de disponibilité, ni rappel dans la liste. Dans **Conditions**, renseigner la **Présence de l’ingé son** : **À confirmer**, **Présent** ou **Absent**. Les conditions financières et le matériel restent à compléter.
 
 ## Doublons et mises à jour
 

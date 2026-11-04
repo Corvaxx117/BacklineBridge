@@ -7,6 +7,7 @@ namespace App\Dto\Concert;
 use App\Entity\ConcertConditions;
 use App\Enum\Accommodation;
 use App\Enum\EngineerPayment;
+use App\Enum\EngineerPresence;
 use App\Enum\PaymentFramework;
 use App\Enum\PaymentMethod;
 use App\Enum\TransportCoverage;
@@ -26,6 +27,11 @@ final class ConcertConditionsInput
 
     #[Assert\NotNull(message: 'Choisissez une option proposée.')]
     public ?PaymentMethod $paymentMethod = PaymentMethod::Unknown;
+
+    #[Assert\NotNull(message: 'Choisissez une option proposée.')]
+    public ?EngineerPresence $engineerPresence = EngineerPresence::Unknown;
+
+    public ?string $expectedDate = null;
 
     #[Assert\NotNull(message: 'Choisissez une option proposée.')]
     public ?EngineerPayment $engineerPayment = EngineerPayment::Unknown;
@@ -51,9 +57,12 @@ final class ConcertConditionsInput
     ),]
     public ?string $notes = null;
 
-    public static function fromConditions(?ConcertConditions $conditions): self
-    {
+    public static function fromConditions(
+        ?ConcertConditions $conditions,
+        ?string $expectedDate = null,
+    ): self {
         $input = new self();
+        $input->expectedDate = $expectedDate;
         if (null === $conditions) {
             return $input;
         }
@@ -61,6 +70,7 @@ final class ConcertConditionsInput
         $input->transportCoverage = $conditions->getTransportCoverage();
         $input->paymentFramework = $conditions->getPaymentFramework();
         $input->paymentMethod = $conditions->getPaymentMethod();
+        $input->engineerPresence = $conditions->getEngineerPresence();
         $input->engineerPayment = $conditions->getEngineerPayment();
         $input->engineerPaymentFramework = $conditions->getEngineerPaymentFramework();
         $input->feeAmount = EuroAmount::fromCents($conditions->getFeeCents());

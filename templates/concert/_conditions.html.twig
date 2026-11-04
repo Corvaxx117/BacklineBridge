@@ -32,6 +32,16 @@
         </a>
     </div>
     <dl class="conditions-grid">
+        {% if showEngineerPresence %}
+            <div>
+                <dt>
+                    Présence de l’ingé son
+                </dt>
+                <dd data-engineer-presence>
+                    {{ conditions ? conditions.engineerPresence.label : 'À confirmer' }}
+                </dd>
+            </div>
+        {% endif %}
         <div>
             <dt>
                 Hébergement
