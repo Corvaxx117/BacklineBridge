@@ -1,0 +1,42 @@
+<details
+    class="push-settings"
+    data-push-settings
+    data-push-url="{{ path('app_notification_push_status') }}"
+    data-push-test-url="{{ path('app_notification_push_test') }}"
+>
+    <summary>
+        <span>Notifications sur cet appareil</span>
+        <span class="push-settings-arrow" aria-hidden="true">⌄</span>
+    </summary>
+    <div class="push-settings-content">
+        <p data-push-status role="status" aria-live="polite">
+            Vérification de cet appareil…
+        </p>
+        <div data-push-install hidden>
+            <ol>
+                <li>Ouvrez cette adresse dans Safari.</li>
+                <li>Touchez Partager, puis « Sur l’écran d’accueil ».</li>
+                <li>Ouvrez BacklineBridge depuis cette icône, connectez-vous et revenez ici.</li>
+            </ol>
+            <p>
+                iOS 16.4 ou une version plus récente est nécessaire.
+            </p>
+        </div>
+        <div class="push-settings-actions">
+            <button type="button" class="button button-primary" data-push-enable hidden>
+                Activer sur cet appareil
+            </button>
+            <button type="button" class="button button-secondary" data-push-test hidden>
+                Envoyer un test
+            </button>
+            <button type="button" class="text-button" data-push-disable hidden>Désactiver</button>
+        </div>
+        <p class="push-settings-note">
+            Choix personnel, à refaire sur chaque appareil. La déconnexion les désactive sur cet
+            appareil. Le contenu peut apparaître sur l’écran verrouillé.
+        </p>
+        <noscript>
+            Activez JavaScript pour gérer les notifications de cet appareil.
+        </noscript>
+    </div>
+</details>

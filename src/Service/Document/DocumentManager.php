@@ -9,6 +9,7 @@ use App\Entity\Band;
 use App\Entity\BandDocument;
 use App\Entity\User;
 use App\Enum\DocumentSource;
+use App\Service\Notification\NotificationRecorder;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -18,6 +19,7 @@ final readonly class DocumentManager
         private EntityManagerInterface $entityManager,
         private DocumentStorage $storage,
         private ValidatorInterface $validator,
+        private NotificationRecorder $notifications,
     ) {
     }
 
@@ -60,6 +62,7 @@ final readonly class DocumentManager
             );
             try {
                 $this->entityManager->persist($document);
+                $this->notifications->documentAdded($document);
                 $this->entityManager->flush();
             } catch (\Throwable $exception) {
                 if ($document->isPdf()) {

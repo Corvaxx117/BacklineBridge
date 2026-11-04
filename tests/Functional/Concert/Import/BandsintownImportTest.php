@@ -169,6 +169,27 @@ final class BandsintownImportTest extends DatabaseTestCase
         self::assertSelectorCount(1, '.import-event-choice input');
     }
 
+    public function testBatchImportCreatesOneGroupedNotificationAndRollbackCreatesNone(): void
+    {
+        $this->preview();
+        $form = $this->client->getCrawler()->filter('form[name="bandsintown_import"]')->form();
+        $this->client->submit($form, ['bandsintown_import' => ['events' => ['10001', '10002']]]);
+        self::assertResponseStatusCodeSame(303);
+        $notices = $this->entityManager()->getRepository(\App\Entity\BandNotification::class)->findAll();
+        self::assertCount(1, $notices);
+        self::assertSame(\App\Enum\NotificationType::ConcertsImported, $notices[0]->getType());
+        self::assertSame(2, $notices[0]->getItemCount());
+        $input = new \App\Dto\Concert\BandsintownImportInput();
+        $input->events = ['10001', '10002'];
+        static::getContainer()->get(\App\Service\Concert\Import\Bandsintown\ConcertImporter::class)->import(
+            $this->entityManager()->find(Band::class, $this->bandId),
+            $this->entityManager()->find(User::class, $this->userId),
+            $this->events,
+            $input,
+        );
+        self::assertSame(1, $this->entityManager()->getRepository(\App\Entity\BandNotification::class)->count([]));
+    }
+
     public function testRepeatedSameDateVenueCityCreatesOnlyOneConcert(): void
     {
         $this->events = [
@@ -298,6 +319,8 @@ final class BandsintownImportTest extends DatabaseTestCase
         self::assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM concert'));
         self::assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM bandsintown_concert'));
         self::assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM concert_availability'));
+        self::assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM band_notification'));
+        self::assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM notification_recipient'));
         self::assertSame(1, $connection->fetchOne('SELECT COUNT(*) FROM technical_sheet'));
         self::assertSame(22, $connection->fetchOne('SELECT COUNT(*) FROM patch_line'));
     }

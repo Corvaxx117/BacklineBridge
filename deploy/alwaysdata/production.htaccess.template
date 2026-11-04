@@ -29,6 +29,7 @@ RewriteRule ^ https://{{HOST}}%{REQUEST_URI} [R=308,L]
 # BEGIN BacklineBridge asset cache
 <IfModule mod_mime.c>
     AddType text/javascript .mjs
+    AddType application/manifest+json .webmanifest
 </IfModule>
 # Seuls les fichiers statiques versionnés peuvent être conservés dans le navigateur.
 # Les pages, documents privés et erreurs gardent la règle no-store ci-dessus.

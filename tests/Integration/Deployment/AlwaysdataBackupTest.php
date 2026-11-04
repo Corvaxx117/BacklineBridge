@@ -115,6 +115,9 @@ final class AlwaysdataBackupTest extends TestCase
                 str_repeat('cd', 32)."\n",
         );
         file_put_contents($this->directory.'/var/private/deployment.json', '{"commit":"test"}');
+        mkdir($this->directory.'/var/private/web-push', 0700);
+        $pushSecret = '{"privateKey":"synthetic-push-backup-key"}';
+        file_put_contents($this->directory.'/var/private/web-push/vapid.json', $pushSecret);
         $database = new \PDO('sqlite:'.$this->directory.'/var/production.db');
         $database->exec('PRAGMA journal_mode = WAL');
         $database->exec('CREATE TABLE notes (value TEXT)');
@@ -136,6 +139,9 @@ final class AlwaysdataBackupTest extends TestCase
             file_get_contents($folder.'/.env.local'),
         );
         self::assertFileExists($folder.'/deployment.json');
+        self::assertSame($pushSecret, file_get_contents($folder.'/vapid.json'));
+        self::assertSame(0600, fileperms($folder.'/vapid.json') & 0777);
+        self::assertStringNotContainsString('synthetic-push-backup-key', $output);
         self::assertFileDoesNotExist($folder.'/demo.db');
     }
 

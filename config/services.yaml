@@ -78,6 +78,20 @@ services:
         arguments: ['google-tokens', 3500, '%kernel.cache_dir%/private/google-tokens']
         tags: [cache.pool]
 
+    App\Integration\WebPush\PushGateway:
+        alias: App\Integration\WebPush\WebPushGateway
+
+    # Le relais reçoit une URL d’abonnement privée : aucune trace dans le profiler.
+    web_push.http_client:
+        class: GuzzleHttp\Client
+        autowire: false
+        autoconfigure: false
+        arguments:
+            - connect_timeout: 3
+              timeout: 8
+              allow_redirects: false
+              http_errors: false
+
 when@test:
     services:
         App\Service\Document\DocumentStorage:

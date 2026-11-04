@@ -70,9 +70,20 @@ $concertCreator = new ConcertCreator(
     $availability,
     $em->getRepository(App\Entity\BandMembership::class),
     new App\Service\Patch\PatchLineCopier(),
+    new App\Service\Notification\NotificationRecorder(
+        $em,
+        $em->getRepository(App\Entity\BandMembership::class),
+        new Symfony\Component\Clock\NativeClock(),
+        new App\Service\Notification\Push\PushQueue(
+            $em,
+            $em->getRepository(App\Entity\PushSubscription::class),
+            new App\Service\Notification\Push\PushConfiguration(false, '', $root, true),
+        ),
+    ),
 );
+$author = $creator->create('author@example.test', 'Membre fictif', 'BrowserTest2026!', $band, BandRole::Booker);
 $concert = $concertCreator->create(
-    $sheet, new DateTimeImmutable('+5 days'), 'Salle fictive', 'Ville fictive', createdBy: $user,
+    $sheet, new DateTimeImmutable('+5 days'), 'Salle fictive', 'Ville fictive', createdBy: $author,
 );
 $issuer = new InvitationIssuer($em, new App\Service\Venue\PublicationBuilder(new App\Service\Stage\StagePatchLinks()));
 $input = new InvitationInput();
