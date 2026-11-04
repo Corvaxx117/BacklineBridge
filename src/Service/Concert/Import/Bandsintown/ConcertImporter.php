@@ -13,6 +13,7 @@ use App\Integration\Bandsintown\BandsintownConfiguration;
 use App\Integration\Bandsintown\Dto\BandsintownEvent;
 use App\Repository\BandMembershipRepository;
 use App\Service\Concert\ConcertCreator;
+use App\Service\Notification\NotificationRecorder;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -26,6 +27,7 @@ final readonly class ConcertImporter
         private BandMembershipRepository $memberships,
         private BandsintownConfiguration $configuration,
         private ValidatorInterface $validator,
+        private NotificationRecorder $notifications,
     ) {
     }
 
@@ -105,6 +107,8 @@ final readonly class ConcertImporter
                 $this->em->persist(new BandsintownConcert($concert, $event));
                 $identities[$key] = true;
             }
+
+            $this->notifications->concertsImported($band, $user, $created + $linked);
 
             return new ImportResult($created, $linked, $skipped);
         });

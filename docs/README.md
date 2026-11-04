@@ -14,6 +14,7 @@ Choisir le guide correspondant à la tâche. Chaque sujet possède un seul guide
 | Répartir les missions et suivre leur avancement | [To Do](utilisation/taches.md) |
 | Classer les PDF et les liens du groupe ou d’un concert | [Documents](utilisation/documents.md) |
 | Consulter l’agenda commun et y ajouter un concert | [Agenda](utilisation/agenda.md) |
+| Retrouver les nouveautés, leur auteur et gérer les non lues | [Notifications](utilisation/notifications.md) |
 
 ## Développer
 

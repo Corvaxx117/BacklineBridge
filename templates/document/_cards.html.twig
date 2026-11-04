@@ -1,6 +1,6 @@
 <ul class="collaboration-grid document-grid" aria-label="Documents partagés">
     {% for document in documents %}
-        <li class="document-card">
+        <li class="document-card" id="document-{{ document.id }}">
             <div class="document-card-heading">
                 <span class="document-icon">
                     {{

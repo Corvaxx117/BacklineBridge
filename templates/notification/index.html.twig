@@ -1,0 +1,209 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Notifications · {{ app_name }}
+{% endblock %}
+
+{% block page_assets %}
+    <link rel="stylesheet" href="{{ asset('/styles/notifications.css') }}" />
+{% endblock %}
+
+{% block body %}
+    <section class="hero notification-hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+            <p class="eyebrow">
+                L’activité de votre équipe
+            </p>
+            <h1 id="page-title">Notifications<span class="title-period">.</span></h1>
+            <p class="hero-description">
+                Les nouveaux concerts et documents, avec leur auteur et leur date.
+            </p>
+        </div>
+        {% if unread > 0 %}
+            <form action="{{ path('app_notification_read_all') }}" method="post">
+                <input
+                    type="hidden"
+                    name="_token"
+                    value="{{ csrf_token('notification_read_all') }}"
+                />
+                <button class="button button-secondary" type="submit">Tout marquer comme lu</button>
+            </form>
+        {% endif %}
+    </section>
+    <nav class="notification-filters" aria-label="Filtrer les notifications">
+        <a
+            href="{{ path('app_notification_index') }}"
+            aria-current="{{ not unreadOnly ? 'page' : 'false' }}"
+        >
+            Toutes
+        </a>
+        <a
+            href="{{
+            path(
+                'app_notification_index',
+                {
+                    view: 'unread'
+                }
+            )
+            }}"
+            aria-current="{{ unreadOnly ? 'page' : 'false' }}"
+        >
+            Non lues <span>{{ unread }}</span>
+        </a>
+    </nav>
+    {% if items is empty %}
+        <section class="notification-empty">
+            <h2>{{ unreadOnly ? 'Vous êtes à jour.' : 'Les nouveautés arriveront ici.' }}</h2>
+            <p>
+                {{ unreadOnly
+                    ? 'Aucune notification non lue pour le moment.'
+                    : 'Les concerts créés et les documents partagés apparaîtront dans cet historique.' }}
+            </p>
+        </section>
+    {% else %}
+        <ul class="notification-list" aria-label="Historique des notifications">
+            {% for item in items %}
+                {% set receipt = item.receipt %}
+                {% set notice = receipt.notification %}
+                <li
+                    class="notification-card{{
+                    receipt.readAt is null
+                        ? ' notification-card--unread'
+                        : ''
+                    }}"
+                    data-notification-id="{{ receipt.id }}"
+                >
+                    <span class="notification-icon">
+                        {{
+                            include(
+                                'notification/_icon.html.twig',
+                                {
+                                    type: notice.type
+                                },
+                                with_context: false
+                            )
+                        }}
+                    </span>
+                    <div class="notification-content">
+                        <div class="notification-meta">
+                            <span>{{ notice.band.name }} · {{ notice.type.label }}</span>
+                            {% if receipt.readAt is null %}
+                                <span class="notification-unread-label">Non lue</span>
+                            {% endif %}
+                        </div>
+                        <p class="notification-action">
+                            <strong>{{ notice.actorName }}</strong>
+                            {{ notice.type.action(notice.itemCount) }}
+                        </p>
+                        <p class="notification-subject">
+                            {{ notice.subjectLabel }}
+                        </p>
+                        {% if notice.contextLabel %}
+                            <p class="notification-context">
+                                {{ notice.contextLabel }}
+                            </p>
+                        {% endif %}
+                        <time datetime="{{ notice.createdAt|date('c') }}">
+                            {{ notice.createdAt|date('d/m/Y à H:i', 'Europe/Paris') }}
+                        </time>
+                        <div class="notification-actions">
+                            {% if item.available %}
+                                <form
+                                    action="{{
+                                    path(
+                                        'app_notification_open',
+                                        {
+                                            id: receipt.id
+                                        }
+                                    )
+                                    }}"
+                                    method="post"
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="_token"
+                                        value="{{ csrf_token('notification_open_' ~ receipt.id) }}"
+                                    />
+                                    <button class="text-button notification-open" type="submit">
+                                        Consulter <span aria-hidden="true">→</span>
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span class="notification-removed">Élément retiré</span>
+                            {% endif %}
+                            <form
+                                action="{{
+                                path(
+                                    'app_notification_read',
+                                    {
+                                        id: receipt.id
+                                    }
+                                )
+                                }}"
+                                method="post"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="_token"
+                                    value="{{ csrf_token('notification_read_' ~ receipt.id) }}"
+                                />
+                                <input
+                                    type="hidden"
+                                    name="state"
+                                    value="{{ receipt.readAt is null ? 'read' : 'unread' }}"
+                                />
+                                <input
+                                    type="hidden"
+                                    name="view"
+                                    value="{{ unreadOnly ? 'unread' : 'all' }}"
+                                />
+                                <button class="text-button notification-read" type="submit">
+                                    {{ receipt.readAt is null
+                                        ? 'Marquer comme lu'
+                                        : 'Marquer comme non lu' }}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        {% if pages > 1 %}
+            <nav class="notification-pagination" aria-label="Pages de notifications">
+                {% if page > 1 %}
+                    <a
+                        class="button button-secondary"
+                        href="{{
+                        path(
+                            'app_notification_index',
+                            {
+                                page: page - 1,
+                                view: unreadOnly ? 'unread' : 'all'
+                            }
+                        )
+                        }}"
+                    >
+                        ← Précédente
+                    </a>
+                {% endif %}
+                <span>Page {{ page }} / {{ pages }}</span>
+                {% if page < pages %}
+                    <a
+                        class="button button-secondary"
+                        href="{{
+                        path(
+                            'app_notification_index',
+                            {
+                                page: page + 1,
+                                view: unreadOnly ? 'unread' : 'all'
+                            }
+                        )
+                        }}"
+                    >
+                        Suivante →
+                    </a>
+                {% endif %}
+            </nav>
+        {% endif %}
+    {% endif %}
+{% endblock %}

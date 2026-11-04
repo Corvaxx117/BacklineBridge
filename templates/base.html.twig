@@ -25,6 +25,9 @@
             <link rel="stylesheet" href="{{ asset('/styles/calendar.css') }}" />
         {% endif %}
         <script src="{{ asset('/scripts/navigation.js') }}" defer></script>
+        {% if app.user %}
+            <script src="{{ asset('/scripts/notifications.js') }}" defer></script>
+        {% endif %}
         {% block page_assets %}
 
         {% endblock %}
@@ -45,6 +48,7 @@
                     </span>
                 </a>
                 {% if app.user %}
+                    {{ include('notification/_bell.html.twig') }}
                     {% set currentBand =
                         member_band(
                             concert is defined and concert
