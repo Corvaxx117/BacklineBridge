@@ -1,0 +1,61 @@
+@font-face {
+    font-family: 'DM Serif Display';
+    src: url('../fonts/dm-serif-display-regular-7e6679d41e354370.woff2') format('woff2');
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+/* Une police de titre ; les contenus techniques conservent leur police de lecture. */
+@media screen {
+    :root {
+        --font-display: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+    }
+
+    .brand-name,
+    .footer-inner > .footer-brand,
+    .hero h1,
+    .workspace-heading h1,
+    .login-layout .form-heading h1 {
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-synthesis: none;
+        font-kerning: normal;
+    }
+
+    .brand-name {
+        display: block;
+        font-size: 36px;
+        line-height: 1.1;
+        letter-spacing: normal;
+    }
+
+    .footer-inner > .footer-brand {
+        font-size: 22px;
+        line-height: 1.15;
+        letter-spacing: normal;
+    }
+
+    .hero h1,
+    .workspace-heading h1,
+    .login-layout .form-heading h1 {
+        line-height: 1.12;
+        letter-spacing: -0.02em;
+    }
+
+    @media (max-width: 720px) {
+        .brand-name {
+            font-size: clamp(24px, 6.8vw, 32px);
+        }
+    }
+
+    @media (max-width: 360px) {
+        .header-inner .brand {
+            gap: 4px;
+        }
+
+        .brand-name {
+            font-size: 22px;
+        }
+    }
+}

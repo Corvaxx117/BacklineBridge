@@ -66,6 +66,18 @@
                         )
                     }}
                 {% endfor %}
+                {% if form.engineerPresence is defined %}
+                    {{
+                        include(
+                            'concert/_field.html.twig',
+                            {
+                                field: form.engineerPresence
+                            },
+                            with_context: false
+                        )
+                    }}
+                    {{ form_widget(form.expectedDate) }}
+                {% endif %}
             </div>
             <div class="form-section-heading equipment-heading">
                 <span class="step-number" aria-hidden="true">02</span>

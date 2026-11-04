@@ -29,13 +29,14 @@ class ConcertRepository extends ServiceEntityRepository
             <<<'SQL'
                 SELECT concert.id, concert.date, concert.venue, concert.city, concert.status,
                     concert.created_by_name, sheet.band_name, membership.role,
-                    availability.status AS availability_status
+                    availability.status AS availability_status, source.id AS bandsintown_id
                 FROM concert
                 JOIN technical_sheet sheet ON sheet.id = concert.patch_sheet_id
                 JOIN band_membership membership ON membership.band_id = concert.band_id
                     AND membership.user_id = :user
                 LEFT JOIN concert_availability availability ON availability.concert_id = concert.id
                     AND availability.user_id = :user
+                LEFT JOIN bandsintown_concert source ON source.concert_id = concert.id
                 ORDER BY concert.date ASC, concert.id ASC
                 SQL,
             ['user' => $user->getId()],
@@ -49,8 +50,9 @@ class ConcertRepository extends ServiceEntityRepository
             status: ConcertStatus::from($row['status']),
             bandName: $row['band_name'],
             createdByName: $row['created_by_name'],
-            canRespond: BandRole::Manager->value === $row['role'],
-            myStatus: null === $row['availability_status'] ? null : AvailabilityStatus::from($row['availability_status']),
+            canRespond: null === $row['bandsintown_id'] && BandRole::Manager->value === $row['role'],
+            myStatus: null !== $row['bandsintown_id'] || null === $row['availability_status']
+                ? null : AvailabilityStatus::from($row['availability_status']),
         ), $rows);
     }
 
