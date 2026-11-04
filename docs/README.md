@@ -14,6 +14,7 @@ Choisir le guide correspondant à la tâche. Chaque sujet possède un seul guide
 | Répartir les missions et suivre leur avancement | [To Do](utilisation/taches.md) |
 | Classer les PDF et les liens du groupe ou d’un concert | [Documents](utilisation/documents.md) |
 | Consulter l’agenda commun et y ajouter un concert | [Agenda](utilisation/agenda.md) |
+| Retrouver les nouveautés, leur auteur et gérer les non lues | [Notifications](utilisation/notifications.md) |
 
 ## Développer
 
@@ -31,6 +32,7 @@ Choisir le guide correspondant à la tâche. Chaque sujet possède un seul guide
 | --- | --- |
 | Envoyer une version du Mac vers alwaysdata | [Mise à jour manuelle de la démo](exploitation/deploiement-demo.md) |
 | Déployer et suivre le site des membres | [Instance officielle](exploitation/deploiement-officiel.md) |
+| Activer les push et programmer leur envoi | [Notifications sur téléphone](exploitation/notifications-push.md) |
 | Raccorder l’agenda privé du groupe | [Google Agenda](exploitation/google-agenda.md) |
 | Conserver une démo et préparer l’instance réelle | [Démo et production](exploitation/demo-et-production.md) |
 | Sauvegarder, suivre les mises à jour, traiter un incident | [Maintenance](exploitation/maintenance.md) |

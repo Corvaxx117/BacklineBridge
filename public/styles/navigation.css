@@ -96,3 +96,68 @@
         box-shadow: none;
     }
 }
+
+/* Notifications : un accès direct, sans ajouter une rubrique au menu principal. */
+.notification-bell {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-left: auto;
+    border-radius: 12px;
+    color: var(--header-text);
+    text-decoration: none;
+}
+
+.notification-bell svg {
+    width: 22px;
+    height: 22px;
+}
+
+.notification-bell:hover,
+.notification-bell[aria-current='page'] {
+    background: var(--header-selected);
+}
+
+.notification-bell:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 1px;
+    right: -2px;
+    min-width: 18px;
+    padding: 2px 4px;
+    border: 2px solid var(--header-background);
+    border-radius: 20px;
+    background: var(--header-accent);
+    color: var(--header-background);
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+}
+
+@media (max-width: 720px) {
+    .header-inner:has(.notification-bell) {
+        column-gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-inner:has(.notification-bell) .nav-toggle [data-navigation-label] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+}

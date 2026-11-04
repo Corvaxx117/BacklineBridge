@@ -16,3 +16,8 @@ function check(directory) {
 }
 check('public/scripts');
 check('tools/frontend');
+
+const worker = spawnSync(process.execPath, ['--check', 'public/service-worker.js'], {
+    stdio: 'inherit',
+});
+if (worker.status !== 0) process.exit(worker.status || 1);

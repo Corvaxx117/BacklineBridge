@@ -49,6 +49,20 @@ try {
     if (is_file($root.'/var/private/deployment.json')) {
         $files[] = 'var/private/deployment.json';
     }
+    $pushFile = $environment['WEB_PUSH_KEY_FILE'] ?? 'var/private/web-push/vapid.json';
+    $pushPath = str_starts_with($pushFile, '/') ? $pushFile : $root.'/'.$pushFile;
+    if (is_file($pushPath)) {
+        $realPushPath = realpath($pushPath);
+        $privatePath = realpath($root.'/var/private');
+        if (false === $realPushPath || false === $privatePath || is_link($pushPath)
+            || !str_starts_with($realPushPath, $privatePath.DIRECTORY_SEPARATOR)
+        ) {
+            throw new RuntimeException('Les clés push doivent rester dans le dossier privé du projet.');
+        }
+        $files[] = substr($realPushPath, strlen($root) + 1);
+    } elseif ('1' === ($environment['WEB_PUSH_ENABLED'] ?? '0')) {
+        throw new RuntimeException('Les clés push activées sont absentes.');
+    }
     $activationFiles = glob($root.'/var/private/activation-codes-*.json');
     if (false === $activationFiles) {
         throw new RuntimeException('Impossible de parcourir les fichiers privés.');

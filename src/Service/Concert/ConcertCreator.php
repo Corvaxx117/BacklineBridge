@@ -9,6 +9,7 @@ use App\Entity\TechnicalSheet;
 use App\Entity\User;
 use App\Enum\ConcertStatus;
 use App\Repository\BandMembershipRepository;
+use App\Service\Notification\NotificationRecorder;
 use App\Service\Patch\PatchLineCopier;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -19,6 +20,7 @@ final readonly class ConcertCreator
         private ConcertAvailabilityManager $availability,
         private BandMembershipRepository $memberships,
         private PatchLineCopier $copier,
+        private NotificationRecorder $notifications,
     ) {
     }
 
@@ -34,6 +36,7 @@ final readonly class ConcertCreator
     ): Concert {
         $concert = $this->prepare($reference, $date, $venue, $city, $status, $notes, $createdBy, $startTime);
         $this->availability->initialize($concert);
+        $this->notifications->concertCreated($concert);
         $this->entityManager->flush();
 
         return $concert;
