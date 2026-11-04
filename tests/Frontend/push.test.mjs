@@ -5,6 +5,7 @@ import { runInNewContext } from 'node:vm';
 import {
     applicationKey,
     deviceSupport,
+    permissionMessage,
     sameKey,
 } from '../../public/scripts/notifications/push-utils.mjs';
 
@@ -120,4 +121,11 @@ test('logout closes notifications already displayed on this device', async () =>
     ];
     await app.dispatch('message', { data: { type: 'BB_LOGOUT' } });
     assert.equal(closed, 1);
+});
+
+test('an unanswered permission request differs from a blocked site', () => {
+    assert.match(permissionMessage('default'), /n’a pas été validée/);
+    assert.doesNotMatch(permissionMessage('default'), /refus|bloqu/i);
+    assert.match(permissionMessage('denied'), /paramètres du site/);
+    assert.match(permissionMessage('denied', true), /réglages de votre iPhone ou iPad/);
 });

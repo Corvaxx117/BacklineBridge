@@ -117,3 +117,64 @@ test('iPhone affiche les étapes d’installation avant toute demande de permiss
     await expect(panel.locator('[data-push-install]')).toContainText('Sur l’écran d’accueil');
     await expect(panel.locator('[data-push-enable]')).toBeHidden();
 });
+
+for (const outcome of ['denied', 'default']) {
+    test(`permission ${outcome} : aide adaptée sans inscription de l’appareil`, async ({
+        page,
+    }) => {
+        await page.addInitScript((permission) => {
+            window.pushSubscriptionsCreated = 0;
+            Object.defineProperty(window, 'Notification', {
+                value: {
+                    permission: 'default',
+                    requestPermission() {
+                        this.permission = permission;
+                        return Promise.resolve(permission);
+                    },
+                },
+            });
+            const registration = {
+                pushManager: {
+                    getSubscription: async () => null,
+                    subscribe: async () => {
+                        window.pushSubscriptionsCreated++;
+                        throw new Error('Unexpected subscription');
+                    },
+                },
+            };
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: {
+                    register: async () => registration,
+                    ready: Promise.resolve(registration),
+                },
+            });
+        }, outcome);
+        let writes = 0;
+        await page.route('**/notifications/appareil', async (route) => {
+            if (route.request().method() !== 'GET') writes++;
+            await route.fulfill({
+                json: {
+                    available: true,
+                    enabled: false,
+                    publicKey: 'BAAB_w',
+                    token: 'synthetic-token',
+                },
+            });
+        });
+        await login(page);
+        const panel = page.locator('[data-push-settings]');
+        const enable = panel.getByRole('button', { name: 'Activer sur cet appareil', exact: true });
+        await enable.click();
+        if (outcome === 'denied') {
+            await expect(panel.locator('[data-push-status]')).toContainText('paramètres du site');
+            await expect(enable).toBeHidden();
+            await page.reload();
+            await page.locator('[data-push-settings] summary').click();
+        } else {
+            await expect(panel.locator('[data-push-status]')).toContainText('n’a pas été validée');
+            await expect(enable).toBeVisible();
+        }
+        expect(await page.evaluate(() => window.pushSubscriptionsCreated)).toBe(0);
+        expect(writes).toBe(0);
+    });
+}

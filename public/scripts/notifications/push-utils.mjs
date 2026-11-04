@@ -17,3 +17,12 @@ export function deviceSupport(environment) {
     if (!environment.worker || !environment.push || !environment.notification) return 'unsupported';
     return 'supported';
 }
+
+export function permissionMessage(permission, ios = false) {
+    if (permission === 'denied') {
+        return ios
+            ? 'Notifications bloquées. Dans les réglages de votre iPhone ou iPad, autorisez BacklineBridge dans Notifications, puis revenez ici.'
+            : 'Notifications bloquées pour ce site. Ouvrez les paramètres du site dans votre navigateur, autorisez les notifications, puis rechargez cette page.';
+    }
+    return 'La demande n’a pas été validée. Réessayez puis choisissez « Autoriser » dans votre navigateur.';
+}

@@ -2,7 +2,8 @@ import {
     applicationKey,
     sameKey,
     deviceSupport,
-} from './notifications/push-utils.mjs?v=8e565fb89d17fc15';
+    permissionMessage,
+} from './notifications/push-utils.mjs?v=98ddcb505019822b';
 
 const panel = document.querySelector('[data-push-settings]');
 if (panel) {
@@ -102,11 +103,10 @@ if (panel) {
         // La demande reste directement liée au clic, condition nécessaire sur iPhone.
         lock(true);
         try {
-            const permission = Notification.requestPermission();
-            if ((await permission) !== 'granted') {
-                message(
-                    'Autorisation refusée. Vous pouvez la modifier dans les réglages de votre appareil.',
-                );
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                message(permissionMessage(permission, ios));
+                enable.hidden = permission === 'denied';
                 return;
             }
             await saveSubscription();
@@ -183,11 +183,12 @@ if (panel) {
                 Notification.permission === 'granted' &&
                 sameKey(subscription, configuration.publicKey);
             controls(active);
+            if (Notification.permission === 'denied') enable.hidden = true;
             message(
                 active
                     ? 'Notifications activées sur cet appareil.'
                     : Notification.permission === 'denied'
-                      ? 'Notifications bloquées. Autorisez-les dans les réglages de votre appareil, puis revenez ici.'
+                      ? permissionMessage(Notification.permission, ios)
                       : 'Recevez les nouveaux concerts et documents, même lorsque BacklineBridge est fermé.',
             );
         } catch {
