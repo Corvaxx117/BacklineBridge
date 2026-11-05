@@ -37,6 +37,17 @@ class BandMembershipRepository extends ServiceEntityRepository
     }
 
     /** @return list<BandMembership> */
+    public function forBand(Band $band): array
+    {
+        return $this->createQueryBuilder('membership')
+            ->addSelect('person')
+            ->join('membership.user', 'person')
+            ->where('membership.band = :band')
+            ->setParameter('band', $band)
+            ->getQuery()->getResult();
+    }
+
+    /** @return list<BandMembership> */
     public function managersFor(Band $band): array
     {
         return $this->createQueryBuilder('membership')

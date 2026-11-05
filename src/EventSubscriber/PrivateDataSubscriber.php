@@ -20,6 +20,7 @@ final class PrivateDataSubscriber implements EventSubscriberInterface
         $route = (string) $event->getRequest()->attributes->get('_route', '');
         foreach (
             [
+                'app_notification_',
                 'app_treasury_',
                 'app_stock_',
                 'app_profile_',

@@ -40,7 +40,10 @@ final class ChangeAction extends AbstractController
             } elseif ($form->isValid()) {
                 $changer->change($user, $form->getData()->password);
                 $security->login($user, 'form_login', 'main');
-                $this->addFlash('success', 'Ton mot de passe a été modifié.');
+                $this->addFlash('success',
+                    'Ton mot de passe a été modifié. '.
+                    'Réactive les notifications sur tes appareils si tu souhaites les recevoir.',
+                );
 
                 return $this->redirectToRoute(
                     'app_account_password',

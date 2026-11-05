@@ -1,0 +1,37 @@
+{% set unread = notification_unread_count(app.user) %}
+<a
+    class="notification-bell"
+    href="{{ path('app_notification_index') }}"
+    aria-label="Notifications, {{ unread }} {{ unread == 1 ? 'non lue' : 'non lues' }}"
+    title="Notifications"
+    data-notification-bell
+    data-unread="{{ unread }}"
+    data-count-url="{{ path('app_notification_count') }}"
+    aria-current="{{
+    app.request.attributes.get('_route') starts with 'app_notification_'
+        ? 'page'
+        : 'false'
+    }}"
+>
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.7"
+        aria-hidden="true"
+    >
+        <path
+            d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        />
+    </svg>
+    <span
+        class="notification-badge"
+        data-notification-count
+        aria-hidden="true"
+        {{ unread == 0 ? 'hidden' : '' }}
+    >
+        {{ unread > 99 ? '99+' : unread }}
+    </span>
+</a>

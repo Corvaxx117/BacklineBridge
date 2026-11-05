@@ -1,0 +1,15 @@
+{% set paths = {
+    concert_created: [
+        'M8 2v4m8-4v4M3 10h18',
+        'M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Z',
+        'm9 15 2 2 4-4'
+    ],
+    concerts_imported: ['M12 3v12m-4-4 4 4 4-4', 'M5 15v6h14v-6'],
+    document_added: ['M14 2H5v20h14V7Z', 'M14 2v5h5M8 12h8m-8 4h6'],
+    roadmap_added: ['m9 3-6 3v15l6-3 6 3 6-3V3l-6 3Z', 'M9 3v15m6-12v15']
+} %}
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+    {% for path in paths[type.value] %}
+        <path d="{{ path }}" stroke-linecap="round" stroke-linejoin="round" />
+    {% endfor %}
+</svg>
