@@ -45,6 +45,7 @@ final readonly class PushSender
                 $delivery->finish('failed', $now);
                 ++$counts['failed'];
                 $this->em->flush();
+                $this->em->clear();
 
                 continue;
             }
@@ -88,6 +89,8 @@ final readonly class PushSender
                 }
             }
             $this->em->flush();
+            // Une cascade en base peut invalider les objets du lot précédent.
+            $this->em->clear();
         }
         $this->deliveries->prune($this->now()->modify('-7 days'));
 
