@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Notification;
 
 use App\Entity\PushDelivery;
 use App\Entity\PushSubscription;
+use App\Entity\User;
 use App\Service\Notification\Push\PushConfiguration;
 use App\Service\Notification\Push\PushDeviceManager;
 use App\Tests\NotificationPushTestCase;
@@ -63,9 +64,12 @@ final class PushDeviceTest extends NotificationPushTestCase
 
     public function testPasswordChangeRevokesEveryDeviceOfThatAccountAndKeepsOtherMembersDevices(): void
     {
+        static::getContainer()->get('limiter.account_password_change')
+            ->create((string) $this->userId)->reset();
         $this->activate();
         $em = $this->entityManager();
-        $owner = $em->find(\App\Entity\User::class, $this->userId);
+        $owner = $em->find(User::class, $this->userId);
+        self::assertInstanceOf(User::class, $owner);
         $device = $em->getRepository(PushSubscription::class)->findOneBy([]);
         self::assertInstanceOf(PushSubscription::class, $device);
         $second = new PushSubscription(
@@ -132,7 +136,7 @@ final class PushDeviceTest extends NotificationPushTestCase
         $this->client->request('POST', '/notifications/appareil', server: ['CONTENT_TYPE' => 'application/json'],
             content: json_encode($this->pushInput, JSON_THROW_ON_ERROR));
         self::assertResponseRedirects('http://localhost/connexion');
-        $this->client->loginUser($this->entityManager()->find(\App\Entity\User::class, $this->userId));
+        $this->client->loginUser($this->entityManager()->find(User::class, $this->userId));
         $this->pushInput['endpoint'] = 'http://127.0.0.1/admin';
         $this->pushRequest('POST', '/notifications/appareil', $this->pushInput);
         self::assertResponseStatusCodeSame(400);
