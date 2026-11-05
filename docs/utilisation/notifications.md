@@ -25,7 +25,7 @@ Sur le site officiel, ouvrir la cloche, déplier **Notifications sur cet apparei
 
 Sur iPhone, ouvrir le site dans Safari, choisir **Partager → Sur l’écran d’accueil**, puis ouvrir cette icône et se connecter avant l’activation. Sur ordinateur ou Android compatible, l’activation se fait depuis le navigateur.
 
-Le choix se fait sur chaque appareil. Tant que l’autorisation reste accordée et que vous ne vous déconnectez pas, il n’est pas nécessaire de le répéter. Une déconnexion désactive les push de cet appareil ; après reconnexion, un clic permet de les réactiver, sans nouvelle demande système si l’autorisation existe encore.
+Le choix se fait sur chaque appareil. Tant que l’autorisation reste accordée et que vous ne vous déconnectez pas, il n’est pas nécessaire de le répéter. Une déconnexion désactive les push de cet appareil ; après reconnexion, un clic permet de les réactiver, sans nouvelle demande système si l’autorisation existe encore. Un changement de mot de passe révoque aussi les appareils du compte ; chacun doit alors être réactivé.
 
 ## Qui reçoit quoi ?
 

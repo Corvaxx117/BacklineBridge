@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\Member;
 
 use App\Entity\User;
+use App\Service\Notification\Push\PushDeviceManager;
 use App\Validator\AccountPassword;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -16,6 +17,7 @@ final readonly class PasswordChanger
         private EntityManagerInterface $entityManager,
         private UserPasswordHasherInterface $hasher,
         private ValidatorInterface $validator,
+        private PushDeviceManager $pushDevices,
     ) {
     }
 
@@ -25,6 +27,7 @@ final readonly class PasswordChanger
             throw new \DomainException(AccountPassword::HELP);
         }
         $user->setPassword($this->hasher->hashPassword($user, $password));
+        $this->pushDevices->revokeAll($user);
         $this->entityManager->flush();
     }
 }

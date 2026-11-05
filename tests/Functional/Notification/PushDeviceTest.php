@@ -61,6 +61,43 @@ final class PushDeviceTest extends NotificationPushTestCase
         self::assertSame(1, $em->getRepository(PushDelivery::class)->count([]));
     }
 
+    public function testPasswordChangeRevokesEveryDeviceOfThatAccountAndKeepsOtherMembersDevices(): void
+    {
+        $this->activate();
+        $em = $this->entityManager();
+        $owner = $em->find(\App\Entity\User::class, $this->userId);
+        $device = $em->getRepository(PushSubscription::class)->findOneBy([]);
+        self::assertInstanceOf(PushSubscription::class, $device);
+        $second = new PushSubscription(
+            $owner, str_repeat('c', 64), $device->getEndpoint().'-second',
+            $device->getPublicKey(), $device->getAuthToken(), $device->getVapidPublicKey(), $this->clock->now(),
+        );
+        $other = new PushSubscription(
+            $this->member('other-password'), str_repeat('d', 64), $device->getEndpoint().'-other',
+            $device->getPublicKey(), $device->getAuthToken(), $device->getVapidPublicKey(), $this->clock->now(),
+        );
+        $em->persist($second);
+        $em->persist($other);
+        foreach ([$device, $second, $other] as $subscription) {
+            $em->persist(new PushDelivery($subscription, $this->clock->now()));
+        }
+        $em->flush();
+        $page = $this->client->request('GET', '/mon-compte/mot-de-passe');
+        $this->client->submit($page->filter('form[name="change_password"]')->form(), [
+            'change_password' => [
+                'currentPassword' => 'BacklineBridge test password 2026!',
+                'password' => ['first' => 'Securite!84', 'second' => 'Securite!84'],
+            ],
+        ]);
+        self::assertResponseRedirects('/mon-compte/mot-de-passe', 303);
+        self::assertSame(0, $em->getRepository(PushSubscription::class)->count(['user' => $this->userId]));
+        self::assertSame(1, $em->getRepository(PushSubscription::class)->count([]));
+        self::assertSame(1, $em->getRepository(PushDelivery::class)->count([]));
+        $this->client->request('GET', '/notifications/appareil');
+        self::assertResponseIsSuccessful();
+        self::assertStringContainsString('"enabled":false', $this->client->getResponse()->getContent());
+    }
+
     public function testOtherAccountCannotReuseOrDisableAnExistingDevice(): void
     {
         $this->activate();

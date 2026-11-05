@@ -67,6 +67,14 @@ final readonly class PushDeviceManager
         }
     }
 
+    /** La révocation est validée avec le changement de mot de passe par le même flush. */
+    public function revokeAll(User $user): void
+    {
+        foreach ($this->subscriptions->findBy(['user' => $user]) as $device) {
+            $this->em->remove($device);
+        }
+    }
+
     public function test(User $user, string $token): void
     {
         $device = $this->subscriptions->device($user, $token);
