@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Notification;
 
 use App\Entity\BandMembership;
+use App\Entity\Concert;
 use App\Entity\NotificationRecipient;
 use App\Entity\PushDelivery;
 use App\Entity\PushSubscription;
+use App\Entity\User;
 use App\Integration\WebPush\PushGateway;
 use App\Integration\WebPush\PushSendResult;
 use App\Service\Notification\Push\PushSender;
@@ -41,6 +43,8 @@ final class PushDeliveryTest extends NotificationPushTestCase
         $sender = static::getContainer()->get(PushSender::class);
         self::assertSame(1, $sender->run()['sent']);
         self::assertSame(0, $sender->run()['sent']);
+        $concert = $em->find(Concert::class, $concert->getId());
+        self::assertInstanceOf(Concert::class, $concert);
         $em->remove($concert);
         $em->flush();
         self::assertSame(1, $em->getRepository(NotificationRecipient::class)->count(['user' => $this->userId]));
@@ -124,5 +128,31 @@ final class PushDeliveryTest extends NotificationPushTestCase
         $connection->rollBack();
         $this->entityManager()->clear();
         self::assertSame(0, $this->entityManager()->getRepository(PushDelivery::class)->count([]));
+    }
+
+    public function testExpiredDeviceDoesNotPreventSendingToAnotherDevice(): void
+    {
+        $this->activate();
+        $em = $this->entityManager();
+        $first = $em->getRepository(PushSubscription::class)->findOneBy([]);
+        $owner = $em->find(User::class, $this->userId);
+        self::assertInstanceOf(PushSubscription::class, $first);
+        self::assertInstanceOf(User::class, $owner);
+        $second = new PushSubscription(
+            $owner, str_repeat('b', 64), $first->getEndpoint().'-second',
+            $first->getPublicKey(), $first->getAuthToken(), $first->getVapidPublicKey(), $this->clock->now(),
+        );
+        $em->persist($second);
+        $em->flush();
+        $this->createdConcert($this->member('expiry-author'));
+        $gateway = $this->createMock(PushGateway::class);
+        $gateway->expects(self::exactly(2))->method('send')->willReturnOnConsecutiveCalls(
+            new PushSendResult(410), new PushSendResult(201),
+        );
+        static::getContainer()->set(PushGateway::class, $gateway);
+        $counts = static::getContainer()->get(PushSender::class)->run();
+        self::assertSame(1, $counts['sent']);
+        self::assertSame(1, $counts['cancelled']);
+        self::assertSame(1, $em->getRepository(PushSubscription::class)->count([]));
     }
 }
