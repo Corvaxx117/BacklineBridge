@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\PushDeliveryRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PushDeliveryRepository::class)]
@@ -21,10 +22,10 @@ class PushDelivery
     #[ORM\Column]
     private int $attempts = 0;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATETIME_UTC_IMMUTABLE)]
     private \DateTimeImmutable $nextAttemptAt;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_UTC_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $finishedAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -33,7 +34,7 @@ class PushDelivery
     public function __construct(
         #[ORM\ManyToOne, ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
         private PushSubscription $subscription,
-        #[ORM\Column] private \DateTimeImmutable $createdAt,
+        #[ORM\Column(type: Types::DATETIME_UTC_IMMUTABLE)] private \DateTimeImmutable $createdAt,
         #[ORM\ManyToOne, ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
         private ?NotificationRecipient $recipient = null,
     ) {
