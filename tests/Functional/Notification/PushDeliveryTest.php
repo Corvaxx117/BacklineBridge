@@ -14,9 +14,54 @@ use App\Integration\WebPush\PushGateway;
 use App\Integration\WebPush\PushSendResult;
 use App\Service\Notification\Push\PushSender;
 use App\Tests\NotificationPushTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class PushDeliveryTest extends NotificationPushTestCase
 {
+    #[DataProvider('serverTimezones')]
+    public function testPersistedTestLifetimeDoesNotDependOnServerTimezone(
+        string $timezone,
+        string $instant,
+        bool $expired,
+    ): void {
+        $previousTimezone = date_default_timezone_get();
+        date_default_timezone_set($timezone);
+        try {
+            $this->clock->modify($instant);
+            $this->activate();
+            $this->pushRequest('POST', '/notifications/appareil/test');
+            self::assertResponseIsSuccessful();
+            // Le processus planifié recharge les dates, contrairement à la requête qui crée le test.
+            $this->entityManager()->clear();
+            $this->clock->sleep($expired ? 301 : 30);
+            $gateway = $this->createMock(PushGateway::class);
+            $gateway->expects($expired ? self::never() : self::once())
+                ->method('send')->willReturn(new PushSendResult(201));
+            static::getContainer()->set(PushGateway::class, $gateway);
+
+            $counts = static::getContainer()->get(PushSender::class)->run();
+
+            self::assertSame($expired ? 0 : 1, $counts['sent']);
+            self::assertSame($expired ? 1 : 0, $counts['cancelled']);
+        } finally {
+            date_default_timezone_set($previousTimezone);
+        }
+    }
+
+    /** @return iterable<string, array{string, string, bool}> */
+    public static function serverTimezones(): iterable
+    {
+        foreach (['Europe/Paris', 'America/New_York'] as $timezone) {
+            foreach (['2026-11-05 01:30:00 UTC', '2026-07-05 01:30:00 UTC'] as $instant) {
+                foreach ([false, true] as $expired) {
+                    yield $timezone.' '.$instant.' '.($expired ? 'expired' : 'fresh') => [
+                        $timezone, $instant, $expired,
+                    ];
+                }
+            }
+        }
+    }
+
     public function testNewActionsQueueOncePerOptedInDeviceAndSkipTheAuthor(): void
     {
         $this->activate();

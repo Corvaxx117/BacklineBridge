@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Enum\NotificationType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -27,7 +28,7 @@ class BandNotification
         private NotificationType $type,
         #[ORM\Column(length: 300)]
         private string $subjectLabel,
-        #[ORM\Column]
+        #[ORM\Column(type: Types::DATETIME_UTC_IMMUTABLE)]
         private \DateTimeImmutable $createdAt,
         #[ORM\ManyToOne, ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
         private ?Concert $concert = null,
