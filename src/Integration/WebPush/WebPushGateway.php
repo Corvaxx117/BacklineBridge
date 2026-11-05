@@ -31,7 +31,11 @@ final readonly class WebPushGateway implements PushGateway
             $report = $sender->sendOneNotification(new Subscription(
                 $subscription->getEndpoint(), $subscription->getPublicKey(),
                 $subscription->getAuthToken(), 'aes128gcm',
-            ), $payload, ['TTL' => $ttl, 'urgency' => 'normal', 'topic' => $topic]);
+            ), $payload, [
+                'TTL' => $ttl,
+                'urgency' => 'normal',
+                'topic' => substr(hash('sha256', $topic), 0, 32),
+            ]);
             $response = $report->getResponse();
             $retry = $response?->getHeaderLine('Retry-After') ?? '';
 

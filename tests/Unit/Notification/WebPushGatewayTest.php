@@ -30,29 +30,39 @@ final class WebPushGatewayTest extends TestCase
                 $keys['publicKey'], new \DateTimeImmutable());
             $http = $this->createMock(ClientInterface::class);
             $calls = 0;
-            $http->expects(self::exactly(3))->method('sendRequest')->willReturnCallback(
-                static function (RequestInterface $request) use (&$calls): Response {
+            $topics = [];
+            $http->expects(self::exactly(4))->method('sendRequest')->willReturnCallback(
+                static function (RequestInterface $request) use (&$calls, &$topics): Response {
                     self::assertSame('POST', $request->getMethod());
                     self::assertSame('aes128gcm', $request->getHeaderLine('Content-Encoding'));
                     self::assertStringContainsString('vapid', $request->getHeaderLine('Authorization'));
                     self::assertSame('300', $request->getHeaderLine('TTL'));
                     self::assertStringNotContainsString('Secret payload', (string) $request->getBody());
+                    $topics[] = $request->getHeaderLine('Topic');
                     ++$calls;
                     if (3 === $calls) {
                         throw new ConnectException('Private endpoint must not appear in logs', $request);
                     }
 
-                    return 1 === $calls ? new Response(201) : new Response(429, ['Retry-After' => '180']);
+                    return in_array($calls, [1, 4], true) ? new Response(201) : new Response(429, ['Retry-After' => '180']);
                 },
             );
             $gateway = new WebPushGateway(new PushConfiguration(true, $file, '', false), $http);
-            self::assertTrue($gateway->send($device, 'Secret payload', 'bb-test', 300)->success());
-            $retry = $gateway->send($device, 'Secret payload', 'bb-test', 300);
+            self::assertTrue($gateway->send($device, 'Secret payload', 'bb-10', 300)->success());
+            $retry = $gateway->send($device, 'Secret payload', 'bb-10', 300);
             self::assertTrue($retry->retryable());
             self::assertSame(180, $retry->retryAfter);
-            $network = $gateway->send($device, 'Secret payload', 'bb-test', 300);
+            $network = $gateway->send($device, 'Secret payload', 'bb-10', 300);
             self::assertTrue($network->retryable());
             self::assertNull($network->status);
+            self::assertTrue($gateway->send($device, 'Secret payload', 'bb-11', 300)->success());
+            foreach ($topics as $topic) {
+                // Format accepté par Apple, même avec un identifiant local à plusieurs chiffres.
+                self::assertMatchesRegularExpression('/^[A-Za-z0-9_-]{32}$/D', $topic);
+            }
+            self::assertSame($topics[0], $topics[1]);
+            self::assertSame($topics[0], $topics[2]);
+            self::assertNotSame($topics[0], $topics[3]);
         } finally {
             unlink($file);
         }
