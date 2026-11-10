@@ -1,0 +1,166 @@
+{% extends 'base.html.twig' %}
+{% set returnUrl = sheet.concert
+    ? path(
+        'app_concert_show',
+        {
+            id: sheet.concert.id,
+            _fragment: 'technical-notes'
+        }
+    )
+    : path(
+        'app_patch_index',
+        {
+            _fragment: 'sheet-notes'
+        }
+    )
+%}
+{% block title %}
+    {{ heading }} · {{ app_name }}
+{% endblock %}
+{% block body %}
+    <a class="back-link" href="{{ returnUrl }}">← Revenir à la fiche technique</a>
+    <section class="form-heading">
+        <p class="eyebrow">
+            {{ sheet.bandName }}
+        </p>
+        <h1>{{ heading }}<span class="title-period">.</span></h1>
+        <p>
+            {{ mode == 'contacts'
+                ? 'Ces coordonnées seront visibles sur les fiches et leurs prochains exports PDF.'
+                : 'Les notes et les contacts se modifient séparément. Les versions déjà transmises à la salle restent conservées.' }}
+        </p>
+    </section>
+    <section class="form-panel technical-information-editor">
+        {{
+            form_start(
+                form,
+                {
+                    attr: {
+                        novalidate: 'novalidate'
+                    }
+                }
+            )
+        }}
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="form-error-summary" role="alert">
+                <strong>Les modifications n’ont pas été enregistrées.</strong>
+                {{ form_errors(form) }}
+                {% if mode == 'contacts' %}{{ form_errors(form.contacts) }}{% endif %}
+                <a
+                    href="{{
+                    path(
+                        mode == 'contacts'
+                            ? 'app_technical_contacts_edit'
+                            : 'app_technical_notes_edit',
+                        {
+                            id: sheet.id
+                        }
+                    )
+                    }}"
+                >
+                    Recharger la version actuelle
+                </a>
+            </div>
+        {% endif %}
+        {% if mode == 'contacts' %}
+            <p class="technical-editor-hint">
+                Contacts communs à toutes les fiches du groupe. Nom et rôle requis pour chaque
+                contact renseigné.
+            </p>
+            <div class="rider-form-grid rider-contact-forms">
+                {% for contact in form.contacts %}
+                    {% if loop.index0 < contactCount %}
+                        {{
+                            include(
+                                'technical/_contact_form.html.twig',
+                                {
+                                    contact: contact,
+                                    number: loop.index
+                                },
+                                with_context: false
+                            )
+                        }}
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% if contactCount < (form.contacts|length) %}
+                <details
+                    class="rider-more-contacts"
+                    {{ form.vars.submitted and not form.vars.valid ? 'open' : '' }}
+                >
+                    <summary>
+                        Ajouter un contact
+                    </summary>
+                    <div class="rider-form-grid rider-contact-forms">
+                        {% for contact in form.contacts %}
+                            {% if loop.index0 >= contactCount %}
+                                {{
+                                    include(
+                                        'technical/_contact_form.html.twig',
+                                        {
+                                            contact: contact,
+                                            number: loop.index
+                                        },
+                                        with_context: false
+                                    )
+                                }}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </details>
+            {% endif %}
+            {% do form.contacts.setRendered %}
+        {% else %}
+            <p class="technical-editor-hint">
+                {{ sheet.concert
+                    ? 'Ces notes concernent uniquement ce concert.'
+                    : 'Ces notes seront reprises dans les prochains concerts créés depuis cette référence.' }}
+            </p>
+            {{
+                include(
+                    'technical/_field.html.twig',
+                    {
+                        field: form.notices
+                    },
+                    with_context: false
+                )
+            }}
+            <div class="technical-editor-hint">
+                {{ form_help(form.notices) }}
+            </div>
+            <fieldset class="rider-style-editor">
+                <legend>
+                    Présentation du groupe
+                </legend>
+                <p class="technical-editor-hint">
+                    Style et présentation communs à toutes les fiches du groupe.
+                </p>
+                {{
+                    include(
+                        'technical/_field.html.twig',
+                        {
+                            field: form.style
+                        },
+                        with_context: false
+                    )
+                }}
+                {{
+                    include(
+                        'technical/_field.html.twig',
+                        {
+                            field: form.description
+                        },
+                        with_context: false
+                    )
+                }}
+            </fieldset>
+        {% endif %}
+        <div class="setup-actions">
+            <button class="button button-primary" type="submit">
+                {{ mode == 'contacts' ? 'Enregistrer les contacts' : 'Enregistrer les notes' }}
+            </button>
+            <a class="button button-secondary" href="{{ returnUrl }}">Annuler</a>
+        </div>
+        {{ form_end(form) }}
+    </section>
+{% endblock %}

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Dto\Technical\TechnicalIdentity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -54,6 +56,20 @@ class Band
     public function setUsefulLinks(array $links): void
     {
         $this->usefulLinks = $links;
+    }
+
+    /** @var array<string, mixed>|null */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $technicalIdentity = null;
+
+    public function getTechnicalIdentity(): TechnicalIdentity
+    {
+        return TechnicalIdentity::fromArray($this->technicalIdentity ?? []);
+    }
+
+    public function setTechnicalIdentity(TechnicalIdentity $identity): void
+    {
+        $this->technicalIdentity = $identity->toArray();
     }
 
     public function getId(): ?int

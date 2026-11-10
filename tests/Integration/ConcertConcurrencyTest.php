@@ -6,8 +6,6 @@ namespace App\Tests\Integration;
 
 use App\Dto\Concert\CreateConcertInput;
 use App\Entity\Concert;
-use App\Entity\ConcertAvailability;
-use App\Enum\AvailabilityStatus;
 use App\Service\Concert\ConcertUpdater;
 use App\Tests\VenueTestCase;
 use Doctrine\DBAL\DriverManager;
@@ -22,9 +20,6 @@ final class ConcertConcurrencyTest extends VenueTestCase
         $id = $concert->getId();
         $em = $this->entityManager();
         $connection = $em->getConnection();
-        $record = $em->getRepository(ConcertAvailability::class)->findOneBy(['concert' => $id]);
-        $record->respond(AvailabilityStatus::Available, 'Confirmation à conserver.');
-        $em->flush();
 
         $otherConnection = DriverManager::getConnection(
             $connection->getParams(),
@@ -60,20 +55,6 @@ final class ConcertConcurrencyTest extends VenueTestCase
                 self::assertSame(
                     'Notes récentes',
                     $connection->fetchOne('SELECT notes FROM concert WHERE id = ?', [$id]),
-                );
-                self::assertSame(
-                    'available',
-                    $connection->fetchOne(
-                        'SELECT status FROM concert_availability WHERE concert_id = ?',
-                        [$id],
-                    ),
-                );
-                self::assertSame(
-                    'Confirmation à conserver.',
-                    $connection->fetchOne(
-                        'SELECT comment FROM concert_availability WHERE concert_id = ?',
-                        [$id],
-                    ),
                 );
             }
         } finally {

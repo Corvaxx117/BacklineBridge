@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Service\Pdf;
 
 use App\Dto\Stage\StageItemInput;
+use App\Service\Stage\StagePresentation;
+use App\Service\Technical\TechnicalPalette;
 
 /** Prépare un dessin vectoriel autonome, sans dépendre du JavaScript de l'éditeur. */
 final class StagePlanLayout
@@ -12,21 +14,25 @@ final class StagePlanLayout
     private const WIDTH = 1000;
     private const HEIGHT = 606;
     private const STYLES = [
-        'riser' => [280, '#e9e6d3', '#9b9a7f'],
+        'riser' => [280, 'none', '#526359'],
         'drums' => [260, 'none', 'none'],
-        'amp' => [130, '#e9e0e6', '#bcabb7'],
-        'person' => [160, 'none', 'none'],
-        'wedge' => [120, '#e9bc85', '#b28756'],
-        'keys' => [160, '#dce8d5', '#99b18c'],
-        'power' => [130, '#fffefa', '#bacbc0'],
-        'other' => [130, '#fffefa', '#bacbc0'],
-        'mic_vocal' => [130, '#eee5df', '#bcabb7'],
-        'mic_instrument' => [130, '#eee5df', '#bcabb7'],
-        'stand_straight' => [130, '#f1f3ef', '#bacbc0'],
-        'stand_boom' => [130, '#f1f3ef', '#bacbc0'],
-        'di_mono' => [130, '#e0eaed', '#99b1bc'],
-        'di_stereo' => [130, '#e0eaed', '#99b1bc'],
+        'amp' => [110, 'none', 'none'],
+        'person' => [120, 'none', 'none'],
+        'wedge' => [80, 'none', 'none'],
+        'keys' => [140, 'none', 'none'],
+        'power' => [70, 'none', 'none'],
+        'other' => [110, 'none', 'none'],
+        'mic_vocal' => [70, 'none', 'none'],
+        'mic_instrument' => [70, 'none', 'none'],
+        'stand_straight' => [70, 'none', 'none'],
+        'stand_boom' => [70, 'none', 'none'],
+        'di_mono' => [70, 'none', 'none'],
+        'di_stereo' => [70, 'none', 'none'],
     ];
+
+    public function __construct(private readonly TechnicalPalette $palette = new TechnicalPalette())
+    {
+    }
 
     /**
      * @param list<array<string, mixed>> $items
@@ -46,24 +52,44 @@ final class StagePlanLayout
                 ? $item['kind']
                 : 'other';
             [$width, $fill, $stroke] = self::STYLES[$kind];
-            $label = $this->wrap($item['label'] ?? '', max(10, (int) (($width - 18) / 8)), 3);
-            $notes = $this->wrap($item['notes'] ?? '', max(10, (int) (($width - 18) / 6)), 2);
+            $family = $this->palette->normalize(is_string($item['family'] ?? null)
+                ? $item['family'] : $this->palette->stageFamily($item));
+            $color = $this->palette->families()[$family];
+            $ink = $color['ink'];
+            $background = $color['background'];
+            if ('riser' === $kind) {
+                $stroke = $color['border'];
+            }
+            $label = 'power' === $kind && 'Alimentation' === ($item['label'] ?? '')
+                ? []
+                : $this->wrap($item['label'] ?? '', max(10, (int) (($width - 8) / 6.5)), 3);
+            $caption = trim(explode('·', $item['notes'] ?? '')[0]);
+            // Un repère court reste visible ; la rédaction complète figure dans l’annexe.
+            $notes = mb_strlen($caption) <= 32
+                ? $this->wrap($caption, max(10, (int) (($width - 18) / 6)), 2)
+                : [];
             $patch = $this->wrap($item['patchLabel'] ?? '', max(10, (int) (($width - 18) / 6)), 3);
-            $symbolWidth = 'drums' === $kind ? $width - 28 : 24;
-            $symbolHeight = 'drums' === $kind ? ($symbolWidth * 184) / 260 : 24;
+            $symbolWidth = match ($kind) {
+                'drums' => $width,
+                'amp', 'keys' => 42,
+                'wedge' => 36,
+                default => 24,
+            };
+            $symbolHeight = 'drums' === $kind ? ($symbolWidth * 184) / 260 : $symbolWidth;
             $height =
                 'riser' === $kind
                     ? 236
-                    : max(74, $symbolHeight + 14 + count($label) * 17 + count($notes) * 13 + count($patch) * 12);
+                    : max(38, $symbolHeight + 14 + count($label) * 17 + count($notes) * 13 + count($patch) * 12);
             $x = ($this->number($item['x'] ?? null, 50, 0, 100) / 100) * self::WIDTH;
             $y = ($this->number($item['y'] ?? null, 50, 0, 100) / 100) * self::HEIGHT;
             $rotation = $this->number($item['rotation'] ?? null, 0, 0, 360);
             $scale = $this->number($item['scale'] ?? null, 1, 0.5, 2.5);
+            $presentationScale = $scale * StagePresentation::BASE_SCALE;
             $radians = deg2rad($rotation);
             $halfWidth =
-                ((abs(cos($radians)) * $width + abs(sin($radians)) * $height) * $scale) / 2;
+                ((abs(cos($radians)) * $width + abs(sin($radians)) * $height) * $presentationScale) / 2;
             $halfHeight =
-                ((abs(sin($radians)) * $width + abs(cos($radians)) * $height) * $scale) / 2;
+                ((abs(sin($radians)) * $width + abs(cos($radians)) * $height) * $presentationScale) / 2;
             $left = min($left, $x - $halfWidth - 10);
             $top = min($top, $y - $halfHeight - 10);
             $right = max($right, $x + $halfWidth + 10);
@@ -71,6 +97,9 @@ final class StagePlanLayout
             $labelY = -$height / 2 + ('riser' === $kind ? 20 : $symbolHeight + 23);
             $nodes[] = compact(
                 'kind',
+                'family',
+                'ink',
+                'background',
                 'width',
                 'height',
                 'fill',
@@ -82,17 +111,17 @@ final class StagePlanLayout
                 'y',
                 'rotation',
                 'scale',
+                'presentationScale',
                 'labelY',
                 'symbolWidth',
                 'symbolHeight',
             );
         }
 
-        // Les praticables restent derrière les instruments, comme dans l'application.
+        // Les petits repères passent au-dessus des instruments ; les praticables restent au fond.
         usort(
             $nodes,
-            static fn (array $a, array $b): int => ('riser' !== $a['kind']) <=>
-                ('riser' !== $b['kind']),
+            fn (array $a, array $b): int => $this->layer($a['kind']) <=> $this->layer($b['kind']),
         );
 
         return [
@@ -107,6 +136,15 @@ final class StagePlanLayout
             ),
             'nodes' => $nodes,
         ];
+    }
+
+    private function layer(string $kind): int
+    {
+        return match ($kind) {
+            'riser' => 0,
+            'power', 'mic_vocal', 'mic_instrument', 'stand_straight', 'stand_boom', 'di_mono', 'di_stereo' => 2,
+            default => 1,
+        };
     }
 
     private function number(mixed $value, float $default, float $min, float $max): float

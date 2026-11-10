@@ -17,7 +17,7 @@ final readonly class NotificationTarget
     public function url(BandNotification $notification): ?string
     {
         $concert = $notification->getConcert();
-        if (NotificationType::ConcertsImported === $notification->getType()) {
+        if (in_array($notification->getType(), [NotificationType::ConcertsImported, NotificationType::OrfeoConcertsImported], true)) {
             return $this->urls->generate('app_concert_index');
         }
         if (NotificationType::ConcertCreated === $notification->getType()) {

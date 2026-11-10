@@ -1,0 +1,197 @@
+/* Enjeu interne : badge compact, note et édition uniquement à la demande. */
+.concert-importance {
+    --importance-color: var(--text-muted);
+    margin-top: 10px;
+    font-size: 13px;
+}
+.importance-level-2 {
+    --importance-color: var(--secondary-text);
+}
+.importance-level-3 {
+    --importance-color: var(--info-text);
+}
+.importance-level-4 {
+    --importance-color: var(--warning-text);
+}
+.importance-level-5 {
+    --importance-color: var(--accent-text);
+}
+.concert-importance > summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    max-width: 100%;
+    min-height: 36px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--importance-color);
+    background: var(--surface-muted);
+    cursor: pointer;
+    list-style: none;
+}
+.concert-importance > summary::-webkit-details-marker {
+    display: none;
+}
+.concert-importance > summary:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
+}
+.importance-label {
+    flex: 0 0 auto;
+    font-weight: 650;
+}
+.importance-meter {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: flex-end;
+    gap: 2px;
+    height: 16px;
+}
+.importance-meter > span {
+    width: 4px;
+    border-radius: 1px;
+    background: var(--border-strong);
+}
+.importance-meter > span:nth-child(1) {
+    height: 3px;
+}
+.importance-meter > span:nth-child(2) {
+    height: 6px;
+}
+.importance-meter > span:nth-child(3) {
+    height: 9px;
+}
+.importance-meter > span:nth-child(4) {
+    height: 12px;
+}
+.importance-meter > span:nth-child(5) {
+    height: 15px;
+}
+.importance-meter > .is-filled {
+    background: var(--importance-color);
+}
+.importance-note-preview {
+    min-width: 0;
+    max-width: 30ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-muted);
+}
+.importance-chevron {
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+.concert-importance[open] .importance-chevron {
+    transform: rotate(180deg);
+}
+.importance-editor {
+    margin-top: 12px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface-muted);
+    color: var(--text);
+}
+.importance-editor .field {
+    margin: 14px 0;
+}
+.importance-editor label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 650;
+}
+.importance-editor select,
+.importance-editor textarea {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+}
+.importance-editor textarea {
+    resize: vertical;
+}
+.importance-editor .button {
+    margin: 0;
+}
+.importance-note {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.concert-filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    margin-bottom: 28px;
+}
+.concert-level-filters,
+.concert-sort-links {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.concert-level-filters > .eyebrow,
+.concert-sort-links > .eyebrow {
+    margin-right: 5px;
+}
+.concert-filter,
+.concert-sort-links > a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    text-decoration: none;
+    font-size: 13px;
+}
+.concert-filter-score {
+    min-width: 44px;
+    font-variant-numeric: tabular-nums;
+}
+.concert-filter:hover,
+.concert-sort-links > a:hover {
+    background: var(--surface-hover);
+}
+.concert-filter-bar .is-active {
+    background: var(--secondary-bg);
+    color: var(--secondary-text);
+    border-color: var(--secondary-border);
+    font-weight: 650;
+}
+@media (max-width: 480px) {
+    .concert-importance > summary {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    .importance-note-preview {
+        flex-basis: 100%;
+        max-width: 100%;
+        order: 1;
+    }
+    .importance-editor {
+        padding: 12px;
+    }
+    .concert-filter-bar {
+        gap: 12px;
+    }
+    .concert-level-filters > .eyebrow {
+        flex-basis: 100%;
+    }
+    .concert-level-filters {
+        gap: 5px;
+    }
+}

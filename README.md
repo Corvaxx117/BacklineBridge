@@ -1,6 +1,6 @@
 # BacklineBridge
 
-Préparer les concerts d’Avee Mana : dossier technique, plan de scène, échanges avec les salles, disponibilités, missions du groupe, trésorerie et stock.
+Préparer les concerts d’Avee Mana : dossier technique, plan de scène, échanges avec les salles, conditions, missions du groupe, trésorerie et stock.
 
 **[Démo privée](https://backlinebridge.alwaysdata.net)** — comptes et données fictifs, accès sur invitation.
 

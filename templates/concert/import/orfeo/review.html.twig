@@ -1,0 +1,220 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Aperçu Orfeo · {{ app_name }}
+{% endblock %}
+{% block page_assets %}
+    <link rel="stylesheet" href="{{ asset('/styles/orfeo.css') }}" />
+{% endblock %}
+{% block body %}
+    <a
+        class="back-link"
+        href="{{
+        path(
+            'app_concert_orfeo_prepare',
+            {
+                id: band.id
+            }
+        )
+        }}"
+    >
+        ← Recharger les dates Orfeo
+    </a>
+    <section class="workspace-heading">
+        <div>
+            <p class="eyebrow">
+                {{ band.name }} · Orfeo
+            </p>
+            <h1>Choisir les dates<span class="title-period">.</span></h1>
+            <p>
+                {{ rows|length }} représentation(s) · Chargées le {{
+                    result.fetchedAt|date('d/m/Y à H:i', 'Europe/Paris')
+                }}.
+            </p>
+        </div>
+    </section>
+    {% if result.ignored %}
+        <p class="flash">
+            {{ result.ignored }} projet(s) écarté(s) : archivés, sans représentation datée ou avec une
+            salle ou une ville manquante.
+        </p>
+    {% endif %}
+    {{
+        form_start(
+            form,
+            {
+                attr: {
+                    'data-concert-import': ''
+                }
+            }
+        )
+    }}{{ form_errors(form) }}{{ form_errors(form.events) }}
+    {% if hasChoices %}
+        <div class="orfeo-selection-tools">
+            <button class="button button-secondary" type="button" data-import-select="all">
+                Tout sélectionner
+            </button>
+            <button class="text-button" type="button" data-import-select="none">
+                Tout désélectionner
+            </button>
+            <span>100 dates maximum · Aperçu valable 15 minutes.</span>
+        </div>
+    {% endif %}
+    <div class="orfeo-preview-list">
+        {% for id, row in rows %}
+            {% set event = row.event %}
+            <article class="workspace-panel orfeo-preview-card">
+                <div class="orfeo-preview-heading">
+                    <div>
+                        <p class="eyebrow">
+                            {{ event.date|date('d/m/Y') }} · {{ event.localTime
+                                ?
+                                : 'Horaire à confirmer' }}
+                        </p>
+                        <h2>{{ event.venue }}</h2>
+                        <p>
+                            {{ event.city }}
+                        </p>
+                    </div>
+                    <span class="reference-tag">
+                        {{
+                            {
+                                new: 'Nouvelle date',
+                                link: 'Rattachement proposé',
+                                choose: 'Rattachement à choisir',
+                                imported: 'Déjà relié à Orfeo',
+                                occupied: 'Déjà associé',
+                                cancelled: 'Annulation signalée'
+                            }[row.state]
+                        }}
+                    </span>
+                </div>
+                <p class="orfeo-status">
+                    Orfeo : <strong>{{ event.statusName ? : 'Statut non renseigné' }}</strong> · Dans
+                    BB : {{ event.status.label }}
+                </p>
+                {% if row.state not in ['cancelled', 'occupied'] %}
+                    {% for child in form.events %}
+                        {% if child.vars.value == id %}
+                            <div class="import-event-choice">
+                                {{ form_widget(child) }}<label for="{{ child.vars.id }}">{{ row.state
+                                        == 'imported'
+                                        ? 'Actualiser cette date'
+                                        : 'Récupérer cette date' }}</label>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% if row.state != 'imported' %}
+                        {% set targetKey = 'event_'
+                            ~ (id|replace({
+                                ':': '_'
+                            }))
+                        %}
+                        <div class="workspace-fields orfeo-target">
+                            {{ form_row(attribute(form.targets, targetKey)) }}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <p class="workspace-hint">
+                        Vérifie cette date dans Orfeo et dans BB. Aucun concert ne sera supprimé ou
+                        remplacé automatiquement.
+                    </p>
+                {% endif %}
+                {% if row.concert %}
+                    <details class="orfeo-comparison">
+                        <summary>
+                            Comparer avec le concert BB
+                        </summary>
+                        <dl>
+                            <dt>
+                                Dans BB
+                            </dt><dd>
+                                {{ row.concert.date|date('d/m/Y') }} · {{ row.concert.startTime
+                                    ?
+                                    : 'Sans horaire' }} · {{ row.concert.venue }} · {{
+                                    row.concert.city
+                                }} · {{ row.concert.status.label }}
+                            </dd>
+                            <dt>
+                                Dans Orfeo
+                            </dt><dd>
+                                {{ event.date|date('d/m/Y') }} · {{ event.localTime
+                                    ?
+                                    : 'Sans horaire' }} · {{ event.venue }} · {{ event.city }} · {{
+                                    event.status.label
+                                }}
+                            </dd>
+                        </dl>
+                    </details>
+                    <a
+                        class="edit-link"
+                        href="{{
+                        path(
+                            'app_concert_show',
+                            {
+                                id: row.concert.id
+                            }
+                        )
+                        }}"
+                    >
+                        Ouvrir le dossier BB →
+                    </a>
+                {% endif %}
+                {% if event.contacts is not empty %}
+                    <details class="orfeo-comparison">
+                        <summary>
+                            {{ event.contacts|length }} contact(s) proposé(s)
+                        </summary>
+                        <ul>
+                            {% for contact in event.contacts %}
+                                <li>
+                                    {{ contact.name }} · {{ contact.role.label }}{% if
+                                        contact.email %}
+                                        · {{ contact.email }}
+                                    {% endif %}
+                                    {% if contact.phone %}
+                                        · {{ contact.phone }}
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </details>
+                {% endif %}
+            </article>
+        {% else %}
+            <section class="workspace-panel empty-state">
+                <h2>Aucune date pour cette sélection.</h2>
+                <p>
+                    Essaie une autre période ou vérifie les représentations dans Orfeo.
+                </p>
+            </section>
+        {% endfor %}
+    </div>
+    {% if hasChoices %}
+        <section class="workspace-panel workspace-form">
+            <h2>Appliquer la sélection</h2>
+            <div class="orfeo-import-options">
+                {% for choice in [form.updateExisting, form.importContacts] %}
+                    <div class="orfeo-import-option">
+                        {{ form_widget(choice) }}
+                        {{ form_label(choice) }}
+                        {{ form_help(choice) }}
+                        {{ form_errors(choice) }}
+                    </div>
+                {% endfor %}
+            </div>
+            <p class="workspace-hint">
+                Les concerts existants restent inchangés sauf si tu coches leur mise à jour. Une
+                date déjà validée sur Bandsintown conserve son statut validé. La fiche technique,
+                les notes et les conditions BB ne sont jamais remplacées par cet import.
+            </p>
+            <button class="button button-primary" type="submit">
+                Appliquer la sélection Orfeo
+            </button>
+        </section>
+    {% else %}
+        {% do form.events.setRendered %}
+    {% endif %}
+    {% do form.targets.setRendered %}
+    {{ form_end(form) }}
+    <script src="{{ asset('/scripts/concert-import.js') }}" defer></script>
+{% endblock %}

@@ -26,6 +26,10 @@
     --header-line: #ffffff24;
     --header-selected: #ffffff0d;
     --header-pill: #ffffff26;
+    --secondary-bg: var(--success-bg);
+    --secondary-text: var(--success-text);
+    --secondary-border: var(--success-border);
+    --secondary-fill: var(--success-fill);
     --success-text: #315f46;
     --success-bg: #eaf3eb;
     --success-border: #a8c1ac;
@@ -76,6 +80,10 @@
     --accent-border: #bb8469;
     --strong-bg: #324f60;
     --header-background: #0d171e;
+    --secondary-bg: var(--strong-bg);
+    --secondary-text: var(--text);
+    --secondary-border: var(--border-strong);
+    --secondary-fill: var(--info-fill);
     --success-text: #a0d4b3;
     --success-bg: #203c31;
     --success-border: #648f76;
@@ -91,7 +99,7 @@
     --violet-text: #cdb5e2;
     --violet-bg: #352f43;
     --violet-border: #8c7a9f;
-    --diagram-floor: #1a2c35;
+    --diagram-floor: var(--surface-muted);
     --diagram-grid: #354d59;
     --diagram-border: #6c8690;
     --diagram-monitor: #4c3a22;

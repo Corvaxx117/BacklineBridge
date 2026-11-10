@@ -53,6 +53,7 @@
                 attr: {
                     class: 'stage-editor',
                     'data-stage-editor': '',
+                    'data-stage-family-rules': technical_stage_rules()|json_encode,
                     'data-stage-unsaved': form.vars.submitted ? 'true' : 'false',
                     novalidate: 'novalidate'
                 }
@@ -110,6 +111,12 @@
                         type="button"
                         class="stage-palette-item"
                         data-add-stage-kind="{{ kind }}"
+                        data-technical-family="{{
+                        technical_stage_family({
+                            kind: kind,
+                            label: label
+                        })
+                        }}"
                         data-label="{{ label }}"
                         data-source-limit="{{ constant(
                             'App\\Dto\\Stage\\StageItemInput::SOURCE_LIMITS'
@@ -283,6 +290,7 @@
                 data-key="{{ key }}"
                 data-label="{{ choice.label }}"
                 data-channel="{{ choice.channel }}"
+                data-family="{{ choice.family }}"
                 data-available="{{ choice.available ? 'true' : 'false' }}"
             >
 

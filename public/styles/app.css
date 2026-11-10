@@ -184,7 +184,7 @@ button {
     display: inline-block;
     width: 6px;
     height: 6px;
-    background: var(--success-fill);
+    background: var(--secondary-fill);
     border-radius: 50%;
     margin-right: 7px;
     vertical-align: 1px;
@@ -302,7 +302,7 @@ button {
     text-align: left;
 }
 .patch-table thead {
-    background: var(--success-bg);
+    background: var(--secondary-bg);
 }
 .patch-table thead th {
     padding: 12px 16px;
@@ -349,7 +349,7 @@ button {
     height: 34px;
     border: 1px solid var(--border);
     border-radius: 4px;
-    background: var(--success-bg);
+    background: var(--secondary-bg);
     color: var(--text-muted);
     font-size: 14px;
     font-weight: 650;
@@ -426,7 +426,7 @@ button {
 .patch-table tr[data-section='tracks'] .channel-number,
 .patch-table tr[data-section='machines'] .channel-number {
     border-color: var(--border);
-    background: var(--success-bg);
+    background: var(--secondary-bg);
     color: var(--text-muted);
 }
 .notes-cell {
@@ -466,7 +466,7 @@ button {
 }
 .panel-footer {
     padding: 14px 28px;
-    background: var(--success-bg);
+    background: var(--secondary-bg);
     border-top: 1px solid var(--border);
     font-size: 10px;
     color: var(--text-muted);
@@ -580,7 +580,7 @@ button {
     width: 52px;
     height: 52px;
     border: 1px solid var(--border);
-    background: var(--success-bg);
+    background: var(--secondary-bg);
     border-radius: 7px;
     font-weight: 650;
     font-size: 20px;
@@ -1339,7 +1339,7 @@ button {
     color: var(--text);
 }
 .button-secondary:hover {
-    background: var(--success-bg);
+    background: var(--secondary-bg);
 }
 .concert-list {
     display: grid;
@@ -1361,7 +1361,7 @@ button {
     font-size: 14px;
     font-weight: 650;
     font-variant-numeric: tabular-nums;
-    color: var(--success-text);
+    color: var(--secondary-text);
     white-space: nowrap;
 }
 .concert-card-copy {
@@ -1393,7 +1393,7 @@ button {
     font-size: 12px;
     line-height: 1.7;
     color: var(--text-muted);
-    background: var(--success-bg);
+    background: var(--secondary-bg);
     padding: 15px 18px;
     border-radius: 5px;
     margin-bottom: 24px;
@@ -1588,28 +1588,6 @@ button {
     overflow: hidden;
     margin-bottom: 30px;
 }
-.conditions-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 25px;
-    padding: 25px 28px;
-    margin: 0;
-}
-.conditions-grid dt {
-    font-size: 10px;
-    color: var(--text-muted);
-    margin-bottom: 7px;
-}
-.conditions-grid dd {
-    font-size: 13px;
-    margin: 0;
-    overflow-wrap: anywhere;
-}
-.condition-amount {
-    display: block;
-    margin-top: 5px;
-    color: var(--text-muted);
-}
 .concert-notes {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -1690,10 +1668,6 @@ button {
     grid-template-columns: 1fr 1fr;
 }
 @media (max-width: 780px) {
-    .conditions-grid {
-        grid-template-columns: 1fr 1fr;
-        padding: 22px;
-    }
     .concert-notes {
         padding: 21px;
     }
@@ -1705,12 +1679,8 @@ button {
     }
 }
 @media (max-width: 550px) {
-    .conditions-grid,
     .conditions-form .form-grid {
         grid-template-columns: 1fr;
-    }
-    .conditions-grid {
-        gap: 20px;
     }
     .session-info {
         display: none;
@@ -1766,7 +1736,7 @@ button {
 }
 .dossier-nav a {
     font-size: 12px;
-    color: var(--success-text);
+    color: var(--secondary-text);
     text-underline-offset: 5px;
 }
 

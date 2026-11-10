@@ -12,7 +12,7 @@ Aucun serveur SQL ni compte de base n’est nécessaire. phpMyAdmin gère MySQL/
 | Tables | Contenu |
 | --- | --- |
 | `app_user`, `band_membership`, `member_profile` | Comptes, droits et profils |
-| `concert`, `concert_conditions`, `concert_availability` | Dates, accords et disponibilités |
+| `concert`, `concert_conditions` | Dates et conditions d’accueil / rémunération |
 | `technical_sheet`, `patch_line` | Référence et copies de dossiers |
 | `bandsintown_concert` | Origine des concerts importés |
 | `concert_contact` | Interlocuteurs d’une date |

@@ -71,128 +71,208 @@
             {% endif %}
         </div>
     {% else %}
-        <div class="table-frame">
-            <table class="patch-table">
-                <caption class="visually-hidden">
-                    Patch des entrées de {{ sheet.bandName }}, classé par numéro de canal.
-                </caption>
-                <thead>
-                    <tr>
-                        <th scope="col" class="channel-column">Canal</th>
-                        <th scope="col">Source</th>
-                        <th scope="col">Micro / DI</th>
-                        <th scope="col">Pied</th>
-                        <th scope="col" class="notes-column">Note</th>
-                        <th scope="col" class="action-column">
-                            <span class="visually-hidden">Actions</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for line in lines %}
-                        <tr data-section="{{ line.section }}">
-                            <td class="channel-cell" data-label="Canal">
-                                <span class="channel-number">
-                                    {{ '%02d'|format(line.channelNumber) }}
-                                </span>
-                            </td>
-                            <th scope="row" class="source-cell">
-                                <span class="source-name">{{ line.sourceName }}</span>
-                                <span class="section-label">
-                                    <span aria-hidden="true"></span>{{ line.sectionLabel }}
-                                </span>
-                                {% if line.notes %}
-                                    <details class="source-note">
-                                        <summary>
-                                            Note technique
-                                        </summary>
-                                        <div>
-                                            {{ line.notes|nl2br }}
-                                        </div>
-                                    </details>
-                                {% endif %}
+        {% if sheet.band.technicalIdentity.style or sheet.band.technicalIdentity.description %}
+            {{
+                include(
+                    'technical/_style.html.twig',
+                    {
+                        identity: sheet.band.technicalIdentity
+                    },
+                    with_context: false
+                )
+            }}
+        {% endif %}
+        <div data-patch-workspace>
+            {% set families = {} %}
+            {% for line in lines %}
+                {% set families =
+                    families|merge({
+                        (line.section): true
+                    })
+                %}
+            {% endfor %}
+            {{
+                include(
+                    'technical/_legend.html.twig',
+                    {
+                        families: families
+                    },
+                    with_context: false
+                )
+            }}
+            <div
+                class="patch-sort"
+                data-patch-sort-controls
+                hidden
+                role="group"
+                aria-label="Ordre du patch"
+            >
+                <button type="button" data-patch-sort="channel" aria-pressed="true">
+                    Par canal
+                </button>
+                <button type="button" data-patch-sort="family" aria-pressed="false">
+                    Par famille
+                </button>
+            </div>
+            <div class="table-frame">
+                <table class="patch-table patch-table--compact" lang="en">
+                    <caption class="visually-hidden">
+                        Input list · {{ sheet.bandName }} · Channel order
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th scope="col" class="channel-column">CH</th>
+                            <th scope="col">SOURCE</th>
+                            <th scope="col">MIC / DI</th>
+                            <th scope="col" class="stand-column">STAND</th>
+                            <th scope="col" class="action-column">
+                                <span class="visually-hidden">Actions</span>
                             </th>
-                            <td class="microphone-cell" data-label="Micro / DI">
-                                {% if line.preferredMicrophone %}
-                                    {{ line.preferredMicrophone }}
-                                {% else %}
-                                    <span class="unfilled">Non renseigné</span>
-                                {% endif %}
-                            </td>
-                            <td class="stand-cell" data-label="Pied">
-                                {% if line.stand %}
-                                    {{ line.stand }}
-                                {% else %}
-                                    <span class="unfilled">—</span>
-                                {% endif %}
-                            </td>
-                            <td class="notes-cell" data-label="Note">
-                                {% if line.notes %}
-                                    <details class="line-note">
-                                        <summary>
-                                            Note technique
-                                        </summary>
-                                        <div>
-                                            {{ line.notes|nl2br }}
-                                        </div>
-                                    </details>
-                                {% else %}
-                                    <span class="unfilled">—</span>
-                                {% endif %}
-                            </td>
-                            <td class="row-action">
-                                {% if canEdit %}
-                                    <a
-                                        class="edit-link"
-                                        href="{{
-                                        path(
-                                            'app_patch_edit',
-                                            {
-                                                id: line.id
-                                            }
-                                        )
-                                        }}"
-                                        aria-label="Modifier le canal {{ line.channelNumber }}, {{
-                                        line.sourceName
-                                        }}"
-                                    >
-                                        Modifier<span aria-hidden="true">↗</span>
-                                    </a>
-                                {% endif %}
-                                {% if canDelete %}
-                                    <form
-                                        class="inline-form delete-source"
-                                        action="{{
-                                        path(
-                                            'app_patch_delete',
-                                            {
-                                                id: line.id
-                                            }
-                                        )
-                                        }}"
-                                        method="post"
-                                    >
-                                        <input
-                                            type="hidden"
-                                            name="_token"
-                                            value="{{ csrf_token('patch_delete_' ~ line.id) }}"
-                                        />
-                                        <button
-                                            class="text-button danger-link"
-                                            type="submit"
-                                            aria-label="Supprimer le canal {{
-                                            line.channelNumber
-                                            }}, {{ line.sourceName }}"
-                                        >
-                                            Supprimer
-                                        </button>
-                                    </form>
-                                {% endif %}
-                            </td>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for line in lines %}
+                            <tr
+                                data-section="{{ line.section }}"
+                                data-technical-family="{{ technical_family(line.section) }}"
+                                data-channel="{{ line.channelNumber }}"
+                                class="{{
+                                loop.first or line.section != lines[loop.index0 - 1].section
+                                    ? 'is-family-start'
+                                    : ''
+                                }}"
+                            >
+                                <td class="channel-cell" data-label="CH">
+                                    <span class="channel-number">
+                                        {{ '%02d'|format(line.channelNumber) }}
+                                    </span>
+                                </td>
+                                <th scope="row" class="source-cell">
+                                    <span class="patch-family-name">
+                                        {{
+                                            technical_palette()[technical_family(
+                                                line.section
+                                            )].label
+                                        }}
+                                    </span>
+                                    <span class="source-name">{{ line.sourceName }}</span>
+                                    {% if line.notes and (line.notes|length) > 40 %}
+                                        <details class="patch-note" lang="fr">
+                                            <summary
+                                                class="patch-action"
+                                                title="Note du canal {{ line.channelNumber }}"
+                                                aria-label="Note du canal {{
+                                                line.channelNumber
+                                                }}, {{ line.sourceName }}"
+                                            >
+                                                {{
+                                                    include(
+                                                        'patch/_action_icon.html.twig',
+                                                        {
+                                                            icon: 'note'
+                                                        },
+                                                        with_context: false
+                                                    )
+                                                }}
+                                            </summary>
+                                            <div lang="en">
+                                                {{ line.notes|nl2br }}
+                                            </div>
+                                        </details>
+                                    {% endif %}
+                                </th>
+                                <td class="microphone-cell" data-label="MIC / DI">
+                                    <span>{{ line.preferredMicrophone ? : '—' }}</span>
+                                    {% if line.notes and (line.notes|length) <= 40 %}
+                                        <span class="patch-short-note">{{ line.notes }}</span>
+                                    {% endif %}
+                                    <span class="patch-mobile-stand">
+                                        · {{ line.stand ? : '—' }}
+                                    </span>
+                                </td>
+                                <td class="stand-cell" data-label="STAND">
+                                    {{ line.stand ? : '—' }}
+                                </td>
+                                <td class="row-action" lang="fr">
+                                    <div class="patch-actions">
+                                        {% if canEdit %}
+                                            <a
+                                                class="patch-action"
+                                                href="{{
+                                                path(
+                                                    'app_patch_edit',
+                                                    {
+                                                        id: line.id
+                                                    }
+                                                )
+                                                }}"
+                                                title="Modifier le canal {{ line.channelNumber }}"
+                                                aria-label="Modifier le canal {{
+                                                line.channelNumber
+                                                }}, {{ line.sourceName }}"
+                                            >
+                                                {{
+                                                    include(
+                                                        'patch/_action_icon.html.twig',
+                                                        {
+                                                            icon: 'edit'
+                                                        },
+                                                        with_context: false
+                                                    )
+                                                }}
+                                            </a>
+                                        {% endif %}
+                                        {% if canDelete %}
+                                            <form
+                                                class="inline-form delete-source"
+                                                action="{{
+                                                path(
+                                                    'app_patch_delete',
+                                                    {
+                                                        id: line.id
+                                                    }
+                                                )
+                                                }}"
+                                                method="post"
+                                            >
+                                                <input
+                                                    type="hidden"
+                                                    name="_token"
+                                                    value="{{
+                                                    csrf_token(
+                                                        'patch_delete_' ~ line.id
+                                                    )
+                                                    }}"
+                                                />
+                                                <button
+                                                    class="patch-action patch-action--delete"
+                                                    type="submit"
+                                                    title="Supprimer le canal {{
+                                                    line.channelNumber
+                                                    }}"
+                                                    aria-label="Supprimer le canal {{
+                                                    line.channelNumber
+                                                    }}, {{ line.sourceName }}"
+                                                >
+                                                    {{
+                                                        include(
+                                                            'patch/_action_icon.html.twig',
+                                                            {
+                                                                icon: 'delete'
+                                                            },
+                                                            with_context: false
+                                                        )
+                                                    }}
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div class="panel-footer">
             <span class="small-dot" aria-hidden="true"></span>Les microphones et pieds indiqués sont

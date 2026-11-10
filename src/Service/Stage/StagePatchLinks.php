@@ -6,11 +6,16 @@ namespace App\Service\Stage;
 
 use App\Entity\PatchLine;
 use App\Entity\TechnicalSheet;
+use App\Service\Technical\TechnicalPalette;
 
 /** @phpstan-import-type StageElement from TechnicalSheet */
 final class StagePatchLinks
 {
-    /** @return array<string, array{label: string, channel: ?int, available: bool}> */
+    public function __construct(private readonly TechnicalPalette $palette = new TechnicalPalette())
+    {
+    }
+
+    /** @return array<string, array{label: string, channel: ?int, available: bool, family: string}> */
     public function choices(TechnicalSheet $sheet): array
     {
         $lines = $sheet->getLines()
@@ -25,6 +30,7 @@ final class StagePatchLinks
                     'label' => sprintf('%02d · %s', $line->getChannelNumber(), $line->getSourceName()),
                     'channel' => $line->getChannelNumber(),
                     'available' => true,
+                    'family' => $this->palette->normalize($line->getSection()),
                 ];
             }
         }
@@ -36,6 +42,7 @@ final class StagePatchLinks
                         'label' => 'Source retirée du patch · liaison '.++$missing,
                         'channel' => null,
                         'available' => false,
+                        'family' => 'utility',
                     ];
                 }
             }
@@ -49,7 +56,7 @@ final class StagePatchLinks
     {
         $choices = $this->choices($sheet);
 
-        return array_map(static function (array $item) use ($choices): array {
+        return array_map(function (array $item) use ($choices): array {
             $channels = [];
             $missing = 0;
             foreach ($item['patchSources'] ?? [] as $key) {
@@ -60,6 +67,7 @@ final class StagePatchLinks
                     $channels[] = $channel;
                 }
             }
+            $item['family'] = $this->palette->stageFamily($item, $choices);
             unset($item['patchSources']);
             if ([] !== $channels || $missing > 0) {
                 sort($channels);

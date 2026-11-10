@@ -1,0 +1,154 @@
+/* Les détails restent repliés dans le dossier ; l’édition regroupe les mêmes rubriques. */
+.conditions-overview {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 28px;
+    padding: 16px 24px 24px;
+}
+.condition-block {
+    min-width: 0;
+}
+.condition-block h3 {
+    font-size: 13px;
+    margin: 0 0 14px;
+}
+.condition-block-wide {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+}
+.condition-facts {
+    margin: 0;
+    font-size: 13px;
+}
+.condition-facts > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+}
+.condition-facts dt {
+    color: var(--text-muted);
+}
+.condition-facts dd {
+    margin: 0;
+    text-align: right;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+.condition-note {
+    margin-top: 10px;
+    font-size: 12px;
+}
+.condition-note > summary,
+.conditions-engineer-editor > summary,
+.conditions-orfeo-proposals > summary {
+    min-height: 36px;
+    padding: 8px 0;
+    font-weight: 600;
+    cursor: pointer;
+}
+.condition-note p {
+    margin: 8px 0 0;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+.conditions-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.conditions-editor {
+    max-width: 1040px;
+}
+.conditions-form-section {
+    padding: 20px 0 0;
+    margin: 26px 0 0;
+    border: 0;
+    border-top: 1px solid var(--border);
+    min-width: 0;
+}
+.conditions-form-section > legend {
+    padding-right: 12px;
+    font-size: 16px;
+    font-weight: 650;
+}
+.conditions-form-section .form-grid {
+    margin-bottom: 20px;
+}
+.conditions-engineer-editor {
+    padding: 0 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.conditions-engineer-editor > .form-grid {
+    margin-top: 16px;
+}
+.conditions-orfeo-proposals {
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--surface-muted);
+    padding: 8px 18px;
+    scroll-margin-top: 24px;
+}
+.conditions-contract {
+    padding: 12px 0;
+}
+.conditions-contract + .conditions-contract {
+    border-top: 1px solid var(--border);
+}
+.conditions-contract h3 {
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+.condition-proposal {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    font-size: 13px;
+}
+.condition-proposal > div {
+    min-width: 0;
+}
+.condition-proposal p {
+    line-height: 1.7;
+    margin: 5px 0 0;
+    overflow-wrap: anywhere;
+}
+.condition-proposal button {
+    flex-shrink: 0;
+    min-height: 40px;
+    padding: 8px 12px;
+    font-size: 12px;
+}
+.conditions-copy-feedback {
+    margin: 16px 0;
+    padding: 12px 16px;
+    background: var(--info-bg);
+    border: 1px solid var(--info-border);
+    color: var(--info-text);
+    border-radius: 6px;
+    font-size: 13px;
+}
+.conditions-copy-feedback p {
+    margin: 0;
+}
+.conditions-copy-feedback button {
+    margin-top: 8px;
+}
+@media (max-width: 650px) {
+    .conditions-overview {
+        grid-template-columns: 1fr;
+        padding: 16px 18px 20px;
+    }
+    .condition-proposal {
+        flex-direction: column;
+    }
+    .condition-proposal button {
+        min-height: 44px;
+    }
+}

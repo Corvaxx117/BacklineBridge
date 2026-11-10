@@ -62,7 +62,7 @@ final class IndexActionTest extends DatabaseTestCase
         self::assertSame(['Hier', 'Ancienne date'], $crawler->filter('section[aria-labelledby="past-concerts-title"] h3')->each(static fn ($node): string => $node->text()));
         self::assertSelectorCount(2, '.concert-card--past .concert-period-badge');
         self::assertSelectorNotExists('.concert-history .concert-availability-link');
-        self::assertSelectorCount(2, 'section[aria-labelledby="upcoming-concerts-title"] .concert-availability-link');
+        self::assertSelectorNotExists('.concert-availability-link');
     }
 
     public function testHistoryRemainsAvailableWhenThereAreNoUpcomingDates(): void

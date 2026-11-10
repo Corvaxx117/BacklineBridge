@@ -1,140 +1,7 @@
-/* Vue d’ensemble : réponses personnelles d’abord, détails à la demande. */
-.availability-panel .panel-header {
-    flex-wrap: wrap;
-    gap: 12px;
-    padding: 20px 24px;
-}
-
-.availability-panel .panel-header h2 {
-    font-size: 18px;
-}
-
-.availability-summary {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px 16px;
-}
-
-.availability-summary .availability-counter {
-    color: var(--text);
-}
-
-.availability-pending,
-.availability-summary .availability-complete {
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    font-size: 12px;
-}
-
-.availability-pending {
-    color: var(--warning-text);
-}
-
-.availability-panel .availability-alert {
-    margin: 0 24px 16px;
-    overflow-wrap: anywhere;
-}
-
-.availability-panel .availability-response,
-.availability-details {
-    margin: 0 24px;
-    padding: 0;
-    border-top: 1px solid var(--border);
-}
-
-.availability-response > summary {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    min-height: 62px;
-    padding-block: 10px;
-    font-size: 13px;
-    cursor: pointer;
-    list-style: none;
-}
-
-.availability-response > summary::-webkit-details-marker {
-    display: none;
-}
-
-.availability-response > summary > span:first-child {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    font-weight: 600;
-}
-
-.availability-response-action {
-    color: var(--accent-text);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-}
-
-.availability-response > summary:focus-visible,
-.availability-details > summary:focus-visible,
 .concert-disclosure > summary:focus-visible {
     outline: 3px solid var(--focus-ring);
     outline-offset: -3px;
     border-radius: 6px;
-}
-
-.availability-response .availability-form {
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 14px 20px;
-    padding-bottom: 20px;
-}
-
-.availability-response .availability-form > .button {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: end;
-}
-
-.availability-response .availability-comment,
-.availability-response .availability-form > ul {
-    grid-column: 1 / -1;
-}
-
-.availability-response .availability-choices {
-    gap: 8px;
-}
-
-.availability-response .availability-choice {
-    min-height: 44px;
-    padding: 10px 12px;
-}
-
-.availability-response .availability-choice:has(input[value='unavailable']:checked) {
-    border-color: var(--danger-border);
-    background: var(--danger-bg);
-    color: var(--danger-text);
-}
-
-.availability-response .availability-choice:has(input[value='pending']:checked) {
-    border-color: var(--warning-border);
-    background: var(--warning-bg);
-    color: var(--warning-text);
-}
-
-.availability-details > summary {
-    padding-block: 14px;
-    color: var(--text-muted);
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.availability-details .availability-roster {
-    padding: 0;
-}
-
-.availability-help {
-    padding-block: 12px 18px;
-    color: var(--text-muted);
-    font-size: 12px;
 }
 
 .concert-disclosure {
@@ -234,35 +101,10 @@
 }
 
 @media (max-width: 720px) {
-    .availability-panel .panel-header,
     .concert-disclosure > summary,
     .concert-disclosure .panel-header,
     .concert-disclosure .concert-tools {
         padding: 18px 16px;
-    }
-
-    .availability-panel .availability-response,
-    .availability-details {
-        margin-inline: 16px;
-    }
-
-    .availability-panel .availability-alert {
-        margin-inline: 16px;
-    }
-
-    .availability-response .availability-form {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .availability-response .availability-form > .button {
-        grid-column: 1;
-        grid-row: auto;
-        width: 100%;
-    }
-
-    .availability-response .availability-choice {
-        flex: 1 1 auto;
-        justify-content: center;
     }
 
     .concert-disclosure > summary h2 {
@@ -276,7 +118,7 @@
     }
 }
 
-/* Repères visuels communs aux titres, dans le même esprit que la setlist. */
+/* Repères visuels communs aux titres des sections. */
 .concert-section-label {
     display: inline-flex;
     align-items: center;
@@ -289,4 +131,22 @@
     height: 19px;
     flex: 0 0 19px;
     color: var(--accent-text);
+}
+
+.concert-orfeo-source {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface-muted);
+    font-size: 13px;
+}
+.concert-orfeo-source summary {
+    cursor: pointer;
+    min-height: 32px;
+    display: list-item;
+    padding-block: 6px;
+}
+.concert-orfeo-source p {
+    margin-block: 8px;
 }

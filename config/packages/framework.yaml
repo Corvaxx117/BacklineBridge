@@ -6,6 +6,10 @@ framework:
     session: true
 
     rate_limiter:
+        orfeo:
+            policy: token_bucket
+            limit: 2
+            rate: { interval: '1 second', amount: 2 }
         member_activation:
             policy: sliding_window
             limit: 5

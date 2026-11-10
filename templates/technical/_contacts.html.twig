@@ -1,0 +1,26 @@
+{% if identity.contacts %}
+    <div class="rider-contacts">
+        {% for contact in identity.contacts %}
+            <address class="rider-contact">
+                <span class="rider-contact-role">{{ contact.role }}</span>
+                <strong>{{ contact.name }}</strong>
+                {% if contact.phone %}
+                    <a
+                        href="tel:{{ contact.phone|replace({
+                            ' ': '',
+                            '(': '',
+                            ')': '',
+                            '.': '',
+                            '-': ''
+                        }) }}"
+                    >
+                        {{ contact.phone }}
+                    </a>
+                {% endif %}
+                {% if contact.email %}
+                    <a href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+                {% endif %}
+            </address>
+        {% endfor %}
+    </div>
+{% endif %}
