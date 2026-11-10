@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Dto\Concert\ConcertCard;
+use App\Dto\Concert\ConcertListFilters;
 use App\Entity\Band;
 use App\Entity\Concert;
 use App\Entity\User;
-use App\Enum\AvailabilityStatus;
 use App\Enum\BandRole;
+use App\Enum\ConcertImportance;
 use App\Enum\ConcertStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -23,23 +24,33 @@ class ConcertRepository extends ServiceEntityRepository
     }
 
     /** @return list<ConcertCard> */
-    public function findCardsForUser(User $user): array
+    public function findCardsForUser(User $user, ?ConcertListFilters $filters = null): array
     {
+        $filters ??= ConcertListFilters::fromQuery([]);
+        $params = ['user' => $user->getId()];
+        $where = '';
+        if ('unrated' === $filters->level) {
+            $where = 'WHERE concert.importance_level IS NULL';
+        } elseif ('all' !== $filters->level) {
+            $where = 'WHERE concert.importance_level = :importance';
+            $params['importance'] = (int) $filters->level;
+        }
+        $order = 'importance' === $filters->sort
+            ? 'CASE WHEN concert.importance_level IS NULL THEN 1 ELSE 0 END ASC, concert.importance_level DESC, '
+            : '';
         $rows = $this->getEntityManager()->getConnection()->fetchAllAssociative(
-            <<<'SQL'
+            <<<SQL
                 SELECT concert.id, concert.date, concert.venue, concert.city, concert.status,
-                    concert.created_by_name, sheet.band_name, membership.role,
-                    availability.status AS availability_status, source.id AS bandsintown_id
+                    concert.created_by_name, concert.importance_level, concert.importance_note, concert.revision,
+                    sheet.band_name, membership.role
                 FROM concert
                 JOIN technical_sheet sheet ON sheet.id = concert.patch_sheet_id
                 JOIN band_membership membership ON membership.band_id = concert.band_id
                     AND membership.user_id = :user
-                LEFT JOIN concert_availability availability ON availability.concert_id = concert.id
-                    AND availability.user_id = :user
-                LEFT JOIN bandsintown_concert source ON source.concert_id = concert.id
-                ORDER BY concert.date ASC, concert.id ASC
+                {$where}
+                ORDER BY {$order}concert.date ASC, concert.id ASC
                 SQL,
-            ['user' => $user->getId()],
+            $params,
         );
 
         return array_map(static fn (array $row): ConcertCard => new ConcertCard(
@@ -50,9 +61,10 @@ class ConcertRepository extends ServiceEntityRepository
             status: ConcertStatus::from($row['status']),
             bandName: $row['band_name'],
             createdByName: $row['created_by_name'],
-            canRespond: null === $row['bandsintown_id'] && BandRole::Manager->value === $row['role'],
-            myStatus: null !== $row['bandsintown_id'] || null === $row['availability_status']
-                ? null : AvailabilityStatus::from($row['availability_status']),
+            importance: null === $row['importance_level'] ? null : ConcertImportance::from((int) $row['importance_level']),
+            importanceNote: $row['importance_note'],
+            revision: (int) $row['revision'],
+            canManageImportance: BandRole::from($row['role'])->canPlanConcerts(),
         ), $rows);
     }
 

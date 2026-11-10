@@ -155,7 +155,7 @@ final class BookingTest extends DatabaseTestCase
             'engineerFeeAmount' => '250.05',
             'notes' => 'Hébergement pour cinq personnes.',
         ]);
-        self::assertResponseRedirects('/concerts/'.$id, 303);
+        self::assertResponseRedirects('/concerts/'.$id.'#concert-conditions', 303);
         $this->client->followRedirect();
         self::assertSelectorTextContains('.conditions-panel', '1 500,50 €');
         self::assertSelectorTextContains('.conditions-panel', '250,05 €');
@@ -172,7 +172,7 @@ final class BookingTest extends DatabaseTestCase
             'engineerFeeAmount' => '',
             'accommodation' => 'return_home',
         ]);
-        self::assertResponseRedirects('/concerts/'.$id, 303);
+        self::assertResponseRedirects('/concerts/'.$id.'#concert-conditions', 303);
         $this->client->followRedirect();
         self::assertSelectorTextContains('.conditions-panel', 'Retour à la casa !');
         $em = $this->entityManager();

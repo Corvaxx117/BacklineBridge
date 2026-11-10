@@ -28,12 +28,12 @@
             "sourceName": "SNARE TOP",
             "preferredMicrophone": "BETA57A",
             "stand": "SHORT BOOM",
-            "notes": "MICRO PERSO",
+            "notes": "OWN MIC",
             "section": "drums"
         },
         {
             "channelNumber": 4,
-            "sourceName": "SNARE BOTT",
+            "sourceName": "SNARE BOTTOM",
             "preferredMicrophone": "E904",
             "stand": "CLAMP",
             "notes": null,
@@ -41,7 +41,7 @@
         },
         {
             "channelNumber": 5,
-            "sourceName": "HH",
+            "sourceName": "HI-HAT",
             "preferredMicrophone": "KM184",
             "stand": "SHORT BOOM",
             "notes": null,
@@ -52,7 +52,7 @@
             "sourceName": "RACK TOM",
             "preferredMicrophone": "MD441",
             "stand": "SHORT BOOM",
-            "notes": "MICRO PERSO",
+            "notes": "OWN MIC",
             "section": "drums"
         },
         {
@@ -60,12 +60,12 @@
             "sourceName": "FLOOR TOM",
             "preferredMicrophone": "MD441",
             "stand": "SHORT BOOM",
-            "notes": "MICRO PERSO",
+            "notes": "OWN MIC",
             "section": "drums"
         },
         {
             "channelNumber": 8,
-            "sourceName": "OH L",
+            "sourceName": "OVERHEAD L",
             "preferredMicrophone": "C414 XLS",
             "stand": "TALL BOOM",
             "notes": null,
@@ -73,7 +73,7 @@
         },
         {
             "channelNumber": 9,
-            "sourceName": "OH R",
+            "sourceName": "OVERHEAD R",
             "preferredMicrophone": "C414 XLS",
             "stand": "TALL BOOM",
             "notes": null,
@@ -97,7 +97,7 @@
         },
         {
             "channelNumber": 12,
-            "sourceName": "GUIT JU",
+            "sourceName": "GUITAR JU",
             "preferredMicrophone": "E906",
             "stand": "SHORT BOOM",
             "notes": null,
@@ -105,7 +105,7 @@
         },
         {
             "channelNumber": 13,
-            "sourceName": "GUIT REMI",
+            "sourceName": "GUITAR REMI",
             "preferredMicrophone": "SM57",
             "stand": "SHORT BOOM",
             "notes": null,
@@ -140,7 +140,7 @@
             "sourceName": "JU VOICE",
             "preferredMicrophone": "BETA57A",
             "stand": "TALL BOOM",
-            "notes": "MICRO PERSO",
+            "notes": "OWN MIC",
             "section": "vocals"
         },
         {
@@ -148,12 +148,12 @@
             "sourceName": "REMI VOICE",
             "preferredMicrophone": "BETA57A",
             "stand": "TALL BOOM",
-            "notes": "MICRO PERSO",
+            "notes": "OWN MIC",
             "section": "vocals"
         },
         {
             "channelNumber": 19,
-            "sourceName": "CLIC",
+            "sourceName": "CLICK",
             "preferredMicrophone": "BSS",
             "stand": "DI",
             "notes": null,
@@ -170,17 +170,17 @@
         {
             "channelNumber": 21,
             "sourceName": "OTO BAM L",
-            "preferredMicrophone": "FX PERSO",
+            "preferredMicrophone": "OWN FX",
             "stand": null,
-            "notes": "FOURNIR UNE SORTIE LIGNE ET DEUX RETOURS LIGNE (JACK TRS OU XLR)(FOH)",
+            "notes": "PROVIDE 1 LINE OUTPUT AND 2 LINE RETURNS (TRS JACK OR XLR) AT FOH",
             "section": "effects"
         },
         {
             "channelNumber": 22,
             "sourceName": "OTO BAM R",
-            "preferredMicrophone": "FX PERSO",
+            "preferredMicrophone": "OWN FX",
             "stand": null,
-            "notes": "FOURNIR UNE SORTIE LIGNE ET DEUX RETOURS LIGNE (JACK TRS OU XLR)(FOH)",
+            "notes": "PROVIDE 1 LINE OUTPUT AND 2 LINE RETURNS (TRS JACK OR XLR) AT FOH",
             "section": "effects"
         }
     ]

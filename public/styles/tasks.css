@@ -133,8 +133,8 @@
 .task-assignee {
     padding: 4px 8px;
     border-radius: 4px;
-    background: var(--success-bg);
-    color: var(--success-text);
+    background: var(--secondary-bg);
+    color: var(--secondary-text);
     font-weight: 700;
 }
 .task-unassigned {
@@ -171,45 +171,67 @@
     font-size: 12px;
     line-height: 1.5;
 }
-.task-state-form {
+.task-card-actions {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
     margin-top: 16px;
     padding-top: 14px;
     border-top: 1px solid var(--border);
 }
-.task-action {
-    flex: 1 1 auto;
-    min-height: 44px;
-    padding: 8px 12px;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    background: var(--surface);
-    color: var(--text);
-    font: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-}
-.task-action:hover {
-    background: var(--success-bg);
-}
-.task-action-primary {
-    background: var(--success-bg);
-    border-color: var(--border-strong);
-}
+.task-state-form,
 .task-card-links {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px 16px;
-    margin-top: 8px;
-    font-size: 12px;
-}
-.task-card-links a {
-    display: inline-flex;
     align-items: center;
-    min-height: 44px;
+    gap: 8px;
+    margin: 0;
+}
+.task-card-links {
+    margin-left: auto;
+}
+.task-action {
+    display: inline-flex;
+    flex: 0 0 44px;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-muted);
+    text-decoration: none;
+    cursor: pointer;
+}
+.task-action svg {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+}
+.task-action:hover,
+.task-action:focus-visible {
+    border-color: var(--border-strong);
+    background: var(--surface-hover);
+    color: var(--text);
+}
+.task-action-primary {
+    border-color: var(--secondary-border);
+    background: var(--secondary-bg);
+    color: var(--secondary-text);
+}
+.task-action-primary:hover,
+.task-action-primary:focus-visible {
+    border-color: var(--secondary-text);
+    background: var(--secondary-bg);
+    color: var(--secondary-text);
+}
+.task-action-danger:hover,
+.task-action-danger:focus-visible {
+    border-color: var(--danger-border);
+    background: var(--danger-bg);
+    color: var(--danger-text);
 }
 .task-empty {
     margin: 6px 0 14px;

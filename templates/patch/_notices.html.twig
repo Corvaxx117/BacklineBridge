@@ -1,39 +1,114 @@
-{% if embedded|default(false) %}
-    <div class="sheet-notes-content">
-        <ul>
-            {% for notice in sheet.notices %}
-                <li>{{ notice }}</li>
-            {% endfor %}
-        </ul>
-        <div class="document-origin">
-            <span class="eyebrow">Document d’origine</span><p>
-                {{ sheet.documentLabel }}
-            </p>
+{% set editable = is_granted('SHEET_MANAGE', sheet) %}
+{% set identity = sheet.band ? sheet.band.technicalIdentity : null %}
+{% if sheet.notices or (identity and identity.contacts) or editable %}
+    <section
+        id="technical-notes"
+        class="technical-information"
+        aria-label="Notes et contacts techniques"
+    >
+        <div class="technical-information-block">
+            <header class="technical-information-heading">
+                <div>
+                    <h3>Contacts du groupe</h3>
+                    <p>
+                        Son et organisation · communs aux fiches techniques
+                    </p>
+                </div>
+                {% if editable %}
+                    <a
+                        class="technical-edit-action"
+                        href="{{
+                        path(
+                            'app_technical_contacts_edit',
+                            {
+                                id: sheet.id
+                            }
+                        )
+                        }}"
+                        title="Modifier les contacts"
+                        aria-label="Modifier les contacts"
+                    >
+                        {{
+                            include(
+                                'patch/_action_icon.html.twig',
+                                {
+                                    icon: 'edit'
+                                },
+                                with_context: false
+                            )
+                        }}
+                    </a>
+                {% endif %}
+            </header>
+            {% if identity and identity.contacts %}
+                {{
+                    include(
+                        'technical/_contacts.html.twig',
+                        {
+                            identity: identity
+                        },
+                        with_context: false
+                    )
+                }}
+            {% else %}
+                <p class="technical-information-empty">
+                    Aucun contact technique renseigné.
+                </p>
+            {% endif %}
         </div>
-    </div>
-{% else %}
-    {% if sheet.notices is not empty %}
-        <aside class="document-notice" aria-labelledby="notice-title">
-            <span class="notice-symbol" aria-hidden="true">!</span>
-            <div>
-                <h2 id="notice-title">Notes de la fiche source</h2>
-                <details class="source-details">
-                    <summary>
-                        Consulter les {{ sheet.notices|length }} précisions et points à vérifier
-                    </summary>
-                    <ul>
-                        {% for notice in sheet.notices %}
-                            <li>{{ notice }}</li>
-                        {% endfor %}
-                    </ul>
-                </details>
-            </div>
-        </aside>
-    {% endif %}
-    <div class="document-origin">
-        <span class="eyebrow">Document d’origine</span>
-        <p>
-            {{ sheet.documentLabel }}
-        </p>
-    </div>
+        <div class="technical-information-block">
+            <header class="technical-information-heading">
+                <div>
+                    <h3>Notes techniques</h3>
+                    <p>
+                        {{ sheet.concert
+                            ? 'Précisions pour ce concert'
+                            : 'Précisions de la fiche de référence' }}
+                    </p>
+                </div>
+                {% if editable %}
+                    <a
+                        class="technical-edit-action"
+                        href="{{
+                        path(
+                            'app_technical_notes_edit',
+                            {
+                                id: sheet.id
+                            }
+                        )
+                        }}"
+                        title="Modifier les notes"
+                        aria-label="Modifier les notes"
+                    >
+                        {{
+                            include(
+                                'patch/_action_icon.html.twig',
+                                {
+                                    icon: 'edit'
+                                },
+                                with_context: false
+                            )
+                        }}
+                    </a>
+                {% endif %}
+            </header>
+            {% if sheet.notices %}
+                <ul class="technical-information-notes">
+                    {% for notice in sheet.notices %}
+                        <li>{{ notice|nl2br }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="technical-information-empty">
+                    Aucune précision supplémentaire.
+                </p>
+            {% endif %}
+        </div>
+    </section>
 {% endif %}
+<div class="document-origin">
+    <span class="eyebrow">Document d’origine</span>
+    <p>
+        {{ sheet.documentLabel }}
+    </p>
+</div>

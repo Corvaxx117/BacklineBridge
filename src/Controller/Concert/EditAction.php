@@ -7,7 +7,6 @@ namespace App\Controller\Concert;
 use App\Dto\Concert\CreateConcertInput;
 use App\Entity\Concert;
 use App\Form\ConcertType;
-use App\Repository\BandsintownConcertRepository;
 use App\Security\Voter\ConcertVoter;
 use App\Service\Concert\ConcertUpdater;
 use Doctrine\ORM\OptimisticLockException;
@@ -31,10 +30,8 @@ final class EditAction extends AbstractController
         Request $request,
         #[MapEntity(id: 'id')] Concert $concert,
         ConcertUpdater $updater,
-        BandsintownConcertRepository $bandsintown,
     ): Response {
         $this->denyAccessUnlessGranted(ConcertVoter::UPDATE, $concert);
-        $imported = $bandsintown->isImported($concert);
         $input = CreateConcertInput::fromConcert($concert);
         $form = $this->createForm(ConcertType::class, $input, ['editing' => true]);
         $form->handleRequest($request);
@@ -44,9 +41,7 @@ final class EditAction extends AbstractController
                 $dateChanged = $updater->update($concert, $input);
                 $message = 'Les informations du concert ont été enregistrées.';
                 if ($dateChanged) {
-                    $message = $imported
-                        ? 'La date a changé : la présence de l’ingé son est à confirmer dans les conditions.'
-                        : 'La date a changé : chaque responsable doit confirmer à nouveau sa disponibilité.';
+                    $message = 'La date a changé : la présence de l’ingé son est à confirmer dans les conditions.';
                 }
                 $this->addFlash('success', $message);
 
@@ -73,7 +68,6 @@ final class EditAction extends AbstractController
                 'concert' => $concert,
                 'form' => $form->createView(),
                 'editing' => true,
-                'availabilityRequired' => !$imported,
                 'conflict' => 409 === $status,
             ],
             new Response(status: $status),

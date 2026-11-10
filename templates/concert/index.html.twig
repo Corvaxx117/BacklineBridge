@@ -6,6 +6,7 @@
 
 {% block page_assets %}
     <link rel="stylesheet" href="{{ asset('/styles/concerts.css') }}" />
+    <link rel="stylesheet" href="{{ asset('/styles/concert-importance.css') }}" />
 {% endblock %}
 
 {% block body %}
@@ -32,19 +33,37 @@
         {% if canCreate %}
             <div class="hero-actions">
                 {% if band %}
-                    <a
-                        class="button button-secondary"
-                        href="{{
-                        path(
-                            'app_concert_bandsintown_prepare',
-                            {
-                                id: band.id
-                            }
-                        )
-                        }}"
-                    >
-                        Importer Bandsintown
-                    </a>
+                    <details class="concert-import-menu">
+                        <summary class="button button-secondary">
+                            Importer des concerts <span aria-hidden="true">⌄</span>
+                        </summary>
+                        <div>
+                            <a
+                                href="{{
+                                path(
+                                    'app_concert_orfeo_prepare',
+                                    {
+                                        id: band.id
+                                    }
+                                )
+                                }}"
+                            >
+                                Depuis Orfeo
+                            </a>
+                            <a
+                                href="{{
+                                path(
+                                    'app_concert_bandsintown_prepare',
+                                    {
+                                        id: band.id
+                                    }
+                                )
+                                }}"
+                            >
+                                Depuis Bandsintown
+                            </a>
+                        </div>
+                    </details>
                 {% endif %}
                 <a class="button button-primary hero-action" href="{{ path('app_concert_new') }}">
                     <span class="button-plus" aria-hidden="true">+</span>Créer un concert
@@ -53,7 +72,17 @@
         {% endif %}
     </section>
 
-    {% if concerts is empty %}
+    {{
+        include(
+            'concert/_filters.html.twig',
+            {
+                filters: filters,
+                importanceLevels: importanceLevels
+            },
+            with_context: false
+        )
+    }}
+    {% if concerts is empty and not filters.filtered %}
         <section class="patch-panel empty-state" aria-labelledby="empty-title">
             <span class="empty-channel" aria-hidden="true">01</span>
             <h2 id="empty-title">Votre première date vous attend.</h2>
@@ -69,6 +98,22 @@
             {% endif %}
         </section>
     {% else %}
+        {% if concerts is empty and filters.filtered %}
+            <p class="concert-group-empty">
+                Aucun concert pour ce niveau d’enjeu. <a
+                    href="{{
+                    path(
+                        'app_concert_index',
+                        {
+                            sort: filters.sort
+                        }
+                    )
+                    }}"
+                >
+                    Afficher tous les niveaux
+                </a>
+            </p>
+        {% endif %}
         <section class="concert-group" aria-labelledby="upcoming-concerts-title">
             <div class="concert-group-heading">
                 <h2 id="upcoming-concerts-title">Concerts à venir</h2>
@@ -81,7 +126,11 @@
             {% else %}
                 <ol
                     class="concert-list"
-                    aria-label="Concerts à venir, du plus proche au plus lointain"
+                    aria-label="{{
+                    filters.sort == 'importance'
+                        ? 'Concerts à venir, par enjeu décroissant'
+                        : 'Concerts à venir, du plus proche au plus lointain'
+                    }}"
                 >
                     {% for concert in upcomingConcerts %}
                         {{
@@ -89,7 +138,9 @@
                                 'concert/_card.html.twig',
                                 {
                                     concert: concert,
-                                    past: false
+                                    past: false,
+                                    filters: filters,
+                                    importanceLevels: importanceLevels
                                 },
                                 with_context: false
                             )
@@ -106,7 +157,11 @@
                 </div>
                 <ol
                     class="concert-list"
-                    aria-label="Concerts passés, du plus récent au plus ancien"
+                    aria-label="{{
+                    filters.sort == 'importance'
+                        ? 'Concerts passés, par enjeu décroissant'
+                        : 'Concerts passés, du plus récent au plus ancien'
+                    }}"
                 >
                     {% for concert in pastConcerts %}
                         {{
@@ -114,7 +169,9 @@
                                 'concert/_card.html.twig',
                                 {
                                     concert: concert,
-                                    past: true
+                                    past: true,
+                                    filters: filters,
+                                    importanceLevels: importanceLevels
                                 },
                                 with_context: false
                             )

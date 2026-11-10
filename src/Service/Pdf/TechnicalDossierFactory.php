@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\Pdf;
 
 use App\Dto\Pdf\TechnicalDossier;
+use App\Dto\Technical\TechnicalIdentity;
 use App\Entity\PatchLine;
 use App\Entity\TechnicalPublication;
 use App\Entity\TechnicalSheet;
@@ -46,12 +47,14 @@ final readonly class TechnicalDossierFactory
                     'microphone' => $line->getPreferredMicrophone(),
                     'stand' => $line->getStand(),
                     'notes' => $line->getNotes(),
+                    'section' => $line->getSection(),
                 ],
                 $this->lines->findForSheet($sheet),
             ),
             stagePlan: $this->stageLinks->present($sheet),
             equipment: $sheet->getEquipmentRequests(),
             documentLabel: $sheet->getDocumentLabel(),
+            identity: $sheet->getBand()?->getTechnicalIdentity(),
         );
     }
 
@@ -87,6 +90,7 @@ final readonly class TechnicalDossierFactory
             equipment: $snapshot['equipment'],
             publishedAt: $publishedAt,
             documentLabel: $documentLabel,
+            identity: TechnicalIdentity::fromArray($snapshot['technicalIdentity'] ?? []),
         );
     }
 }

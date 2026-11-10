@@ -1,0 +1,81 @@
+<div class="concert-filter-bar">
+    <nav class="concert-level-filters" aria-label="Filtrer les concerts par enjeu">
+        <span class="eyebrow">Enjeu</span>
+        {% for value, label in {
+            all: 'Tous',
+            unrated: 'À évaluer'
+        } %}
+            <a
+                class="concert-filter {{ filters.level == value ? 'is-active' : '' }}"
+                href="{{
+                path(
+                    'app_concert_index',
+                    {
+                        sort: filters.sort,
+                        enjeu: value
+                    }
+                )
+                }}"
+                {{ filters.level == value ? 'aria-current="page"' : '' }}
+            >
+                {{ label }}
+            </a>
+        {% endfor %}
+        {% for level in importanceLevels %}
+            <a
+                class="concert-filter concert-filter-score {{
+                filters.level == level.value ~ ''
+                    ? 'is-active'
+                    : ''
+                }}"
+                href="{{
+                path(
+                    'app_concert_index',
+                    {
+                        sort: filters.sort,
+                        enjeu: level.value
+                    }
+                )
+                }}"
+                title="Enjeu {{ level.label|lower }}"
+                aria-label="Enjeu {{ level.value }} sur 5 · {{ level.label }}"
+                {{ filters.level == level.value ~ '' ? 'aria-current="page"' : '' }}
+            >
+                {{ level.value }}
+            </a>
+        {% endfor %}
+    </nav>
+    <nav class="concert-sort-links" aria-label="Trier les concerts">
+        <span class="eyebrow">Trier</span>
+        <a
+            href="{{
+            path(
+                'app_concert_index',
+                {
+                    sort: 'date',
+                    enjeu: filters.level
+                }
+            )
+            }}"
+            class="{{ filters.sort == 'date' ? 'is-active' : '' }}"
+            {{ filters.sort == 'date' ? 'aria-current="page"' : '' }}
+        >
+            Par date
+        </a>
+        <a
+            href="{{
+            path(
+                'app_concert_index',
+                {
+                    sort: 'importance',
+                    enjeu: filters.level
+                }
+            )
+            }}"
+            class="{{ filters.sort == 'importance' ? 'is-active' : '' }}"
+            {{ filters.sort == 'importance' ? 'aria-current="page"' : '' }}
+        >
+            Enjeu le plus fort
+        </a>
+    </nav>
+</div>

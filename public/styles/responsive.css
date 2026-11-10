@@ -43,7 +43,7 @@
     cursor: default;
 }
 .stage-zoom-controls button[aria-pressed='true'] {
-    background: var(--success-bg);
+    background: var(--secondary-bg);
     border-color: var(--border-strong);
 }
 .stage-zoom-controls output {

@@ -16,7 +16,7 @@
             with_context: false
         )
     }}
-    <div class="panel-header">
+    <div class="panel-header conditions-actions">
         <a
             class="button button-secondary"
             href="{{
@@ -30,77 +30,142 @@
         >
             {{ conditions ? 'Modifier les conditions' : 'Compléter les conditions' }}
         </a>
+        {% if (orfeoSource|default(null)) and orfeoSource.event.contracts %}
+            <a
+                class="text-button"
+                href="{{
+                path(
+                    'app_concert_conditions',
+                    {
+                        id: concert.id,
+                        _fragment: 'orfeo-conditions'
+                    }
+                )
+                }}"
+            >
+                Propositions Orfeo
+            </a>
+        {% endif %}
     </div>
-    <dl class="conditions-grid">
-        {% if showEngineerPresence %}
-            <div>
-                <dt>
-                    Présence de l’ingé son
-                </dt>
-                <dd data-engineer-presence>
-                    {{ conditions ? conditions.engineerPresence.label : 'À confirmer' }}
-                </dd>
-            </div>
-        {% endif %}
-        <div>
-            <dt>
-                Hébergement
-            </dt>
-            <dd>{{ conditions ? conditions.accommodation.label : 'À confirmer' }}</dd>
-        </div>
-        <div>
-            <dt>
-                Frais de transport
-            </dt>
-            <dd>{{ conditions ? conditions.transportCoverage.label : 'À confirmer' }}</dd>
-        </div>
-        <div>
-            <dt>
-                Montant convenu
-            </dt>
-            <dd>
-                {{ conditions and conditions.feeCents is not null
-                    ? ((conditions.feeCents / 100)|number_format(2, ',', ' ')) ~ ' €'
-                    : 'À confirmer' }}
-            </dd>
-        </div>
-        <div>
-            <dt>
-                Cadre de rémunération
-            </dt>
-            <dd>{{ conditions ? conditions.paymentFramework.label : 'À confirmer' }}</dd>
-        </div>
-        <div>
-            <dt>
-                Moyen de paiement
-            </dt>
-            <dd>{{ conditions ? conditions.paymentMethod.label : 'À confirmer' }}</dd>
-        </div>
-        <div>
-            <dt>
-                Rémunération de l’ingé son
-            </dt>
-            <dd>
-                {{ conditions ? conditions.engineerPayment.label : 'À confirmer' }}{% if
-                    conditions %}
-                    <span class="condition-amount">
-                        {{ conditions.engineerPaymentFramework.label }}
-                    </span>
+    <div class="conditions-overview">
+        <section class="condition-block" aria-label="Accueil et déplacements">
+            <h3>Accueil et déplacements</h3>
+            <dl class="condition-facts">
+                <div>
+                    <dt>
+                        Hébergement
+                    </dt><dd>{{ conditions ? conditions.accommodation.label : 'À confirmer' }}</dd>
+                </div>
+                <div>
+                    <dt>
+                        Transport
+                    </dt><dd>
+                        {{ conditions ? conditions.transportCoverage.label : 'À confirmer' }}
+                    </dd>
+                </div>
+            </dl>
+            {{
+                include(
+                    'concert/_condition_note.html.twig',
+                    {
+                        title: 'Précisions d’hébergement',
+                        text: conditions ? conditions.accommodationNotes : null
+                    },
+                    with_context: false
+                )
+            }}
+            {{
+                include(
+                    'concert/_condition_note.html.twig',
+                    {
+                        title: 'Précisions de transport',
+                        text: conditions ? conditions.transportNotes : null
+                    },
+                    with_context: false
+                )
+            }}
+            {{
+                include(
+                    'concert/_condition_note.html.twig',
+                    {
+                        title: 'Repas et catering',
+                        text: conditions ? conditions.mealNotes : null
+                    },
+                    with_context: false
+                )
+            }}
+        </section>
+        <section class="condition-block" aria-label="Rémunération et ingénieur son">
+            <h3>Rémunération et ingé son</h3>
+            <dl class="condition-facts">
+                <div>
+                    <dt>
+                        Montant convenu
+                    </dt><dd>
+                        {{ conditions and conditions.feeCents is not null
+                            ? ((conditions.feeCents / 100)|number_format(2, ',', ' ')) ~ ' €'
+                                ~ (conditions.feeBasis.value == 'unknown'
+                                    ? ''
+                                    : ' ' ~ conditions.feeBasis.label)
+                            : 'À confirmer' }}
+                    </dd>
+                </div>
+                {% if conditions and conditions.paymentFramework.value != 'unknown' %}
+                    <div>
+                        <dt>
+                            Cadre
+                        </dt><dd>{{ conditions.paymentFramework.label }}</dd>
+                    </div>
                 {% endif %}
-                {% if conditions and conditions.engineerFeeCents is not null %}
-                    <span class="condition-amount">
-                        {{ (conditions.engineerFeeCents / 100)|number_format(2, ',', ' ') }} €
-                    </span>
+                {% if conditions and conditions.paymentMethod.value != 'unknown' %}
+                    <div>
+                        <dt>
+                            Paiement
+                        </dt><dd>{{ conditions.paymentMethod.label }}</dd>
+                    </div>
                 {% endif %}
-            </dd>
-        </div>
+                <div>
+                    <dt>
+                        Ingé son
+                    </dt><dd data-engineer-presence>
+                        {{ conditions ? conditions.engineerPresence.label : 'À confirmer' }}
+                    </dd>
+                </div>
+            </dl>
+            {% if
+                conditions
+                    and (conditions.engineerPayment.value != 'unknown'
+                    or conditions.engineerFeeCents is not null
+                        or conditions.engineerPaymentFramework.value != 'unknown') %}
+                <details class="condition-note">
+                    <summary>
+                        Rémunération de l’ingé son
+                    </summary>
+                    <p>
+                        {{ conditions.engineerPayment.label }}{% if
+                            conditions.engineerFeeCents is not null %}
+                            · {{ (conditions.engineerFeeCents / 100)|number_format(2, ',', ' ') }} €
+                        {% endif %}
+                        {% if conditions.engineerPaymentFramework.value != 'unknown' %}
+                            · {{ conditions.engineerPaymentFramework.label }}
+                        {% endif %}
+                    </p>
+                </details>
+            {% endif %}
+        </section>
         {% if conditions and conditions.notes %}
-            <div class="field-full">
-                <dt>
-                    Précisions
-                </dt>
-                <dd>{{ conditions.notes|nl2br }}</dd>
+            <div class="condition-block condition-block-wide">
+                {{
+                    include(
+                        'concert/_condition_note.html.twig',
+                        {
+                            title: 'Autres précisions et points à confirmer',
+                            text: conditions.notes
+                        },
+                        with_context: false
+                    )
+                }}
             </div>
         {% endif %}
-    </dl>
+    </div>
 </details>

@@ -51,7 +51,6 @@ final readonly class ConcertRemover
                 'technical_publication',
                 'bandsintown_concert',
                 'concert_conditions',
-                'concert_availability',
             ] as $table) {
                 $connection->executeStatement('DELETE FROM '.$table.' WHERE concert_id = ?', [$id]);
             }

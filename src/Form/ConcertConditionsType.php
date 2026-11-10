@@ -8,6 +8,7 @@ use App\Dto\Concert\ConcertConditionsInput;
 use App\Enum\Accommodation;
 use App\Enum\EngineerPayment;
 use App\Enum\EngineerPresence;
+use App\Enum\FeeBasis;
 use App\Enum\PaymentFramework;
 use App\Enum\PaymentMethod;
 use App\Enum\TransportCoverage;
@@ -18,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /** @extends AbstractType<ConcertConditionsInput> */
 final class ConcertConditionsType extends AbstractType
@@ -30,6 +32,7 @@ final class ConcertConditionsType extends AbstractType
                 'transportCoverage' => [TransportCoverage::class, 'Frais de transport'],
                 'paymentFramework' => [PaymentFramework::class, 'Cadre de rémunération'],
                 'paymentMethod' => [PaymentMethod::class, 'Moyen de paiement'],
+                'feeBasis' => [FeeBasis::class, 'Montant exprimé en'],
                 'engineerPayment' => [EngineerPayment::class, 'Rémunération de l’ingé son'],
                 'engineerPaymentFramework' => [
                     PaymentFramework::class,
@@ -50,7 +53,9 @@ final class ConcertConditionsType extends AbstractType
                     'label' => 'Présence de l’ingé son',
                     'choice_label' => static fn (EngineerPresence $presence): string => $presence->label(),
                 ])
-                ->add('expectedDate', HiddenType::class);
+                ->add('expectedDate', HiddenType::class, [
+                    'constraints' => [new Assert\NotBlank(), new Assert\Regex('/^\\d{4}-\\d{2}-\\d{2}$/D')],
+                ]);
         }
         foreach (
             [
@@ -68,6 +73,18 @@ final class ConcertConditionsType extends AbstractType
                 ],
             ]);
         }
+        $builder->add('revision', HiddenType::class, ['empty_data' => '']);
+        foreach ([
+            'accommodationNotes' => 'Précisions d’hébergement',
+            'transportNotes' => 'Précisions de transport',
+            'mealNotes' => 'Repas et catering',
+        ] as $name => $label) {
+            $builder->add($name, TextareaType::class, [
+                'label' => $label,
+                'required' => false,
+                'attr' => ['maxlength' => 4000, 'rows' => 3],
+            ]);
+        }
         $builder->add('notes', TextareaType::class, [
             'label' => 'Précisions et points à confirmer',
             'required' => false,
@@ -79,7 +96,7 @@ final class ConcertConditionsType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => ConcertConditionsInput::class,
-            'engineer_presence' => false,
+            'engineer_presence' => true,
             'csrf_token_id' => 'concert_conditions',
             'csrf_message' => 'Le formulaire a expiré. Recharge la page puis réessaie.',
         ]);

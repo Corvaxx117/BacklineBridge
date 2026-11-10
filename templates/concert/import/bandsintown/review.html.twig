@@ -40,7 +40,7 @@
             form,
             {
                 attr: {
-                    'data-bandsintown-import': ''
+                    'data-concert-import': ''
                 }
             }
         )
@@ -154,8 +154,7 @@
         <div class="workspace-panel workspace-form">
             <p>
                 Les concerts sélectionnés seront validés, y compris ceux rattachés à une date
-                existante. La disponibilité du groupe est acquise. La présence de l’ingé son et le
-                matériel restent à confirmer séparément.
+                existante. La présence de l’ingé son et le matériel restent à confirmer séparément.
             </p>
             <p class="workspace-hint">
                 Les nouveaux dossiers techniques partiront de la référence actuelle du groupe. Rien
@@ -165,5 +164,5 @@
     {% else %}
         {% do form.events.setRendered %}
     {% endif %}
-    {{ form_end(form) }}<script src="{{ asset('/scripts/bandsintown-import.js') }}" defer></script>
+    {{ form_end(form) }}<script src="{{ asset('/scripts/concert-import.js') }}" defer></script>
 {% endblock %}

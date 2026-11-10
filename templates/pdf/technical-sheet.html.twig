@@ -7,6 +7,7 @@
         </title>
         <style>
             {{ include('pdf/styles.css.twig', {}, with_context: false) }}
+            {{ technical_pdf_styles() }}
         </style>
     </head>
     <body>
@@ -38,9 +39,33 @@
                             </p>
                         {% endif %}
                     </td>
-                    <td class="brand">
-                        {{ app_name }}<br />
-                        <span class="caption">FICHE TECHNIQUE</span>
+                    <td class="document-contacts">
+                        <p class="document-kind">
+                            FICHE TECHNIQUE
+                        </p>
+                        {% if dossier.identity and dossier.identity.contacts %}
+                            <table class="public-contacts">
+                                {% for row in dossier.identity.contacts|batch(2) %}
+                                    <tr>
+                                        {% for contact in row %}
+                                            <td>
+                                                <span class="caption">{{ contact.role }}</span><br
+                                                />
+                                                <strong>{{ contact.name }}</strong>{% if
+                                                    contact.phone %}
+                                                    <br />{{ contact.phone }}
+                                                {% endif %}
+                                                {% if contact.email %}
+                                                    <br /><a href="mailto:{{ contact.email }}">{{
+                                                            contact.email
+                                                        }}</a>
+                                                {% endif %}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        {% endif %}
                     </td>
                 </tr>
             </table>
@@ -66,37 +91,96 @@
         </section>
         <section>
             <h2>Patch des entrées</h2>
+            {% if dossier.identity %}{{
+                include(
+                    'technical/_style.html.twig',
+                    {
+                        identity: dossier.identity
+                    },
+                    with_context: false
+                )
+            }}{% endif %}
             {% if dossier.lines %}
-                <table class="data-table">
+                {% set families = {} %}
+                {% for line in dossier.lines %}
+                    {% set families =
+                        families|merge({
+                            (technical_family(line.section|default('utility'))): true
+                        })
+                    %}
+                {% endfor %}
+                {{
+                    include(
+                        'technical/_legend.html.twig',
+                        {
+                            families: families
+                        },
+                        with_context: false
+                    )
+                }}
+                <table class="data-table input-table">
                     <thead>
                         <tr>
-                            <th class="channel">Canal</th>
-                            <th class="source">Source</th>
-                            <th class="microphone">Micro / DI</th>
-                            <th class="stand">Pied</th>
+                            <th class="channel">CH</th>
+                            <th class="source">SOURCE</th>
+                            <th class="microphone">MIC / DI</th>
+                            <th class="stand">STAND</th>
+                            <th class="other">OTHER</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for line in dossier.lines %}
-                            <tr>
+                            {% set family = technical_family(line.section|default('utility')) %}
+                            {% set firstInFamily = loop.first
+                                or family
+                                    != technical_family(
+                                        dossier.lines[loop.index0 - 1].section|default('utility')
+                                    )
+                            %}
+                            <tr
+                                class="input-family input-family-{{ family }} {{
+                                firstInFamily
+                                    ? 'first-in-family'
+                                    : ''
+                                }}"
+                            >
                                 <td class="channel">{{ '%02d'|format(line.channel) }}</td>
-                                <td>{{ line.source }}</td>
+                                <td>
+                                    {% if firstInFamily %}
+                                        <span class="pdf-family-name">
+                                            {{ technical_palette()[family].label }} ·
+                                        </span>
+                                    {% endif %}{{ line.source }}
+                                </td>
                                 <td>{{ line.microphone ? : '-' }}</td>
                                 <td>{{ line.stand ? : '-' }}</td>
+                                <td>
+                                    {{ line.notes and (line.notes|length) <= 40
+                                        ? line.notes
+                                        : line.notes ? 'See input notes' : '-' }}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                {% set notes = dossier.lines|filter(line => line.notes) %}
+                {% set notes = {} %}
+                {% for line in dossier.lines|filter(
+                    line => line.notes and (line.notes|length) > 40
+                ) %}
+                    {% set notes =
+                        notes|merge({
+                            (line.notes): notes[line.notes]
+                                |default([])
+                                |merge(['%02d'|format(line.channel)])
+                        })
+                    %}
+                {% endfor %}
                 {% if notes %}
                     <div class="patch-notes">
-                        <h3>Précisions par canal</h3>
-                        {% for line in notes %}
+                        <h3>Input notes</h3>
+                        {% for text, channels in notes %}
                             <p>
-                                <strong>
-                                    {{ '%02d'|format(line.channel) }} · {{ line.source }} :
-                                </strong>
-                                {{ line.notes|nl2br }}
+                                <strong>CH {{ channels|join(', ') }} :</strong> {{ text|nl2br }}
                             </p>
                         {% endfor %}
                     </div>
@@ -132,7 +216,11 @@
             {% endfor %}
             {% for group in groups %}
                 <div class="equipment-group">
-                    <h3>{{ group.label }}</h3>
+                    <h3>
+                        {{ group.label == 'Batterie' and is_drum_kit(group.items)
+                            ? 'Kit batterie complet - fûts et hardware'
+                            : group.label }}
+                    </h3>
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -143,7 +231,7 @@
                         </thead>
                         <tbody>
                             {% for item in group.items %}
-                                <tr>
+                                <tr class="equipment-family-{{ technical_equipment_family(item) }}">
                                     <td class="quantity">{{ item.quantity }}</td>
                                     <td>{{ item.label }}</td>
                                     <td>{{ item.specification ? : '-' }}</td>

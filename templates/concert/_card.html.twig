@@ -1,4 +1,4 @@
-<li class="concert-card{{ past ? ' concert-card--past' : '' }}">
+<li id="concert-{{ concert.id }}" class="concert-card{{ past ? ' concert-card--past' : '' }}">
     <div class="concert-date-block">
         <time class="concert-date" datetime="{{ concert.date|date('Y-m-d') }}">
             {{ concert.date|date('d/m/Y') }}
@@ -36,22 +36,19 @@
                 ? 'Créé par ' ~ concert.createdByName
                 : 'Créateur non renseigné' }}
         </p>
-        {% if not past and concert.canRespond %}
-            {% set myStatus = concert.myStatus %}
-            <a
-                class="concert-availability-link"
-                href="{{
-                path(
-                    'app_concert_show',
-                    {
-                        id: concert.id
-                    }
-                )
-                }}#disponibilites"
-            >
-                Ma disponibilité : {{ myStatus ? myStatus.label : 'À confirmer' }}
-            </a>
-        {% endif %}
+        {{
+            include(
+                'concert/_importance.html.twig',
+                {
+                    concert: concert,
+                    canEdit: concert.canManageImportance,
+                    levels: importanceLevels,
+                    sort: filters.sort,
+                    levelFilter: filters.level
+                },
+                with_context: false
+            )
+        }}
     </div>
     <a
         class="button button-secondary"

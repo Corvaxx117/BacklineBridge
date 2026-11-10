@@ -85,6 +85,9 @@ try {
     );
     $twig = new Environment(new FilesystemLoader($root.'/templates'), ['strict_variables' => true]);
     $twig->addGlobal('app_name', 'BacklineBridge');
+    $palette = new App\Service\Technical\TechnicalPalette();
+    $twig->addExtension(new App\Twig\TechnicalExtension($palette, new App\Service\Technical\TechnicalPaletteStyles($palette)));
+    $twig->addExtension(new App\Twig\EquipmentExtension());
     $renderer = new TechnicalPdfRenderer(
         $twig,
         new StagePlanLayout(),

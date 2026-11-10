@@ -1,0 +1,24 @@
+<fieldset class="rider-contact-editor">
+    <legend>
+        Contact {{ number }}
+    </legend>
+    <div class="field-errors">
+        {{ form_errors(contact) }}
+    </div>
+    <div class="rider-form-grid">
+        {% for field in [contact.name, contact.role, contact.email, contact.phone] %}
+            <div class="field">
+                {{ form_label(field) }}
+                {{ form_widget(field) }}
+                <div class="field-errors">
+                    {{ form_errors(field) }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="rider-contact-remove">
+        {{ form_widget(contact.remove) }}{{ form_label(contact.remove) }}{{
+            form_errors(contact.remove)
+        }}
+    </div>
+</fieldset>

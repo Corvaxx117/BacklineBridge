@@ -53,6 +53,7 @@
                 {% for items in groups %}
                     {% set category = items|first.category|trim ? : 'Autre' %}
                     {% set icon = categoryIcons[category]|default('gear') %}
+                    {% set drumKit = category == 'Batterie' and is_drum_kit(items) %}
                     <section
                         class="equipment-group equipment-group-{{ icon }}"
                         aria-labelledby="equipment-category-{{ loop.index }}"
@@ -69,29 +70,53 @@
                                     )
                                 }}
                             </span>
-                            <h3 id="equipment-category-{{ loop.index }}">{{ category }}</h3>
+                            <h3 id="equipment-category-{{ loop.index }}">
+                                {{ drumKit ? 'Kit batterie complet' : category }}
+                            </h3>
                             <span class="equipment-category-count">
-                                {{ items|length }} demande{{ (items|length) > 1 ? 's' : '' }}
+                                {{ drumKit
+                                    ? 'Fûts + hardware'
+                                    : (items|length) ~ ' demande'
+                                        ~ ((items|length) > 1 ? 's' : '') }}
                             </span>
                         </header>
-                        <ul class="equipment-items">
-                            {% for item in items %}
-                                <li class="equipment-item">
-                                    <span class="equipment-quantity">
-                                        <span class="visually-hidden">Quantité :</span>
-                                        <span aria-hidden="true">×</span>{{ item.quantity }}
-                                    </span>
-                                    <div class="equipment-item-copy">
-                                        <strong>{{ item.label }}</strong>
-                                        {% if item.specification %}
-                                            <p>
-                                                {{ item.specification }}
-                                            </p>
-                                        {% endif %}
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
+                        {% set itemList %}
+                            <ul class="equipment-items">
+                                {% for item in items %}
+                                    <li
+                                        class="equipment-item"
+                                        data-technical-family="{{
+                                        technical_equipment_family(
+                                            item
+                                        )
+                                        }}"
+                                    >
+                                        <span class="equipment-quantity">
+                                            <span class="visually-hidden">Quantité :</span>
+                                            <span aria-hidden="true">×</span>{{ item.quantity }}
+                                        </span>
+                                        <div class="equipment-item-copy">
+                                            <strong>{{ item.label }}</strong>
+                                            {% if item.specification %}
+                                                <p>
+                                                    {{ item.specification }}
+                                                </p>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endset %}
+                        {% if drumKit %}
+                            <details class="drum-kit-details">
+                                <summary>
+                                    Composition du kit · {{ items|length }} éléments à confirmer <span aria-hidden="true">⌄</span>
+                                </summary>
+                                {{ itemList }}
+                            </details>
+                        {% else %}
+                            {{ itemList }}
+                        {% endif %}
                     </section>
                 {% endfor %}
             </div>

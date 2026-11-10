@@ -74,6 +74,17 @@ final readonly class NotificationRecorder
         ));
     }
 
+    public function orfeoConcertsImported(Band $band, User $actor, int $count): void
+    {
+        if ($count < 1) {
+            return;
+        }
+        $this->record(new BandNotification(
+            $band, $actor, NotificationType::OrfeoConcertsImported, 'Import Orfeo', $this->now(),
+            itemCount: $count,
+        ));
+    }
+
     private function record(BandNotification $notification): void
     {
         $this->entityManager->persist($notification);

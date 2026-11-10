@@ -28,6 +28,7 @@ final class PublicationBuilder
                     'microphone' => $line->getPreferredMicrophone(),
                     'stand' => $line->getStand(),
                     'notes' => $line->getNotes(),
+                    'section' => $line->getSection(),
                 ];
             }
         }
@@ -36,6 +37,7 @@ final class PublicationBuilder
         // Liste explicite : les conditions privées ne font jamais partie du dossier invité.
         return [
             'bandName' => $sheet->getBandName(),
+            'technicalIdentity' => $concert->getBand()->getTechnicalIdentity()->toArray(),
             'date' => $concert->getDate()->format('Y-m-d'),
             'venue' => $concert->getVenue(),
             'city' => $concert->getCity(),

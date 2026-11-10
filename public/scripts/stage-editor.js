@@ -1,3 +1,4 @@
+import { stageFamily } from './stage/family.mjs?v=99f847fd60dc7227';
 import { clone, serialize, createHistory } from './stage/history.mjs?v=afa1e5023e95ab81';
 import {
     clamp,
@@ -12,6 +13,7 @@ import {
     if (!form) return;
 
     const MAX_ITEMS = 40;
+    const familyRules = JSON.parse(form.dataset.stageFamilyRules);
     const payload = form.querySelector('[data-stage-payload]');
     const board = form.querySelector('[data-stage-board]');
     const shell = form.querySelector('.stage-canvas-shell');
@@ -34,6 +36,7 @@ import {
                 label: option.dataset.label,
                 channel: option.dataset.channel ? Number(option.dataset.channel) : null,
                 available: option.dataset.available === 'true',
+                family: option.dataset.family,
             },
         ]),
     );
@@ -228,13 +231,15 @@ import {
 
     function paint(item) {
         const node = nodes.get(item.id);
-        node.className = `stage-node stage-${item.kind} stage-editable${item.id === selectedId ? ' is-selected' : ''}`;
+        node.className = `stage-node stage-${item.kind} stage-editable${item.id === selectedId ? ' is-selected' : ''}${item.kind === 'power' && item.label === 'Alimentation' ? ' stage-symbol-only' : ''}`;
+        node.dataset.technicalFamily = stageFamily(item, familyRules, sourceChoices);
         node.style.left = `${item.x}%`;
         node.style.top = `${item.y}%`;
         node.style.setProperty('--stage-rotation', `${item.rotation}deg`);
         node.style.setProperty('--stage-scale', item.scale);
         node.querySelector('strong').textContent = item.label || 'Élément';
-        node.querySelector('small').textContent = item.notes;
+        const caption = item.notes.split('·')[0].trim();
+        node.querySelector('small').textContent = caption.length <= 32 ? caption : '';
         const binding = patchLabel(item);
         const badge = node.querySelector('.stage-patch-badge');
         badge.textContent = binding.label;
@@ -242,6 +247,7 @@ import {
         badge.classList.toggle('has-missing-source', binding.missing > 0);
         const hit = node.querySelector('[data-stage-hit]');
         hit.setAttribute('aria-label', `Sélectionner : ${item.label || 'Élément'}`);
+        hit.title = [item.label, item.notes].filter(Boolean).join(' · ');
         hit.setAttribute('aria-pressed', String(item.id === selectedId));
         node.querySelector('[data-stage-handle="rotate"]').setAttribute(
             'aria-label',

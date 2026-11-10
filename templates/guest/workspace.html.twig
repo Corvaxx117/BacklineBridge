@@ -3,6 +3,36 @@
     {{ snapshot.venue }} · Espace salle · {{ app_name }}
 {% endblock %}
 {% block body %}
+    {% set publicIdentity = snapshot.technicalIdentity|default({}) %}
+    {% if
+        (publicIdentity.style|default(''))
+            or (publicIdentity.description|default(''))
+            or (publicIdentity.contacts|default([])) %}
+        <details class="guest-rider-identity">
+            <summary>
+                Contacts et style du groupe
+            </summary>
+            {{
+                include(
+                    'technical/_style.html.twig',
+                    {
+                        identity: snapshot.technicalIdentity
+                    },
+                    with_context: false
+                )
+            }}
+            {{
+                include(
+                    'technical/_contacts.html.twig',
+                    {
+                        identity: snapshot.technicalIdentity
+                    },
+                    with_context: false
+                )
+            }}
+        </details>
+    {% endif %}
+
     <section class="hero concert-hero">
         <div>
             <p class="eyebrow">

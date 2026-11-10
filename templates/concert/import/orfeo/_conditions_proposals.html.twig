@@ -1,0 +1,92 @@
+<details id="orfeo-conditions" class="conditions-orfeo-proposals" data-conditions-proposals>
+    <summary>
+        Propositions Orfeo · {{ source.syncedAt|date('d/m/Y à H:i', 'Europe/Paris') }}
+    </summary>
+    <p class="workspace-hint">
+        Ces propositions proviennent du dernier import. Choisis ce que tu souhaites reprendre,
+        vérifie le formulaire puis enregistre. Rien n’est envoyé à Orfeo.
+    </p>
+    {% for contract in source.event.contracts %}
+        <article class="conditions-contract">
+            <h3>
+                {{ contract.label }}{% if contract.status %}
+                    · {{ contract.status }}
+                {% endif %}
+            </h3>
+            {% for field, label in {
+                accommodationNotes: 'Hébergement',
+                transportNotes: 'Transport',
+                mealNotes: 'Repas'
+            } %}
+                {% set value = attribute(contract, field) %}
+                {% if value %}
+                    <div class="condition-proposal">
+                        <div>
+                            <strong>{{ label }}</strong><p>
+                                {{ value|nl2br }}
+                            </p>
+                        </div>
+                        <button
+                            class="button button-secondary"
+                            type="button"
+                            data-condition-copy
+                            data-target="{{ attribute(form, field).vars.id }}"
+                            data-value="{{ value|e('html_attr') }}"
+                            aria-label="Reprendre les précisions {{ label }} depuis Orfeo"
+                            hidden
+                        >
+                            Reprendre
+                        </button>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for kind, cents in {
+                HT: contract.feeHtCents,
+                TTC: contract.feeTtcCents
+            } %}
+                {% if cents is not null %}
+                    <div class="condition-proposal">
+                        <div>
+                            <strong>Montant {{ kind }}</strong><p>
+                                {{ (cents / 100)|number_format(2, ',', ' ') }} €
+                            </p>
+                        </div>
+                        <button
+                            class="button button-secondary"
+                            type="button"
+                            data-condition-copy
+                            data-target="{{ form.feeAmount.vars.id }}"
+                            data-value="{{ '%d.%02d'|format(cents // 100, cents % 100) }}"
+                            data-basis-field="{{ form.feeBasis.vars.id }}"
+                            data-basis="{{ kind|lower }}"
+                            aria-label="Utiliser le montant {{ kind }} du contrat Orfeo"
+                            hidden
+                        >
+                            Utiliser {{ kind }}
+                        </button>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <p class="workspace-hint">
+                Vérifie le périmètre du montant du contrat avant de le retenir comme tarif du
+                concert.
+            </p>
+        </article>
+    {% else %}
+        <p>
+            Aucune condition disponible dans cette copie Orfeo. <a
+                href="{{
+                path(
+                    'app_concert_orfeo_prepare',
+                    {
+                        id: concert.band.id,
+                        event: source.event.id
+                    }
+                )
+                }}"
+            >
+                Actualiser les données Orfeo
+            </a>
+        </p>
+    {% endfor %}
+</details>
