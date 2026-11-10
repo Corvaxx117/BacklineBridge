@@ -1,0 +1,27 @@
+{% set event = source.event %}
+<details class="concert-orfeo-source">
+    <summary>
+        Orfeo · Actualisé le {{ source.syncedAt|date('d/m/Y à H:i', 'Europe/Paris') }}
+    </summary>
+    <p>
+        {{ event.date|date('d/m/Y') }} · {{ event.venue }} · {{ event.city }} · {{
+            event.statusName
+        }}
+    </p>
+    {% if is_granted('CONCERT_UPDATE', concert) %}
+        <a
+            class="edit-link"
+            href="{{
+            path(
+                'app_concert_orfeo_prepare',
+                {
+                    id: concert.band.id,
+                    event: event.id
+                }
+            )
+            }}"
+        >
+            Vérifier les mises à jour Orfeo →
+        </a>
+    {% endif %}
+</details>

@@ -1,0 +1,143 @@
+/* Input list : une ligne par canal, actions et notes accessibles au clavier. */
+.patch-table--compact tbody td,
+.patch-table--compact tbody th {
+    padding-block: 4px;
+}
+.patch-table--compact .channel-number {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+    border-radius: 4px;
+}
+.patch-table--compact .source-name {
+    display: inline;
+    font-size: 13px;
+    font-weight: 650;
+}
+.patch-table--compact .action-column {
+    width: 96px;
+}
+.patch-mobile-stand {
+    display: none;
+}
+.patch-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
+}
+.patch-actions form {
+    display: flex;
+    margin: 0;
+}
+.patch-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 7px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: var(--text-muted);
+    background: transparent;
+    text-decoration: none;
+    cursor: pointer;
+    vertical-align: middle;
+}
+.patch-action svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+.patch-action:hover,
+.patch-note[open] > summary {
+    background: var(--surface-hover);
+    border-color: var(--border);
+    color: var(--text);
+}
+.patch-action:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+.patch-action--delete:hover {
+    color: var(--danger-text);
+    background: var(--danger-bg);
+    border-color: var(--danger-border);
+}
+.patch-note {
+    display: inline;
+    font-weight: 400;
+}
+.patch-note > summary {
+    list-style: none;
+}
+.patch-note > summary::-webkit-details-marker {
+    display: none;
+}
+.patch-note > div {
+    max-width: 48ch;
+    padding: 8px 0 10px;
+    color: var(--text);
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+@media (max-width: 550px) {
+    .patch-table--compact tbody tr {
+        grid-template-columns: 30px minmax(0, 1fr) 92px;
+        gap: 2px 8px;
+        padding: 7px 10px;
+        min-height: 62px;
+    }
+    .patch-table--compact tbody .channel-cell {
+        grid-row: 1 / 3;
+        align-self: center;
+    }
+    .patch-table--compact tbody .source-cell {
+        grid-column: 2;
+        grid-row: 1;
+        align-self: end;
+    }
+    .patch-table--compact tbody .microphone-cell {
+        grid-column: 2;
+        grid-row: 2;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+    .patch-table--compact .microphone-cell::before {
+        content: none;
+    }
+    .patch-table--compact tbody .stand-cell {
+        display: none;
+    }
+    .patch-table--compact .patch-mobile-stand {
+        display: inline;
+        color: var(--text-muted);
+    }
+    .patch-table--compact tbody .row-action {
+        grid-row: 1 / 3;
+        align-self: center;
+    }
+    .patch-action {
+        width: 44px;
+        height: 44px;
+    }
+    .patch-note > summary {
+        width: 32px;
+        height: 32px;
+        padding: 5px;
+    }
+}
+
+.patch-short-note {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 5px;
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    color: var(--text);
+    font-size: 10px;
+    font-weight: 650;
+    line-height: 1.2;
+}

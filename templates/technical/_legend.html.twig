@@ -1,0 +1,7 @@
+<ul class="technical-legend" aria-label="Couleurs des familles techniques" data-technical-legend>
+    {% for key, color in technical_palette() %}
+        {% if families[key]|default(false) %}
+            <li data-technical-family="{{ key }}"><i aria-hidden="true"></i>{{ color.label }}</li>
+        {% endif %}
+    {% endfor %}
+</ul>

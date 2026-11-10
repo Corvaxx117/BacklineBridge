@@ -1,4 +1,6 @@
 {% set category = items|first.category %}
+{% set drumKit = category == 'Batterie' and is_drum_kit(items) %}
+{% set groupTitle = drumKit ? 'Kit batterie complet' : category %}
 {% set categoryIcons = {
     Batterie: 'drums',
     Amplification: 'amp',
@@ -37,7 +39,7 @@
             }}
         </span>
         <span class="material-group-title">
-            {{ category }}<span data-group-request-count>{{ items|length }} demande{{ (items|length)
+            {{ groupTitle }}<span data-group-request-count>{{ items|length }} demande{{ (items|length)
                     > 1
                     ? 's'
                     : '' }}</span>
@@ -78,6 +80,12 @@
             conservées.
         </p>
     </div>
+    {% if drumKit %}
+        <p class="drum-kit-reply-hint">
+            Fûts et hardware détaillés ci-dessous. Utilisez « Tout disponible » si l’ensemble du kit
+            est fourni, puis précisez les éventuelles alternatives.
+        </p>
+    {% endif %}
     <div class="reply-group-items">
         {% for key, item in items %}
             {% set answer = form.answers[key] %}

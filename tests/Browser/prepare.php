@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Dto\Technical\TechnicalIdentity;
 use App\Dto\Venue\InvitationInput;
 use App\Entity\Band;
 use App\Entity\MemberProfile;
@@ -49,6 +50,13 @@ foreach ($fixture['lines'] as $data) {
     );
 }
 $band = new Band('Groupe fictif', $sheet);
+$band->setTechnicalIdentity(TechnicalIdentity::fromArray([
+    'style' => 'Indie / Rock', 'description' => 'Dynamic live show',
+    'contacts' => [
+        ['name' => 'Martin fictif', 'role' => 'Son / FOH', 'email' => 'sound@example.test', 'phone' => '01 00 00 00 01'],
+        ['name' => 'Rémi fictif', 'role' => 'Contact groupe', 'email' => 'band@example.test', 'phone' => '01 00 00 00 02'],
+    ],
+]));
 $em->persist($band);
 $em->flush();
 // Les services métier sont privés : on les utilise via un conteneur browser dédié.
@@ -60,14 +68,8 @@ $creator = new UserCreator(
 $user = $creator->create('browser@example.test', 'Musicien fictif', 'BrowserTest2026!', $band, BandRole::Manager);
 $em->persist(new MemberProfile($band, $user, 'Musicien fictif', 'Guitare', MemberKind::Musician));
 $em->flush();
-$availability = new App\Service\Concert\ConcertAvailabilityManager(
-    $em,
-    $em->getRepository(App\Entity\BandMembership::class),
-    $em->getRepository(App\Entity\ConcertAvailability::class),
-);
 $concertCreator = new ConcertCreator(
     $em,
-    $availability,
     $em->getRepository(App\Entity\BandMembership::class),
     new App\Service\Patch\PatchLineCopier(),
     new App\Service\Notification\NotificationRecorder(
@@ -85,6 +87,20 @@ $author = $creator->create('author@example.test', 'Membre fictif', 'BrowserTest2
 $concert = $concertCreator->create(
     $sheet, new DateTimeImmutable('+5 days'), 'Salle fictive', 'Ville fictive', createdBy: $author,
 );
+$orfeoEvent = new App\Integration\Orfeo\Dto\OrfeoEvent(
+    901, 1001, 301, $concert->getDate()->format('Y-m-d'), null,
+    'Salle fictive', 'Ville fictive', null, 1, 'Confirmé', true, false, [], [
+        new App\Integration\Orfeo\Dto\OrfeoContract(
+            501, 'Contrat fictif', 'En préparation',
+            "Prise en charge : organisateur.\nDeux chambres à confirmer.",
+            'Trajets et transferts pris en charge.',
+            'Repas végétariens sur place.',
+            180000, 216000,
+        ),
+    ],
+);
+$em->persist(new App\Entity\OrfeoConcert($concert, $orfeoEvent, new DateTimeImmutable()));
+$em->flush();
 $issuer = new InvitationIssuer($em, new App\Service\Venue\PublicationBuilder(new App\Service\Stage\StagePatchLinks()));
 $input = new InvitationInput();
 $input->label = 'Régie fictive';

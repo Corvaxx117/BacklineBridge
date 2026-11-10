@@ -5,6 +5,8 @@
         'app_concert_show',
         'app_stage_edit',
         'app_equipment_edit',
+        'app_technical_contacts_edit',
+        'app_technical_notes_edit',
         'app_concert_reference_import',
         'app_concert_invitations',
         'app_concert_responses',
@@ -28,15 +30,29 @@
         or route starts with 'app_task_'
         or route starts with 'app_document_'
         or route starts with 'app_concert_bandsintown_'
+        or route starts with 'app_concert_orfeo_'
+        or route == 'app_concert_importance'
         or route == 'app_concert_show' %}
     <link rel="stylesheet" href="{{ asset('/styles/group.css') }}" />
 {% endif %}
-{% if route starts with 'app_concert_bandsintown_' or route == 'app_concert_show' %}
-    <link rel="stylesheet" href="{{ asset('/styles/bandsintown.css') }}" />
+{% if
+    route starts with 'app_concert_bandsintown_'
+        or route starts with 'app_concert_orfeo_'
+        or route == 'app_concert_show' %}
+    <link rel="stylesheet" href="{{ asset('/styles/concert-import.css') }}" />
 {% endif %}
 <link rel="stylesheet" href="{{ asset('/styles/responsive.css') }}" />
 <link rel="stylesheet" href="{{ asset('/styles/motion.css') }}" />
 <link rel="stylesheet" href="{{ asset('/styles/typography.css') }}" />
 {% if technical %}
+    <link rel="stylesheet" href="{{ asset('/styles/patch.css') }}" />
+{% endif %}
+{% if technical %}
     <script src="{{ asset('/scripts/stage-viewer.js') }}" defer></script>
+{% endif %}
+
+{% if technical %}
+    {{ include('technical/_palette.html.twig', {}, with_context: false) }}
+    <link rel="stylesheet" href="{{ asset('/styles/technical-families.css') }}" />
+    <script src="{{ asset('/scripts/patch-sort.js') }}" defer></script>
 {% endif %}

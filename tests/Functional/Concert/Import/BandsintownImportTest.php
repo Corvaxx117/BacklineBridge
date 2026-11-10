@@ -7,10 +7,8 @@ namespace App\Tests\Functional\Concert\Import;
 use App\Entity\Band;
 use App\Entity\BandsintownConcert;
 use App\Entity\Concert;
-use App\Entity\ConcertAvailability;
 use App\Entity\TechnicalSheet;
 use App\Entity\User;
-use App\Enum\AvailabilityStatus;
 use App\Enum\BandRole;
 use App\Integration\Bandsintown\BandsintownConfiguration;
 use App\Integration\Bandsintown\BandsintownGateway;
@@ -104,10 +102,6 @@ final class BandsintownImportTest extends DatabaseTestCase
         self::assertSame($this->userId, $concert->getCreatedBy()->getId());
         self::assertNotSame($this->sheetId, $concert->getPatchSheet()->getId());
         self::assertCount(22, $concert->getPatchSheet()->getLines());
-        self::assertSame(
-            0,
-            $em->getConnection()->fetchOne('SELECT COUNT(*) FROM concert_availability'),
-        );
         self::assertSame(1, $em->getRepository(BandsintownConcert::class)->count([]));
 
         $this->client->request('GET', '/concerts/'.$concert->getId());
@@ -135,12 +129,6 @@ final class BandsintownImportTest extends DatabaseTestCase
                 createdBy: $this->entityManager()->find(User::class, $this->userId),
             );
         $id = $existing->getId();
-        $availability = $this->entityManager()->getRepository(ConcertAvailability::class)->findOneBy([
-            'concert' => $existing,
-        ]);
-        self::assertInstanceOf(ConcertAvailability::class, $availability);
-        $availability->respond(AvailabilityStatus::Available, 'Réponse à conserver');
-        $this->entityManager()->flush();
         $this->preview();
         self::assertSelectorTextContains('.bit-preview-list', 'Rattacher cette annonce');
         $form = $this->client->getCrawler()->filter('form[name="bandsintown_import"]')->form();
@@ -154,12 +142,6 @@ final class BandsintownImportTest extends DatabaseTestCase
         $saved = $em->find(Concert::class, $id);
         self::assertSame('Note privée à conserver', $saved->getNotes());
         self::assertSame('validated', $saved->getStatus()->value);
-        $savedAvailability = $em->getRepository(ConcertAvailability::class)->findOneBy([
-            'concert' => $saved,
-        ]);
-        self::assertInstanceOf(ConcertAvailability::class, $savedAvailability);
-        self::assertSame(AvailabilityStatus::Available, $savedAvailability->getStatus());
-        self::assertSame('Réponse à conserver', $savedAvailability->getComment());
         $this->client->request('GET', '/concerts/'.$id);
         self::assertSelectorNotExists('#disponibilites');
         $this->client->request('GET', '/concerts');
@@ -318,7 +300,6 @@ final class BandsintownImportTest extends DatabaseTestCase
         }
         self::assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM concert'));
         self::assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM bandsintown_concert'));
-        self::assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM concert_availability'));
         self::assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM band_notification'));
         self::assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM notification_recipient'));
         self::assertSame(1, $connection->fetchOne('SELECT COUNT(*) FROM technical_sheet'));

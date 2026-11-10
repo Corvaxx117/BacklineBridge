@@ -40,3 +40,42 @@
     border-radius: var(--radius);
     color: var(--text-muted);
 }
+
+.concert-import-menu {
+    position: relative;
+}
+.concert-import-menu > summary {
+    list-style: none;
+    cursor: pointer;
+    gap: 12px;
+}
+.concert-import-menu > summary::-webkit-details-marker {
+    display: none;
+}
+.concert-import-menu > summary:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 4px;
+}
+.concert-import-menu > div {
+    position: absolute;
+    z-index: 5;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 230px;
+    max-width: calc(100vw - 40px);
+    padding: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+.concert-import-menu > div a {
+    display: block;
+    min-height: 44px;
+    padding: 11px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+.concert-import-menu > div a:hover {
+    background: var(--surface-hover);
+}

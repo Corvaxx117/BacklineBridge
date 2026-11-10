@@ -27,29 +27,24 @@ final class ImportedConcertConditionsTest extends DatabaseTestCase
         $this->client->catchExceptions(true);
     }
 
-    public function testImportedDatesHideAvailabilityAndRejectDirectRepliesWhileManualDatesKeepIt(): void
+    public function testAllConcertsExposeEngineerPresenceWithoutMemberAvailability(): void
     {
         $importedId = $this->importedConcert();
         $manual = static::getContainer()->get(ConcertCreator::class)->create(
             $this->sheet(), new \DateTimeImmutable('2026-12-13'), 'Salle manuelle', 'Lyon',
         );
-        $manualId = $manual->getId();
-        $this->client->request('GET', '/concerts/'.$importedId);
-        self::assertResponseIsSuccessful();
-        self::assertSelectorNotExists('#disponibilites');
-        self::assertSelectorTextContains('[data-engineer-presence]', 'À confirmer');
-        $this->client->request('POST', '/concerts/'.$importedId.'/disponibilite', [
-            'concert_availability' => ['status' => 'available', 'expectedDate' => '2026-12-12'],
-        ]);
-        self::assertResponseStatusCodeSame(403);
+        foreach ([$importedId, $manual->getId()] as $id) {
+            $this->client->request('GET', '/concerts/'.$id);
+            self::assertResponseIsSuccessful();
+            self::assertSelectorNotExists('#disponibilites');
+            self::assertSelectorTextContains('[data-engineer-presence]', 'À confirmer');
+            $this->client->request('POST', '/concerts/'.$id.'/disponibilite');
+            self::assertResponseStatusCodeSame(404);
+            $this->client->request('GET', '/concerts/'.$id.'/conditions');
+            self::assertSelectorExists('[name="concert_conditions[engineerPresence]"]');
+        }
         $this->client->request('GET', '/concerts');
-        self::assertSelectorCount(1, '.concert-availability-link');
-        self::assertSelectorExists('a.concert-availability-link[href="/concerts/'.$manualId.'#disponibilites"]');
-        $this->client->request('GET', '/concerts/'.$manualId);
-        self::assertSelectorExists('#disponibilites');
-        self::assertSelectorNotExists('[data-engineer-presence]');
-        $this->client->request('GET', '/concerts/'.$manualId.'/conditions');
-        self::assertSelectorNotExists('[name="concert_conditions[engineerPresence]"]');
+        self::assertSelectorNotExists('.concert-availability-link');
     }
 
     #[DataProvider('organizers')]
@@ -62,7 +57,7 @@ final class ImportedConcertConditionsTest extends DatabaseTestCase
         }
         foreach (['present' => 'Présent', 'absent' => 'Absent', 'unknown' => 'À confirmer'] as $value => $label) {
             $this->submitConditions($first, ['engineerPresence' => $value, 'feeAmount' => '1500,50']);
-            self::assertResponseRedirects('/concerts/'.$first, 303);
+            self::assertResponseRedirects('/concerts/'.$first.'#concert-conditions', 303);
             $this->client->followRedirect();
             self::assertSelectorTextContains('[data-engineer-presence]', $label);
             self::assertSelectorNotExists('#disponibilites');
@@ -106,7 +101,7 @@ final class ImportedConcertConditionsTest extends DatabaseTestCase
         $old = $this->client->request('GET', '/concerts/'.$id.'/conditions')
             ->filter('form[name="concert_conditions"]')->form()->getPhpValues();
         $edit = $this->client->request('GET', '/concerts/'.$id.'/edit');
-        self::assertSelectorTextContains('.form-aside', 'le groupe est disponible');
+        self::assertSelectorTextContains('.form-aside', 'présence de l’ingé son');
         $this->client->submit($edit->filter('form[name="concert"]')->form(), [
             'concert' => ['date' => '2026-12-14'],
         ]);
@@ -114,7 +109,7 @@ final class ImportedConcertConditionsTest extends DatabaseTestCase
         $this->client->followRedirect();
         self::assertSelectorTextContains('.flash-success', 'la présence de l’ingé son est à confirmer');
         self::assertSelectorTextContains('[data-engineer-presence]', 'À confirmer');
-        self::assertSelectorTextContains('.conditions-grid', '1 500,00 €');
+        self::assertSelectorTextContains('.conditions-overview', '1 500,00 €');
         self::assertSelectorNotExists('#disponibilites');
         $this->client->request('POST', '/concerts/'.$id.'/conditions', $old);
         self::assertResponseStatusCodeSame(422);

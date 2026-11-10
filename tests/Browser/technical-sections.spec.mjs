@@ -33,5 +33,7 @@ test('la référence se replie au clavier et retrouve la section de travail', as
         .toBe(true);
     await page.goto('/#equipment-title');
     await expect(page.locator('#sheet-equipment')).toHaveAttribute('open', '');
+    await expect(page.locator('.drum-kit-details > summary')).toBeVisible();
+    await page.locator('.drum-kit-details > summary').click();
     await expect(page.locator('.equipment-items').first()).toBeVisible();
 });

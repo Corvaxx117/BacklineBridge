@@ -4,12 +4,25 @@ import test from 'node:test';
 
 const css = readFileSync(new URL('../../public/styles/tokens.css', import.meta.url), 'utf8');
 const [lightBlock, darkBlock] = css.split(":root[data-theme='dark']");
-const colors = (block) =>
+const declarations = (block) =>
     Object.fromEntries(
-        [...block.matchAll(/--([\w-]+):\s*(#[a-f\d]{6});/gi)].map((match) => [match[1], match[2]]),
+        [...block.matchAll(/--([\w-]+):\s*(#[a-f\d]{6}|var\(--[\w-]+\));/gi)].map((match) => [
+            match[1],
+            match[2],
+        ]),
     );
-const light = colors(lightBlock);
-const dark = { ...light, ...colors(darkBlock) };
+function resolveColors(tokens) {
+    const resolve = (key, seen = new Set()) => {
+        assert.ok(tokens[key], `Couleur absente : ${key}`);
+        assert.ok(!seen.has(key), `Référence de couleur circulaire : ${key}`);
+        const alias = /^var\(--([\w-]+)\)$/.exec(tokens[key]);
+        return alias ? resolve(alias[1], new Set([...seen, key])) : tokens[key];
+    };
+    return Object.fromEntries(Object.keys(tokens).map((key) => [key, resolve(key)]));
+}
+const lightTokens = declarations(lightBlock);
+const light = resolveColors(lightTokens);
+const dark = resolveColors({ ...lightTokens, ...declarations(darkBlock) });
 
 function luminance(hex) {
     const rgb = [1, 3, 5].map((index) => Number.parseInt(hex.slice(index, index + 2), 16) / 255);
@@ -24,6 +37,11 @@ const pairs = [
     ['text', 'background'],
     ['text-muted', 'surface'],
     ['text-muted', 'background'],
+    ['text', 'secondary-bg'],
+    ['text-muted', 'secondary-bg'],
+    ['secondary-text', 'secondary-bg'],
+    ['text', 'diagram-floor'],
+    ['on-strong', 'secondary-fill'],
     ['accent-text', 'surface'],
     ['on-strong', 'accent'],
     ['on-strong', 'accent-hover'],

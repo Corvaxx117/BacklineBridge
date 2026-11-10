@@ -26,9 +26,8 @@ Le code est valable 30 jours et utilisable une seule fois. Un formulaire refusé
 | Manager | Modifier | Modifier | Aucun accès | Toutes, en lecture |
 | Salle invitée | Lire la version partagée et répondre | Aucun accès interne | Aucun accès | Aucune |
 
-Musiciens et ingénieur son ont le rôle **Responsable**. Le profil **Musicien** ouvre en plus la trésorerie. Tous les comptes internes peuvent consulter l’[agenda commun](agenda.md), nommé **Avee Mana Partagé** ; les quatre musiciens et le manager peuvent y ajouter un concert depuis BacklineBridge. Romain a le rôle **Booker**. Le manager accède aux fonctions internes, sauf à la trésorerie et au stock ; sa disponibilité sur scène n’est pas demandée. Ces droits sont vérifiés sur le serveur.
+Musiciens et ingénieur son ont le rôle **Responsable**. Le profil **Musicien** ouvre en plus la trésorerie. Tous les comptes internes peuvent consulter l’[agenda commun](agenda.md), nommé **Avee Mana Partagé** ; les quatre musiciens et le manager peuvent y ajouter un concert depuis BacklineBridge. Romain a le rôle **Booker**. Le manager accède aux fonctions internes, sauf à la trésorerie et au stock. Ces droits sont vérifiés sur le serveur.
 
-Les [setlists](setlists.md) sont consultables par toute l’équipe ; les quatre musiciens et le manager peuvent les modifier. Elles restent invisibles aux salles.
 
 Tous les membres de l’équipe accèdent aussi au [To Do partagé](taches.md) pour créer et répartir les missions du groupe. Les salles invitées n’y ont pas accès.
 

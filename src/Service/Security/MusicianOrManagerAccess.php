@@ -10,7 +10,7 @@ use App\Enum\BandRole;
 use App\Repository\BandMembershipRepository;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-/** Setlists, publication dans l’agenda et fiches administratives ; les finances gardent MusicianAccess. */
+/** Publication dans l’agenda et fiches administratives ; les finances gardent MusicianAccess. */
 final readonly class MusicianOrManagerAccess
 {
     public function __construct(

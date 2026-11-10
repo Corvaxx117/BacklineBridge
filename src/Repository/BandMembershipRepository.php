@@ -46,20 +46,4 @@ class BandMembershipRepository extends ServiceEntityRepository
             ->setParameter('band', $band)
             ->getQuery()->getResult();
     }
-
-    /** @return list<BandMembership> */
-    public function managersFor(Band $band): array
-    {
-        return $this->createQueryBuilder('membership')
-            ->addSelect('person')
-            ->join('membership.user', 'person')
-            ->andWhere('membership.band = :band')
-            ->andWhere('membership.role = :role')
-            ->setParameter('band', $band)
-            ->setParameter('role', BandRole::Manager)
-            ->orderBy('person.displayName', 'ASC')
-            ->addOrderBy('person.id', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Dto\Pdf;
 
+use App\Dto\Technical\TechnicalIdentity;
+
 /** Les seules données techniques autorisées dans un document partageable. */
 final readonly class TechnicalDossier
 {
@@ -26,6 +28,7 @@ final readonly class TechnicalDossier
         public array $equipment,
         public ?\DateTimeImmutable $publishedAt = null,
         public ?string $documentLabel = null,
+        public ?TechnicalIdentity $identity = null,
     ) {
     }
 }

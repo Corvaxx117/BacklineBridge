@@ -36,18 +36,39 @@ p {
 .document-header {
     width: 100%;
     margin-bottom: 12pt;
-    border-bottom: 2pt solid #b44b2d;
+    border-bottom: 2pt solid #243c47;
 }
 .document-header td {
     padding: 0 0 10pt;
     vertical-align: bottom;
 }
-.brand {
-    width: 140pt;
+.document-contacts {
+    width: 340pt;
     text-align: right;
-    color: #b44b2d;
-    font-size: 11pt;
+    font-size: 8pt;
+    line-height: 1.3;
+}
+.document-kind {
+    color: #152b38;
+    font-size: 9pt;
     font-weight: bold;
+    margin-bottom: 5pt;
+}
+.public-contacts {
+    width: 100%;
+    table-layout: fixed;
+}
+.public-contacts td {
+    width: 50%;
+    padding: 0 0 0 10pt;
+    vertical-align: top;
+    font-size: 8pt;
+    line-height: 1.3;
+    word-wrap: break-word;
+}
+.public-contacts a {
+    color: #224a7d;
+    text-decoration: none;
 }
 .caption {
     color: #67747a;
@@ -103,13 +124,16 @@ p {
     font-weight: bold;
 }
 .source {
-    width: 44%;
+    width: 28%;
 }
 .microphone {
-    width: 30%;
+    width: 22%;
 }
 .stand {
     width: 20%;
+}
+.other {
+    width: 24%;
 }
 .quantity {
     width: 7%;
@@ -157,4 +181,34 @@ p {
     color: #67747a;
     padding: 14pt;
     margin-bottom: 18pt;
+}
+
+.rider-style {
+    margin-bottom: 8pt;
+    font-size: 8pt;
+}
+.technical-legend {
+    padding: 0;
+    margin: 4pt 0 8pt;
+    list-style: none;
+}
+.technical-legend li {
+    display: inline-block;
+    margin-right: 5pt;
+    padding: 2pt 6pt;
+    font-size: 7pt;
+}
+.technical-legend i {
+    display: none;
+}
+.pdf-family-name {
+    font-size: 7pt;
+    font-weight: bold;
+}
+
+/* Le patch standard de 22 canaux reste lisible sur une seule page. */
+.input-table td {
+    font-size: 8pt;
+    line-height: 1.15;
+    padding: 1pt 7pt;
 }

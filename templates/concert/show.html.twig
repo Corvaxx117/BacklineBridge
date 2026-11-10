@@ -6,7 +6,8 @@
 
 {% block page_assets %}
     <link rel="stylesheet" href="{{ asset('/styles/concert-detail.css') }}" />
-    <link rel="stylesheet" href="{{ asset('/styles/setlist.css') }}" />
+    <link rel="stylesheet" href="{{ asset('/styles/conditions.css') }}" />
+    <link rel="stylesheet" href="{{ asset('/styles/concert-importance.css') }}" />
     <script src="{{ asset('/scripts/concert-details.js') }}" defer></script>
 {% endblock %}
 
@@ -56,19 +57,28 @@
             </a>
         {% endif %}
     </section>
-    {% if availability is not null %}
-        {{
-            include(
-                'concert/_availability.html.twig',
-                {
-                    concert: concert,
-                    availability: availability,
-                    availabilityForm: availabilityForm
-                },
-                with_context: false
-            )
-        }}
-    {% endif %}
+    {% if orfeoSource %}{{
+        include(
+            'concert/import/orfeo/_source.html.twig',
+            {
+                source: orfeoSource,
+                concert: concert
+            },
+            with_context: false
+        )
+    }}{% endif %}
+    {{
+        include(
+            'concert/_importance.html.twig',
+            {
+                concert: concert,
+                canEdit: is_granted('CONCERT_UPDATE', concert),
+                levels: importanceLevels,
+                returnTo: 'concert'
+            },
+            with_context: false
+        )
+    }}
     {% if concert.notes %}
         <section class="concert-notes" aria-labelledby="concert-notes-title">
             <div class="concert-notes-heading">
@@ -107,17 +117,6 @@
     {% endif %}
     {{
         include(
-            'setlist/_panel.html.twig',
-            {
-                sheet: sheet,
-                setlist: setlist,
-                referenceSetlist: referenceSetlist
-            },
-            with_context: false
-        )
-    }}
-    {{
-        include(
             'concert/document/_panel.html.twig',
             {
                 concert: concert,
@@ -143,7 +142,7 @@
                 {
                     concert: concert,
                     conditions: conditions,
-                    showEngineerPresence: bandsintownSource is not null
+                    orfeoSource: orfeoSource
                 },
                 with_context: false
             )

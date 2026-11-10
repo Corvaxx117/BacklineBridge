@@ -51,7 +51,6 @@
     }
 
     .concert-disclosure > summary,
-    .setlist-panel > summary,
     .sheet-section > summary,
     .site-nav a,
     .nav-group > summary {
@@ -61,7 +60,6 @@
     }
 
     .concert-disclosure > summary::after,
-    .setlist-panel > summary::after,
     .sheet-section > summary::after,
     .nav-chevron,
     .sheet-toggle svg {
@@ -91,12 +89,7 @@
     /* Les autres navigateurs conservent le fonctionnement natif des accordéons. */
     @supports (interpolate-size: allow-keywords) and selector(::details-content) and
         (transition-behavior: allow-discrete) {
-        :is(
-            .concert-disclosure,
-            .setlist-panel,
-            .availability-details,
-            .sheet-section
-        )::details-content {
+        :is(.concert-disclosure, .sheet-section)::details-content {
             interpolate-size: allow-keywords;
             block-size: 0;
             opacity: 0;
@@ -107,21 +100,13 @@
                 content-visibility var(--motion-duration) allow-discrete;
         }
 
-        :is(
-                .concert-disclosure,
-                .setlist-panel,
-                .availability-details,
-                .sheet-section
-            )[open]::details-content {
+        :is(.concert-disclosure, .sheet-section)[open]::details-content {
             block-size: auto;
             opacity: 1;
         }
 
         /* Un lien direct doit rester positionné juste, sans attendre la transition. */
-        :is(.concert-disclosure, .setlist-panel, .availability-details, .sheet-section):is(
-                :target,
-                :has(:target)
-            )::details-content {
+        :is(.concert-disclosure, .sheet-section):is(:target, :has(:target))::details-content {
             transition: none;
         }
     }
