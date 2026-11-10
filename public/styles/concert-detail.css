@@ -118,7 +118,7 @@
     }
 }
 
-/* Repères visuels communs aux titres, dans le même esprit que la setlist. */
+/* Repères visuels communs aux titres des sections. */
 .concert-section-label {
     display: inline-flex;
     align-items: center;

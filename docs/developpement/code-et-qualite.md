@@ -101,13 +101,6 @@ Le changement émet `backlinebridge:themechange` ; le calendrier y répond en me
 
 `concert/show.html.twig` privilégie la réponse personnelle et les notes. Les sections secondaires utilisent des éléments HTML `details` : ouverture au clavier et fonctionnement sans JavaScript. `concert-details.js` ouvre la section visée par un lien direct ou un retour de formulaire. Les styles propres à cette page sont dans `concert-detail.css`. La présentation ne modifie ni les droits ni les données enregistrées.
 
-## Setlists internes
-
-`Setlist` conserve une liste ordonnée de titres pour une fiche de référence ou de concert, dans une table séparée. La fiche technique ne porte pas cette relation : les données préparées pour les publications, les salles et les PDF restent inchangées. Supprimer une fiche retire sa setlist par clé étrangère.
-
-Les deux contrôleurs de `Controller/Setlist/` délèguent à `SetlistManager`. `BAND_SETLIST` et le service vérifient le profil Musicien et le rôle Responsable ; la lecture utilise les droits existants sur les fiches et concerts. `SetlistContent` vérifie les titres. La version du formulaire et la version Doctrine empêchent un enregistrement périmé de remplacer celui d’un autre membre. L’import vérifie la référence et le concert dans la même transaction et exige une confirmation avant remplacement.
-
-L’encart utilise `templates/setlist/` et `public/styles/setlist.css`, avec les couleurs du thème. Le mécanisme existant de `concert-details.js` ouvre aussi `#setlist` sur la fiche de référence. Aucun nouveau script ou paquet n’est nécessaire.
 
 ## Optimisations et tests navigateur
 

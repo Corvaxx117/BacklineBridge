@@ -13,6 +13,47 @@ use Psr\Log\NullLogger;
 
 final class SetlistMigrationTest extends TestCase
 {
+    public function testRemovalPreservesSheetsUsersAndConcerts(): void
+    {
+        require_once dirname(__DIR__, 2).'/migrations/Version20261102183945.php';
+        require_once dirname(__DIR__, 2).'/migrations/Version20261110100000.php';
+        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
+        try {
+            $connection->executeStatement('PRAGMA foreign_keys = ON');
+            foreach (['app_user', 'technical_sheet', 'concert'] as $table) {
+                $connection->executeStatement('CREATE TABLE '.$table.' (id INTEGER PRIMARY KEY, name TEXT)');
+                $connection->insert($table, ['id' => 1, 'name' => 'Donnée conservée']);
+            }
+            $creation = new Version20261102183945($connection, new NullLogger());
+            $creation->up(new Schema());
+            foreach ($creation->getSql() as $query) {
+                $connection->executeStatement($query->getStatement());
+            }
+            $connection->insert('setlist', [
+                'sheet_id' => 1, 'updated_by_id' => 1, 'updated_by_name' => 'Auteur',
+                'updated_at' => '2026-11-10 10:00:00', 'tracks' => '["Titre supprimé"]',
+            ]);
+            $removal = new \DoctrineMigrations\Version20261110100000($connection, new NullLogger());
+            $removal->up(new Schema());
+            foreach ($removal->getSql() as $query) {
+                $connection->executeStatement($query->getStatement());
+            }
+            self::assertFalse($connection->createSchemaManager()->tablesExist(['setlist']));
+            foreach (['app_user', 'technical_sheet', 'concert'] as $table) {
+                self::assertSame('Donnée conservée', $connection->fetchOne('SELECT name FROM '.$table));
+            }
+            $rollback = new \DoctrineMigrations\Version20261110100000($connection, new NullLogger());
+            $rollback->down(new Schema());
+            foreach ($rollback->getSql() as $query) {
+                $connection->executeStatement($query->getStatement());
+            }
+            self::assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM setlist'));
+            self::assertSame([], $connection->fetchAllAssociative('PRAGMA foreign_key_check'));
+        } finally {
+            $connection->close();
+        }
+    }
+
     public function testMigrationPreservesDataAndEnforcesSetlistOwnership(): void
     {
         require_once dirname(__DIR__, 2).'/migrations/Version20261102183945.php';

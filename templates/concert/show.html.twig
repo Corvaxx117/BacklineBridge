@@ -7,7 +7,6 @@
 {% block page_assets %}
     <link rel="stylesheet" href="{{ asset('/styles/concert-detail.css') }}" />
     <link rel="stylesheet" href="{{ asset('/styles/conditions.css') }}" />
-    <link rel="stylesheet" href="{{ asset('/styles/setlist.css') }}" />
     <link rel="stylesheet" href="{{ asset('/styles/concert-importance.css') }}" />
     <script src="{{ asset('/scripts/concert-details.js') }}" defer></script>
 {% endblock %}
@@ -116,17 +115,6 @@
             </p>
         </section>
     {% endif %}
-    {{
-        include(
-            'setlist/_panel.html.twig',
-            {
-                sheet: sheet,
-                setlist: setlist,
-                referenceSetlist: referenceSetlist
-            },
-            with_context: false
-        )
-    }}
     {{
         include(
             'concert/document/_panel.html.twig',

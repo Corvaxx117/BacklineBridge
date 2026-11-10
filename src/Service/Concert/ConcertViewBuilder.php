@@ -13,7 +13,6 @@ use App\Integration\GoogleCalendar\GoogleCalendarConfiguration;
 use App\Repository\BandDocumentRepository;
 use App\Repository\BandsintownConcertRepository;
 use App\Repository\PatchLineRepository;
-use App\Repository\SetlistRepository;
 use App\Security\Voter\ConcertVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -22,7 +21,6 @@ final readonly class ConcertViewBuilder
 {
     public function __construct(
         private PatchLineRepository $lines,
-        private SetlistRepository $setlists,
         private EntityManagerInterface $entityManager,
         private BandsintownConcertRepository $bandsintown,
         private BandDocumentRepository $documents,
@@ -41,8 +39,6 @@ final readonly class ConcertViewBuilder
         return [
             'concert' => $concert,
             'importanceLevels' => ConcertImportance::cases(),
-            'setlist' => $this->setlists->forSheet($concert->getPatchSheet()),
-            'referenceSetlist' => $this->setlists->forSheet($concert->getBand()->getReferenceSheet()),
             'calendarConfigured' => $calendarConfigured,
             'calendarName' => $this->calendar->name(),
             'calendarTimezone' => $calendarConfigured ? $this->calendar->timezone()->getName() : null,

@@ -60,8 +60,7 @@ final class ManagerAccessTest extends VenueTestCase
         $permissions = static::getContainer()->get(AuthorizationCheckerInterface::class);
         foreach ([BandVoter::VIEW, BandVoter::EDIT_PATCH, BandVoter::DELETE_PATCH,
             BandVoter::MANAGE_TECHNICAL, BandVoter::PLAN_CONCERT, BandVoter::CONDITIONS,
-            BandVoter::COLLABORATE, BandVoter::CALENDAR, BandVoter::CALENDAR_PUBLISH,
-            BandVoter::SETLIST] as $attribute) {
+            BandVoter::COLLABORATE, BandVoter::CALENDAR, BandVoter::CALENDAR_PUBLISH] as $attribute) {
             self::assertTrue($permissions->isGranted($attribute, $concert->getBand()), $attribute);
         }
         foreach ([ConcertVoter::SHARE, ConcertVoter::DELETE, ConcertVoter::IMPORT_REFERENCE] as $attribute) {

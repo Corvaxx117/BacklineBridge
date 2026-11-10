@@ -27,7 +27,7 @@ final class OrfeoImportType extends AbstractType
         }
         $builder->add($targets)
             ->add('updateExisting', CheckboxType::class, ['label' => 'Mettre aussi à jour les informations générales des concerts existants',
-                'required' => false, 'help' => 'Date, heure, salle, ville et statut présentés dans cet aperçu. Les notes BB, conditions, enjeux, setlists et dossiers techniques sont conservés.'])
+                'required' => false, 'help' => 'Date, heure, salle, ville et statut présentés dans cet aperçu. Les notes BB, conditions, enjeux et dossiers techniques sont conservés.'])
             ->add('importContacts', CheckboxType::class, ['label' => 'Récupérer les contacts disponibles',
                 'required' => false, 'help' => 'Les contacts saisis ou retouchés dans BB sont conservés.']);
     }

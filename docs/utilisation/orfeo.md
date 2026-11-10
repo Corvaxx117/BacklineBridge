@@ -21,7 +21,7 @@ Les projets archivés, sans représentation datée ou sans salle / ville sont é
 
 ## Ce qui reste dans BB
 
-La fiche technique, le plan, la setlist, les conditions, les notes et l’enjeu du concert sont conservés. Les contacts saisis ou modifiés manuellement dans BB ne sont pas écrasés. Un contact supprimé manuellement n’est pas recréé par une actualisation de son lien existant.
+La fiche technique, le plan, les conditions, les notes et l’enjeu du concert sont conservés. Les contacts saisis ou modifiés manuellement dans BB ne sont pas écrasés. Un contact supprimé manuellement n’est pas recréé par une actualisation de son lien existant.
 
 Les contrats transmettent désormais uniquement les propositions utiles : hébergement, transport, repas et montants HT / TTC. Elles se consultent dans **Modifier les conditions → Propositions Orfeo** et ne remplacent aucune saisie sans validation. Les documents restent hors de cet import. Le lien **Vérifier les mises à jour Orfeo** recharge un aperçu ; il ne lance pas de synchronisation automatique.
 

@@ -8,7 +8,6 @@ Choisir le guide correspondant à la tâche. Chaque sujet possède un seul guide
 | --- | --- |
 | Se connecter, changer son mot de passe, comprendre les droits | [Comptes et accès](utilisation/acces.md) |
 | Préparer une date, le plan, le matériel, inviter la salle et télécharger un PDF | [Concerts et dossier technique](utilisation/concerts.md) |
-| Définir les morceaux du groupe et les adapter à une date | [Setlists](utilisation/setlists.md) |
 | Suivre l’argent, le merch et les profils | [Espace groupe](utilisation/groupe.md) |
 | Récupérer les dates et contacts saisis par le booker | [Orfeo](utilisation/orfeo.md) |
 | Récupérer les annonces de l’artiste | [Bandsintown](utilisation/bandsintown.md) |

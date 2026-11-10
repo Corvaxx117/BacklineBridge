@@ -4,7 +4,7 @@ Chaque concert possède son propre dossier. Modifier Lyon ne modifie ni Nantes n
 
 ## Lire le dossier
 
-Les notes pratiques apparaissent en premier. Les sections **Setlist**, **Documents**, **Contacts**, **Conditions**, **Dossier technique** et **Google Agenda** sont repliées : cliquer sur leur titre pour les ouvrir. Les liens directs et les retours de formulaire ouvrent la section concernée.
+Les notes pratiques apparaissent en premier. Les sections **Documents**, **Contacts**, **Conditions**, **Dossier technique** et **Google Agenda** sont repliées : cliquer sur leur titre pour les ouvrir. Les liens directs et les retours de formulaire ouvrent la section concernée.
 
 ## Créer et compléter une date
 
@@ -25,9 +25,6 @@ Dans **Modifier les conditions**, les **Propositions Orfeo** présentent les inf
 
 La présence de Marty se renseigne dans les conditions de tous les concerts. Elle revient à **À confirmer** si la date change. Les disponibilités individuelles des membres ne sont plus suivies.
 
-## Setlist du concert
-
-L’encart **Setlist** reste fermé pour laisser la place aux informations pratiques. Les quatre musiciens peuvent y importer la référence du groupe ou préparer une version propre à la date ; toute l’équipe peut la consulter. Voir le guide [Setlists](setlists.md). Elle est exclue des PDF et des espaces salle.
 
 ## Contacts et documents de la date
 
@@ -41,7 +38,7 @@ Dans **Documents du concert**, ajouter une fiche reçue en PDF ou le lien d’un
 
 Les responsables disposent du lien **Supprimer le concert**, en bas de son dossier. Une page présente les conséquences avant confirmation.
 
-La suppression est définitive : dossier technique de cette date, contacts, conditions, setlist, invitations et réponses de la salle sont retirés. Les documents restent dans la bibliothèque du groupe. La référence technique et les autres concerts sont conservés.
+La suppression est définitive : dossier technique de cette date, contacts, conditions, invitations et réponses de la salle sont retirés. Les documents restent dans la bibliothèque du groupe. La référence technique et les autres concerts sont conservés.
 
 Une suppression dans BacklineBridge ne supprime pas l’événement Bandsintown. Il pourra être réimporté. Un concert modifié depuis l’ouverture de la confirmation doit être relu avant suppression.
 

@@ -5,7 +5,6 @@
 {% endblock %}
 
 {% block page_assets %}
-    <link rel="stylesheet" href="{{ asset('/styles/setlist.css') }}" />
     <link rel="stylesheet" href="{{ asset('/styles/reference.css') }}" />
     <script src="{{ asset('/scripts/concert-details.js') }}" defer></script>
     <script src="{{ asset('/scripts/technical-sections.js') }}" defer></script>
@@ -72,16 +71,6 @@
         </button>
     </div>
     <div class="sheet-sections" data-sheet-sections data-sheet-id="{{ sheet.id }}">
-        {{
-            include(
-                'setlist/_panel.html.twig',
-                {
-                    sheet: sheet,
-                    setlist: setlist
-                },
-                with_context: false
-            )
-        }}
         {% embed 'technical/_section.html.twig'
             with {
                 sectionId: 'sheet-stage',
