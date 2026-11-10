@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\ConcertImportance;
 use App\Enum\ConcertStatus;
 use App\Repository\ConcertRepository;
 use Doctrine\DBAL\Types\Types;
@@ -57,6 +58,31 @@ class Concert
 
     #[ORM\Column(length: 5, nullable: true)]
     private ?string $startTime = null;
+
+    #[ORM\Column(name: 'importance_level', type: Types::SMALLINT, enumType: ConcertImportance::class, nullable: true)]
+    private ?ConcertImportance $importance = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $importanceNote = null;
+
+    public function getImportance(): ?ConcertImportance
+    {
+        return $this->importance;
+    }
+
+    public function getImportanceNote(): ?string
+    {
+        return $this->importanceNote;
+    }
+
+    public function setImportance(?ConcertImportance $importance, ?string $note): void
+    {
+        if (null !== $note && mb_strlen($note) > 500) {
+            throw new \InvalidArgumentException('La note d’enjeu est limitée à 500 caractères.');
+        }
+        $this->importance = $importance;
+        $this->importanceNote = null !== $note && '' !== trim($note) ? trim($note) : null;
+    }
 
     public function getStartTime(): ?string
     {

@@ -47,7 +47,7 @@ final class CreateAction extends AbstractController
             );
             $this->addFlash(
                 'success',
-                'Le concert est créé. Chacun peut maintenant confirmer sa disponibilité pour cette date.',
+                'Le concert est créé. Son dossier est accessible à l’équipe.',
             );
 
             return $this->redirectToRoute(

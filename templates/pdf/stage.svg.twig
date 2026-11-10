@@ -14,15 +14,7 @@
         stroke="#81948b"
         stroke-width="2"
     />
-    <g stroke="#dce4d8" stroke-width="0.5">
-        {% for column in 1..19 %}
-            <line x1="{{ column * 50 }}" y1="0" x2="{{ column * 50 }}" y2="606" />
-        {% endfor %}
-        {% for row in 1..11 %}
-            <line x1="0" y1="{{ row * 50 }}" x2="1000" y2="{{ row * 50 }}" />
-        {% endfor %}
-    </g>
-    <g font-family="DejaVu Sans" text-anchor="middle">
+    <g font-family="DejaVu Sans" text-anchor="middle" color="#152b38">
         <text x="500" y="17" font-size="10" fill="#65796d">
             FOND DE SCÈNE
         </text>
@@ -31,8 +23,9 @@
         </text>
         {% for node in nodes %}
             <g
+                color="{{ node.ink }}"
                 transform="translate({{ node.x }} {{ node.y }}) rotate({{ node.rotation }}) scale({{
-                node.scale
+                node.presentationScale
                 }})"
             >
                 {% if node.kind == 'riser' %}
@@ -47,17 +40,6 @@
                         stroke-width="1.5"
                         stroke-dasharray="5 4"
                     />
-                {% elseif node.kind != 'person' %}
-                    <rect
-                        x="{{ - node.width / 2 }}"
-                        y="{{ - node.height / 2 }}"
-                        width="{{ node.width }}"
-                        height="{{ node.height }}"
-                        rx="6"
-                        fill="{{ node.fill }}"
-                        stroke="{{ node.stroke }}"
-                        stroke-width="1.5"
-                    />
                 {% endif %}
                 {% if node.kind == 'drums' %}
                     <g
@@ -66,10 +48,23 @@
                             + 7
                         }}) scale({{ node.symbolWidth / 260 }})"
                     >
-                        {{ include('stage/_drum-kit.svg.twig', {}, with_context: false) }}
+                        {{
+                            include(
+                                'stage/_drum-kit.svg.twig',
+                                {
+                                    drumFill: node.background
+                                },
+                                with_context: false
+                            )
+                        }}
                     </g>
                 {% elseif node.kind != 'riser' %}
-                    <g transform="translate(-12 {{ - node.height / 2 + 7 }})">
+                    <g
+                        transform="translate({{ - node.symbolWidth / 2 }} {{
+                        - node.height / 2
+                            + 7
+                        }}) scale({{ node.symbolWidth / 24 }})"
+                    >
                         {{
                             include(
                                 'pdf/stage-symbol.svg.twig',
@@ -85,9 +80,9 @@
                     <text
                         x="0"
                         y="{{ node.labelY + loop.index0 * 17 }}"
-                        font-size="14"
+                        font-size="12"
                         font-weight="bold"
-                        fill="{{ node.kind == 'person' ? '#9f4b31' : '#152b38' }}"
+                        fill="{{ node.ink }}"
                     >
                         {{ line }}
                     </text>
@@ -97,7 +92,7 @@
                         x="0"
                         y="{{ node.labelY + (node.label|length) * 17 + loop.index0 * 13 }}"
                         font-size="11"
-                        fill="#526359"
+                        fill="{{ node.ink }}"
                     >
                         {{ line }}
                     </text>
@@ -111,7 +106,7 @@
                         }}"
                         font-size="10"
                         font-weight="bold"
-                        fill="#24483f"
+                        fill="{{ node.ink }}"
                     >
                         {{ line }}
                     </text>

@@ -1,0 +1,10 @@
+{% if text %}
+    <details class="condition-note">
+        <summary>
+            {{ title }}
+        </summary>
+        <p>
+            {{ text|nl2br }}
+        </p>
+    </details>
+{% endif %}

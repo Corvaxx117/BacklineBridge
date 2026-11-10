@@ -51,7 +51,10 @@ final readonly class TechnicalPdfRenderer
         if (false === $svg) {
             throw new \RuntimeException('Impossible de préparer le dessin du plan de scène.');
         }
-        $scale = min(740 / $layout['width'], 340 / $layout['height']);
+        $contacts = null === $dossier->identity ? [] : $dossier->identity->contacts;
+        $contactRows = (int) ceil(count($contacts) / 2);
+        $availableHeight = 330 - 40 * max(0, $contactRows - 1);
+        $scale = min(740 / $layout['width'], $availableHeight / $layout['height']);
         $html = $this->twig->render('pdf/technical-sheet.html.twig', [
             'dossier' => $dossier,
             'stageImage' => 'data:image/svg+xml;base64,'.base64_encode($svg),
@@ -70,7 +73,7 @@ final readonly class TechnicalPdfRenderer
         $canvas->page_text(
             28,
             $canvas->get_height() - 23,
-            $this->twig->getGlobals()['app_name'].' - Fiche technique',
+            $dossier->bandName.' - Fiche technique',
             $font,
             7,
             $color,

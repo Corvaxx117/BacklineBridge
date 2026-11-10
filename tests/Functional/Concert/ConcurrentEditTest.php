@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Concert;
 
 use App\Entity\Concert;
-use App\Entity\ConcertAvailability;
-use App\Enum\AvailabilityStatus;
 use App\Tests\VenueTestCase;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
@@ -56,7 +54,7 @@ final class ConcurrentEditTest extends VenueTestCase
         }
     }
 
-    public function testStaleFormPreservesNewDateNotesAndAvailability(): void
+    public function testStaleFormPreservesNewDateAndNotes(): void
     {
         $id = $this->concert()->getId();
         $uri = '/concerts/'.$id.'/edit';
@@ -67,14 +65,6 @@ final class ConcurrentEditTest extends VenueTestCase
             'concert' => ['date' => '2026-12-20', 'notes' => 'Nouvel accueil à 18 h.'],
         ]);
         self::assertResponseStatusCodeSame(303);
-
-        $em = $this->entityManager();
-        $availability = $em->getRepository(ConcertAvailability::class)->findOneBy([
-            'concert' => $id,
-            'user' => $this->userId,
-        ]);
-        $availability->respond(AvailabilityStatus::Available, 'Présent le 20.');
-        $em->flush();
 
         $this->client->submit($stale, ['concert' => ['city' => 'Marseille']]);
         self::assertResponseStatusCodeSame(409);
@@ -89,13 +79,6 @@ final class ConcurrentEditTest extends VenueTestCase
         self::assertSame('Nouvel accueil à 18 h.', $saved->getNotes());
         self::assertSame('Lyon', $saved->getCity());
         self::assertSame(2, $saved->getRevision());
-        $availability = $em->getRepository(ConcertAvailability::class)->findOneBy([
-            'concert' => $id,
-            'user' => $this->userId,
-        ]);
-        self::assertSame(AvailabilityStatus::Available, $availability->getStatus());
-        self::assertSame('Présent le 20.', $availability->getComment());
-
         $fresh = $this->client->request('GET', $uri)->filter('form[name="concert"]')->form();
         $this->client->submit($fresh, ['concert' => ['city' => 'Marseille']]);
         self::assertResponseStatusCodeSame(303);

@@ -161,15 +161,20 @@
                 }}
             {% endblock %}
         {% endembed %}
-        {% if sheet.notices is not empty %}
+        {% if
+            is_granted('SHEET_MANAGE', sheet)
+                or sheet.notices is not empty
+                or (sheet.band and sheet.band.technicalIdentity.contacts is not empty) %}
             {% embed 'technical/_section.html.twig'
                 with {
                     sectionId: 'sheet-notes',
                     titleId: 'notice-title',
-                    sectionTitle: 'Notes techniques',
+                    sectionTitle: 'Notes et contacts techniques',
                     sectionIcon: 'notes',
-                    sectionMeta: (sheet.notices|length)
-                        ~ ((sheet.notices|length) == 1 ? ' précision' : ' précisions'),
+                    sectionMeta: sheet.notices is empty
+                        ? 'Style et contacts'
+                        : (sheet.notices|length)
+                            ~ ((sheet.notices|length) == 1 ? ' précision' : ' précisions'),
                     sheet: sheet
                 } only
             %}

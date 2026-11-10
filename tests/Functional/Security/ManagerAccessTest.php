@@ -12,7 +12,6 @@ use App\Enum\BandRole;
 use App\Enum\MemberKind;
 use App\Security\Voter\BandVoter;
 use App\Security\Voter\ConcertVoter;
-use App\Service\Concert\ConcertAvailabilityManager;
 use App\Service\Concert\ConcertCreator;
 use App\Service\Security\UserCreator;
 use App\Tests\VenueTestCase;
@@ -69,7 +68,6 @@ final class ManagerAccessTest extends VenueTestCase
             self::assertTrue($permissions->isGranted($attribute, $concert), $attribute);
         }
         self::assertFalse($permissions->isGranted(BandVoter::TREASURY, $concert->getBand()));
-        self::assertFalse($permissions->isGranted(ConcertVoter::RESPOND_AVAILABILITY, $concert));
     }
 
     public function testManagerCanCreateAConcertWithoutBecomingAPerformer(): void
@@ -80,12 +78,6 @@ final class ManagerAccessTest extends VenueTestCase
             $this->sheet(), new \DateTimeImmutable('2026-12-20'), 'Salle fictive', 'Lyon', createdBy: $user,
         );
         self::assertSame('Manager fictif', $concert->getCreatedByName());
-        $roster = static::getContainer()->get(ConcertAvailabilityManager::class)->roster($concert, $user);
-        self::assertSame(1, $roster['total']);
-        self::assertNotSame($user->getId(), $roster['rows'][0]['user']->getId());
-        self::assertSame(0, $this->entityManager()->getConnection()->fetchOne(
-            'SELECT COUNT(*) FROM concert_availability WHERE user_id = ?', [$user->getId()],
-        ));
     }
 
     public function testManagerCannotAccessAnotherBandsWorkspace(): void

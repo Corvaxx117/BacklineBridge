@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Enjeu du concert · {{ app_name }}
+{% endblock %}
+{% block body %}
+    <a class="back-link" href="{{ path('app_concert_index') }}">← Revenir aux concerts</a>
+    <section class="workspace-heading">
+        <div>
+            <p class="eyebrow">
+                {{ concert.venue }} · {{ concert.date|date('d/m/Y') }}
+            </p>
+            <h1>Enjeu du concert<span class="title-period">.</span></h1>
+            <p>
+                Une appréciation interne, partagée avec l’équipe.
+            </p>
+        </div>
+    </section>
+    <section class="workspace-panel workspace-form">
+        {{ form_start(form) }}{{ form_errors(form) }}
+        <div class="workspace-fields">
+            {{ form_row(form.level) }}{{ form_row(form.note) }}
+        </div>
+        <button class="button button-primary" type="submit">Enregistrer l’enjeu</button>
+        {{ form_end(form) }}
+    </section>
+{% endblock %}

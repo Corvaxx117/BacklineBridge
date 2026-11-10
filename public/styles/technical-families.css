@@ -1,0 +1,281 @@
+/* Les mêmes familles servent de repères dans le patch et sur scène. */
+.technical-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    padding: 10px 20px;
+    margin: 0;
+    list-style: none;
+    font-size: 11px;
+}
+.technical-legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text);
+}
+.technical-legend i {
+    width: 12px;
+    height: 12px;
+    background: var(--family-bg);
+    border: 1px solid var(--family-border);
+    border-radius: 2px;
+}
+.patch-table--compact tbody tr[data-technical-family] {
+    background: var(--family-bg);
+}
+.patch-table--compact tbody tr[data-technical-family]:hover {
+    box-shadow: inset 3px 0 var(--family-ink);
+}
+.patch-table--compact tr[data-technical-family] .channel-number {
+    background: var(--family-bg);
+    color: var(--family-ink);
+    border-color: var(--family-border);
+}
+.patch-family-name {
+    display: none;
+    margin-right: 7px;
+    color: var(--family-ink);
+    font-size: 10px;
+    font-weight: 700;
+}
+.is-family-start .patch-family-name {
+    display: inline;
+}
+.patch-table--compact tbody .is-family-start:not(:first-child) > * {
+    border-top: 2px solid var(--family-border);
+}
+.patch-sort {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 20px 12px;
+}
+.patch-sort button {
+    min-height: 36px;
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 12px;
+}
+.patch-sort button[aria-pressed='true'] {
+    border-color: var(--border-strong);
+    font-weight: 650;
+    background: var(--surface-hover);
+}
+.patch-sort button:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+.stage-node[data-technical-family] {
+    color: var(--family-ink);
+}
+.stage-node[data-technical-family] strong,
+.stage-node[data-technical-family] small {
+    color: var(--family-ink);
+}
+.stage-drum-kit .drum-surface {
+    fill: var(--family-bg, none);
+}
+.stage-legend dt[data-technical-family] {
+    color: var(--family-ink);
+    border-left: 3px solid var(--family-border);
+    padding-left: 7px;
+}
+.equipment-item[data-technical-family] {
+    border-left: 3px solid var(--family-border);
+    padding-left: 10px;
+}
+.equipment-item[data-technical-family] .equipment-quantity {
+    color: var(--family-ink);
+    background: var(--family-bg);
+    border-color: var(--family-border);
+}
+.rider-style {
+    padding: 10px 20px 14px;
+    font-size: 12px;
+    line-height: 1.6;
+}
+.rider-style em {
+    color: var(--text-muted);
+}
+.rider-contacts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 24px;
+    margin: 0;
+}
+.rider-contact {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    margin: 0;
+    padding-left: 12px;
+    border-left: 2px solid var(--border-strong);
+    font-style: normal;
+    overflow-wrap: anywhere;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.rider-contact-role {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+.technical-information {
+    padding: 4px 20px 20px;
+}
+.technical-information-block {
+    padding-top: 18px;
+}
+.technical-information-block + .technical-information-block {
+    border-top: 1px solid var(--border);
+    margin-top: 22px;
+}
+.technical-information-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.technical-information-heading h3 {
+    margin: 0;
+    font-size: 14px;
+}
+.technical-information-heading p,
+.technical-information-empty,
+.technical-editor-hint {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+.technical-edit-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-decoration: none;
+}
+.technical-edit-action svg {
+    width: 17px;
+    height: 17px;
+}
+.technical-edit-action:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-strong);
+}
+.technical-edit-action:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
+}
+.technical-information-notes {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 13px;
+    line-height: 1.7;
+}
+.technical-information-notes li + li {
+    margin-top: 9px;
+}
+.technical-information-editor {
+    max-width: 1000px;
+    padding: 24px;
+    margin-bottom: 80px;
+}
+.technical-information-editor fieldset {
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 20px 0 0;
+}
+.technical-information-editor legend {
+    padding: 0 6px;
+    font-size: 13px;
+    font-weight: 650;
+}
+.rider-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 20px;
+}
+.rider-contact-forms > fieldset {
+    align-self: start;
+}
+.rider-contact-editor .field {
+    margin: 0;
+}
+.rider-contact-remove {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    font-size: 12px;
+}
+.rider-contact-remove input {
+    width: auto;
+    margin: 0;
+}
+.rider-more-contacts {
+    margin-top: 20px;
+}
+.rider-more-contacts > summary {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 650;
+    min-height: 36px;
+}
+.rider-style-editor .technical-editor-hint {
+    margin-bottom: 16px;
+}
+@media (max-width: 680px) {
+    .technical-information-editor {
+        padding: 16px;
+    }
+    .rider-contacts,
+    .rider-form-grid {
+        grid-template-columns: 1fr;
+    }
+    .technical-edit-action {
+        width: 44px;
+        height: 44px;
+    }
+}
+@media (max-width: 550px) {
+    .patch-sort button {
+        min-height: 44px;
+    }
+    .is-family-start .patch-family-name {
+        display: block;
+        margin-bottom: 2px;
+    }
+}
+
+.guest-rider-identity {
+    padding: 12px 18px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 18px;
+    font-size: 13px;
+}
+.guest-rider-identity > summary {
+    min-height: 32px;
+    cursor: pointer;
+    font-weight: 650;
+}
+
+.stage-riser[data-technical-family] {
+    border-color: var(--family-border);
+}

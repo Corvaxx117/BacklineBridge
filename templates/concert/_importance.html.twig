@@ -1,0 +1,117 @@
+<details
+    class="concert-importance importance-level-{{
+    concert.importance
+        ? concert.importance.value
+        : 'unrated'
+    }}"
+    id="enjeu-{{ concert.id }}"
+>
+    <summary>
+        <span class="importance-meter" aria-hidden="true">
+            {% for index in 1..5 %}
+                <span
+                    class="{{
+                    concert.importance and index <= concert.importance.value
+                        ? 'is-filled'
+                        : ''
+                    }}"
+                >
+
+                </span>
+            {% endfor %}
+        </span>
+        <span class="importance-label">
+            {{ concert.importance
+                ? 'Enjeu ' ~ (concert.importance.label|lower) ~ ' · ' ~ concert.importance.value
+                    ~ '/5'
+                : 'Enjeu à évaluer' }}
+        </span>
+        {% if concert.importanceNote %}
+            <span class="importance-note-preview" title="{{ concert.importanceNote }}">
+                {{ concert.importanceNote }}
+            </span>
+        {% endif %}
+        <span class="importance-chevron" aria-hidden="true">⌄</span>
+    </summary>
+    <div class="importance-editor">
+        <p class="workspace-hint">
+            Interne à l’équipe · Non transmis à la salle. L’enjeu est une appréciation du potentiel
+            de la date, indépendante du cachet.
+        </p>
+        {% if canEdit %}
+            <form
+                method="post"
+                action="{{
+                path(
+                    'app_concert_importance',
+                    {
+                        id: concert.id
+                    }
+                )
+                }}"
+            >
+                <input
+                    type="hidden"
+                    name="concert_importance[_token]"
+                    value="{{ csrf_token('concert_importance_' ~ concert.id) }}"
+                />
+                <input
+                    type="hidden"
+                    name="concert_importance[revision]"
+                    value="{{ concert.revision }}"
+                />
+                <input
+                    type="hidden"
+                    name="concert_importance[returnSort]"
+                    value="{{ sort|default('date') }}"
+                />
+                <input
+                    type="hidden"
+                    name="concert_importance[returnLevel]"
+                    value="{{ levelFilter|default('all') }}"
+                />
+                <input
+                    type="hidden"
+                    name="concert_importance[returnTo]"
+                    value="{{ returnTo|default('list') }}"
+                />
+                <div class="field">
+                    <label for="importance-level-{{ concert.id }}">Enjeu du concert</label>
+                    <select id="importance-level-{{ concert.id }}" name="concert_importance[level]">
+                        <option value="" {{ concert.importance is null ? 'selected' : '' }}>
+                            À évaluer
+                        </option>
+                        {% for level in levels %}
+                            <option
+                                value="{{ level.value }}"
+                                {{ concert.importance == level ? 'selected' : '' }}
+                            >
+                                {{ level.value }} / 5 · {{ level.label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="importance-note-{{ concert.id }}">Pourquoi cet enjeu ?</label>
+                    <textarea
+                        id="importance-note-{{ concert.id }}"
+                        name="concert_importance[note]"
+                        rows="3"
+                        maxlength="500"
+                        placeholder="Public attendu, belle salle, pros présents, potentiel de rencontres, conditions…"
+                    >
+                        {{- concert.importanceNote -}}
+                    </textarea>
+                    <p class="workspace-hint">
+                        Facultatif · 500 caractères maximum.
+                    </p>
+                </div>
+                <button class="button button-secondary" type="submit">Enregistrer l’enjeu</button>
+            </form>
+        {% else %}
+            <p class="importance-note">
+                {{ concert.importanceNote ? : 'Pas encore de précision pour cette date.' }}
+            </p>
+        {% endif %}
+    </div>
+</details>

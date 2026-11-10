@@ -1,0 +1,7 @@
+{% if identity.style or identity.description %}
+    <p class="rider-style">
+        <strong>Style :</strong><br />{{ identity.style }}{% if identity.description %}
+            <br /><em>{{ identity.description }}</em>
+        {% endif %}
+    </p>
+{% endif %}

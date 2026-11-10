@@ -7,14 +7,11 @@ namespace App\Tests\Functional\Concert\Reference;
 use App\Dto\Concert\ConcertConditionsInput;
 use App\Entity\Band;
 use App\Entity\Concert;
-use App\Entity\ConcertAvailability;
 use App\Entity\ConcertConditions;
 use App\Entity\PatchLine;
 use App\Entity\TechnicalPublication;
 use App\Entity\TechnicalSheet;
-use App\Enum\AvailabilityStatus;
 use App\Enum\BandRole;
-use App\Service\Concert\ConcertAvailabilityManager;
 use App\Service\Concert\ConcertConditionsUpdater;
 use App\Service\Security\UserCreator;
 use App\Service\Venue\PublicationBuilder;
@@ -41,26 +38,15 @@ final class ReferenceImportTest extends VenueTestCase
         $otherId = $other->getId();
         $conditionsInput = new ConcertConditionsInput();
         $conditionsInput->feeAmount = '1500';
+        $conditionsInput->notes = 'PRECISION PRIVEE DES CONDITIONS';
         static::getContainer()
             ->get(ConcertConditionsUpdater::class)
             ->save($concert, $conditionsInput);
-        $availability = static::getContainer()->get(ConcertAvailabilityManager::class);
-        $input = $availability->inputFor(
-            $concert,
-            $this->entityManager()->find(\App\Entity\User::class, $this->userId),
-        );
-        $input->status = AvailabilityStatus::Available;
-        $input->comment = 'PRECISION PRIVEE DE DISPONIBILITE';
-        $availability->respond(
-            $concert,
-            $this->entityManager()->find(\App\Entity\User::class, $this->userId),
-            $input,
-        );
         $issued = $this->issue($concert);
         $publicationId = $issued->invitation->getPublication()->getId();
         $snapshot = $issued->invitation->getPublication()->getSnapshot();
         self::assertStringNotContainsString(
-            $input->comment,
+            $conditionsInput->notes,
             json_encode($snapshot, JSON_THROW_ON_ERROR),
         );
         $oldPatch = $concert->getPatchSheet()->getLines()->first()->getSourceName();
@@ -95,13 +81,6 @@ final class ReferenceImportTest extends VenueTestCase
                 ->findOneBy(['concert' => $id])
                 ->getFeeCents(),
         );
-        self::assertSame(
-            AvailabilityStatus::Available,
-            $em
-                ->getRepository(ConcertAvailability::class)
-                ->findOneBy(['concert' => $id])
-                ->getStatus(),
-        );
         self::assertNotSame(
             $plan,
             $em->find(Concert::class, $otherId)->getPatchSheet()->getStagePlan(),
@@ -117,7 +96,7 @@ final class ReferenceImportTest extends VenueTestCase
         );
         $this->enter($issued->token);
         self::assertSelectorNotExists('.availability-panel');
-        self::assertSelectorTextNotContains('main', $input->comment);
+        self::assertSelectorTextNotContains('main', $conditionsInput->notes);
         self::assertSelectorTextNotContains('main', 'NOUVEAU KICK');
         $this->client->request('GET', $this->guestUrl('/salle/fiche-technique.pdf'));
         self::assertResponseIsSuccessful();

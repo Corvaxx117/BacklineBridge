@@ -1,150 +1,9 @@
-/* Création et disponibilité de l’équipe */
+/* Concerts et import de référence */
 .concert-creator {
     margin-top: 10px;
     color: var(--text-muted);
     font-size: 12px;
     line-height: 1.6;
-}
-.concert-availability-link {
-    display: inline-block;
-    margin-top: 8px;
-    color: var(--success-text);
-    font-size: 12px;
-    text-underline-offset: 4px;
-}
-.availability-panel {
-    margin: 28px 0;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    background: var(--surface);
-    overflow: hidden;
-    scroll-margin-top: 24px;
-}
-.availability-counter {
-    color: var(--success-text);
-    font-size: 13px;
-    white-space: nowrap;
-}
-.availability-roster {
-    list-style: none;
-    margin: 0;
-    padding: 0 28px;
-}
-.availability-person {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 18px;
-    padding: 15px 0;
-    border-top: 1px solid var(--border);
-}
-.availability-person strong {
-    font-size: 14px;
-    font-weight: 600;
-}
-.availability-person p {
-    margin: 6px 0;
-    font-size: 13px;
-    overflow-wrap: anywhere;
-}
-.availability-person small,
-.availability-you {
-    color: var(--text-muted);
-    font-size: 11px;
-    font-weight: normal;
-}
-.availability-badge {
-    flex-shrink: 0;
-    padding: 6px 10px;
-    border-radius: 20px;
-    background: var(--surface-muted);
-    color: var(--text-muted);
-    font-size: 11px;
-}
-.availability-available {
-    background: var(--success-bg);
-    color: var(--success-text);
-}
-.availability-unavailable {
-    background: var(--danger-bg);
-    color: var(--danger-text);
-}
-.availability-alert,
-.availability-complete {
-    margin: 0 28px 16px;
-    padding: 12px 16px;
-    border-radius: 6px;
-    background: var(--danger-bg);
-    color: var(--danger-text);
-    font-size: 13px;
-}
-.availability-complete {
-    background: var(--success-bg);
-    color: var(--success-text);
-}
-.availability-response {
-    margin: 6px 28px 24px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-}
-.availability-form {
-    display: grid;
-    gap: 18px;
-}
-.availability-form > .button {
-    justify-self: start;
-}
-.availability-choices {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    border: 0;
-    padding: 0;
-    margin: 0;
-}
-.availability-choices legend {
-    margin-bottom: 12px;
-    font-size: 13px;
-    font-weight: 600;
-}
-.availability-choice {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 14px;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 13px;
-}
-.availability-choice:has(input:checked) {
-    background: var(--success-bg);
-    border-color: var(--border-strong);
-}
-.availability-choice input {
-    width: 16px;
-    height: 16px;
-    margin: 0;
-    accent-color: var(--success-fill);
-}
-.availability-comment summary {
-    cursor: pointer;
-    font-size: 12px;
-    color: var(--text-muted);
-}
-.availability-comment .field {
-    margin-top: 16px;
-}
-.availability-comment textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font: inherit;
-}
-.availability-comment .help-text {
-    color: var(--text-muted);
-    font-size: 12px;
 }
 /* Import volontaire de la fiche de référence */
 .reference-import-notice {
@@ -193,11 +52,11 @@
 }
 .reference-columns > section + section {
     border-left: 1px solid var(--border);
-    background: var(--success-bg);
+    background: var(--secondary-bg);
 }
 .reference-columns h2 {
     margin: 0 0 18px;
-    color: var(--success-text);
+    color: var(--secondary-text);
     font-size: 15px;
 }
 .reference-items {
@@ -236,7 +95,7 @@
     flex-shrink: 0;
     width: 17px;
     height: 17px;
-    accent-color: var(--success-fill);
+    accent-color: var(--secondary-fill);
     margin: 2px 0 0;
 }
 @media (max-width: 780px) {
@@ -247,27 +106,8 @@
         border-left: 0;
         border-top: 1px solid var(--border);
     }
-    .availability-roster {
-        padding: 0 20px;
-    }
-    .availability-response {
-        margin-left: 20px;
-        margin-right: 20px;
-    }
-    .availability-panel .panel-header {
-        align-items: flex-start;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
 }
 @media (max-width: 550px) {
-    .availability-choice {
-        padding: 10px;
-        font-size: 12px;
-    }
-    .availability-person {
-        align-items: flex-start;
-    }
     .reference-comparison > summary span {
         display: block;
         margin: 6px 0 0 17px;
@@ -308,7 +148,7 @@
     font-size: 13px;
 }
 .reference-section-choices label:has(input:checked) {
-    background: var(--success-bg);
+    background: var(--secondary-bg);
     border-color: var(--border-strong);
 }
 .reference-confirmation {
@@ -325,13 +165,8 @@
     background: transparent;
     flex-wrap: wrap;
 }
-.availability-form > ul,
 .reference-import-form form > ul {
     color: var(--danger-text);
     font-size: 13px;
     padding-left: 20px;
-}
-
-.form-panel > .availability-form {
-    padding: 24px;
 }

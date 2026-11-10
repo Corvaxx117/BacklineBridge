@@ -1,99 +1,111 @@
-{# Vue de dessus, batteur tourné vers le public : son côté gauche est à droite du dessin. #}
+{# Vue depuis le public : charleston et caisse claire à droite, tom basse à gauche. #}
 <g
-    transform="translate(0 10)"
-    stroke="#526b68"
+    fill="none"
+    stroke="currentColor"
     stroke-width="1.8"
     stroke-linecap="round"
     stroke-linejoin="round"
 >
-    <g data-drum-part="floor-tom">
-        <path d="m70 49-7-6m47 6 7-6M88 96v9" />
-        <circle cx="88" cy="68" r="28" fill="#ceddd7" />
-        <circle cx="88" cy="68" r="24" fill="#fbfdf9" />
-        <path d="M88 40v4m0 48v4M60 68h4m48 0h4" />
-    </g>
-    <g data-drum-part="snare">
-        <circle cx="174" cy="38" r="24" fill="#ceddd7" />
-        <circle cx="174" cy="38" r="20" fill="#fbfdf9" />
-        <path d="M174 14v4m0 40v4m-24-24h4m40 0h4" />
-    </g>
     <g data-drum-part="kick">
-        <path d="m109 164-6 8m48-8 6 8" />
-        <rect x="103" y="111" width="54" height="55" rx="6" fill="#e0e9e2" />
-        <ellipse cx="130" cy="111" rx="27" ry="7" fill="#fbfdf9" />
-        <path d="M108 120v35m44-35v35M105 161h50" />
+        <path
+            class="drum-surface"
+            fill="{{ drumFill|default('none') }}"
+            d="M104 113Q135 106 166 113V163Q135 171 104 163Z"
+        />
+        <path d="M104 119q31-7 62 0m-62 38q31 8 62 0M110 121v33m50-33v33" opacity="0.55" />
+        <path d="M130 112v-12h10v12m-5-12V88m-4 0h8" />
+    </g>
+    <g data-drum-part="floor-tom">
+        <path d="m72 68-5-7m45 7 5-7M92 118v9" opacity="0.65" />
+        <circle class="drum-surface" fill="{{ drumFill|default('none') }}" cx="92" cy="90" r="28" />
+        <circle cx="92" cy="90" r="24" opacity="0.4" stroke-width="1" />
     </g>
     <g data-drum-part="rack-tom">
-        <circle cx="150" cy="84" r="25" fill="#ceddd7" />
-        <circle cx="150" cy="84" r="21" fill="#fbfdf9" />
-        <path d="M150 59v4m0 42v4m-25-25h4m42 0h4" />
+        <circle
+            class="drum-surface"
+            fill="{{ drumFill|default('none') }}"
+            cx="163"
+            cy="103"
+            r="24"
+        />
+        <circle cx="163" cy="103" r="20" opacity="0.4" stroke-width="1" />
     </g>
-    <g fill="#edd5a1" stroke="#a67a38">
-        <g data-drum-part="hi-hat">
-            <path d="m231 84 7 12h-13" fill="none" />
-            <circle cx="229" cy="60" r="25" />
-            <circle cx="229" cy="60" r="21" fill="#f7e8c5" />
-            <circle cx="229" cy="54" r="3" fill="#c4964e" />
-        </g>
-        <g data-drum-part="cymbal-1">
-            <path d="M49 153v10m0-7-9 8m9-8 9 8" fill="none" />
-            <circle cx="49" cy="124" r="29" />
-            <circle cx="49" cy="124" r="24" fill="#f7e8c5" />
-            <circle cx="49" cy="117" r="4" fill="#c4964e" />
-        </g>
-        <g data-drum-part="cymbal-2">
-            <path d="M212 157v8m0-5-9 8m9-8 9 8" fill="none" />
-            <circle cx="212" cy="127" r="30" />
-            <circle cx="212" cy="127" r="25" fill="#f7e8c5" />
-            <circle cx="212" cy="120" r="4" fill="#c4964e" />
-        </g>
+    <g data-drum-part="snare">
+        <circle
+            class="drum-surface"
+            fill="{{ drumFill|default('none') }}"
+            cx="190"
+            cy="61"
+            r="23"
+        />
+        <circle cx="190" cy="61" r="19" opacity="0.4" stroke-width="1" />
+        <path d="m175 44 29 29m-27-31 29 29" opacity="0.2" stroke-width="1" />
     </g>
-    <g
-        fill="#263e43"
-        stroke="none"
-        font-family="DejaVu Sans, sans-serif"
-        font-size="11"
-        font-weight="bold"
-        text-anchor="middle"
-    >
-        <text x="88" y="65">
-            Tom
-        </text>
-        <text x="88" y="78">
-            basse
-        </text>
-        <text x="174" y="35">
-            Caisse
-        </text>
-        <text x="174" y="48">
-            claire
-        </text>
-        <text x="150" y="81">
-            Tom
-        </text>
-        <text x="150" y="94">
-            alto
-        </text>
-        <text x="130" y="135">
-            Grosse
-        </text>
-        <text x="130" y="148">
-            caisse
-        </text>
-        <text x="229" y="69" font-size="8.5">
-            Charleston
-        </text>
-        <text x="49" y="132" font-size="10">
-            Cymbale
-        </text>
-        <text x="49" y="145" font-size="10">
-            1
-        </text>
-        <text x="212" y="135" font-size="10">
-            Cymbale
-        </text>
-        <text x="212" y="148" font-size="10">
-            2
-        </text>
+    <g data-drum-part="cymbal-1">
+        <ellipse
+            class="drum-surface"
+            fill="{{ drumFill|default('none') }}"
+            cx="71"
+            cy="131"
+            rx="31"
+            ry="25"
+        />
+        <ellipse cx="71" cy="131" rx="8" ry="6" opacity="0.6" />
+        <path d="M67 131h8m-4-3v6" />
     </g>
+    <g data-drum-part="cymbal-2">
+        <ellipse
+            class="drum-surface"
+            fill="{{ drumFill|default('none') }}"
+            cx="193"
+            cy="128"
+            rx="32"
+            ry="26"
+        />
+        <ellipse cx="193" cy="128" rx="8" ry="6" opacity="0.6" />
+        <path d="M189 128h8m-4-3v6" />
+    </g>
+    <g data-drum-part="hi-hat">
+        <path d="M203 66a20 17 0 0 0 38 0" opacity="0.5" />
+        <ellipse
+            class="drum-surface"
+            fill="{{ drumFill|default('none') }}"
+            cx="222"
+            cy="62"
+            rx="20"
+            ry="17"
+        />
+        <ellipse cx="222" cy="62" rx="5" ry="4" opacity="0.6" />
+        <path d="M219 62h6m-3-3v6" />
+    </g>
+</g>
+<g
+    fill="currentColor"
+    stroke="none"
+    font-family="DejaVu Sans, sans-serif"
+    font-size="9"
+    font-weight="bold"
+    text-anchor="middle"
+>
+    <text x="92" y="94">
+        Floor
+    </text>
+    <text x="190" y="65">
+        Snare
+    </text>
+    <text x="163" y="107">
+        Rack
+    </text>
+    <text x="135" y="145">
+        Kick
+    </text>
+    <text x="222" y="93">
+        Hi-hat
+    </text>
+    <text x="71" y="170">
+        Cym 1
+    </text>
+    <text x="193" y="168">
+        Cym 2
+    </text>
 </g>

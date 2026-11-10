@@ -4,7 +4,7 @@ Chaque concert possède son propre dossier. Modifier Lyon ne modifie ni Nantes n
 
 ## Lire le dossier
 
-Les disponibilités des concerts saisis manuellement et les notes pratiques apparaissent en premier. Les sections **Setlist**, **Documents**, **Contacts**, **Conditions**, **Dossier technique** et **Google Agenda** sont repliées : cliquer sur leur titre pour les ouvrir. Les liens directs et les retours de formulaire ouvrent la section concernée.
+Les notes pratiques apparaissent en premier. Les sections **Setlist**, **Documents**, **Contacts**, **Conditions**, **Dossier technique** et **Google Agenda** sont repliées : cliquer sur leur titre pour les ouvrir. Les liens directs et les retours de formulaire ouvrent la section concernée.
 
 ## Créer et compléter une date
 
@@ -17,17 +17,13 @@ L’hébergement comprend **Retour à la casa !**. Un montant vide est inconnu ;
 
 Le nom du créateur est enregistré. Une ancienne date sans auteur indique « Créateur non renseigné ». Les annonces [importées de Bandsintown](bandsintown.md) sont validées automatiquement.
 
-## Répondre aux disponibilités
+## Conditions du concert
 
-Pour les concerts importés de Bandsintown, le groupe est considéré comme disponible : cette section et le rappel dans la liste sont masqués. La présence de Marty se renseigne dans **Conditions → Présence de l’ingé son**. Elle revient à **À confirmer** si la date change.
+Les conditions regroupent **Accueil et déplacements**, **Rémunération et ingé son** et les précisions. Les textes détaillés restent repliés dans le dossier.
 
-Les quatre musiciens et Marty répondent pour eux-mêmes : **Disponible**, **Indisponible** ou **À confirmer**, avec une précision facultative. Romain consulte les réponses.
+Dans **Modifier les conditions**, les **Propositions Orfeo** présentent les informations du dernier import : hébergement, transport, repas et montants HT / TTC. Choisir une proposition la copie dans le formulaire ; vérifier puis enregistrer. Un champ déjà rempli demande une confirmation de remplacement. Le choix HT ou TTC est conservé avec le montant. Aucun accord n’est déduit automatiquement du texte d’un contrat.
 
-Le formulaire personnel est ouvert tant que la réponse reste **À confirmer**. Après réponse, **Modifier** permet de la changer. **Les réponses de l’équipe** affiche les commentaires et dates de réponse ; une indisponibilité reste signalée même lorsque ce détail est fermé.
-
-Tout commence à confirmer, même pour le créateur. Changer la date remet les disponibilités et leurs précisions à zéro ; changer la salle ou les notes les conserve. Le compteur porte sur les responsables ayant un compte dans le groupe.
-
-**Concert validé, membres disponibles et matériel confirmé sont trois informations différentes.**
+La présence de Marty se renseigne dans les conditions de tous les concerts. Elle revient à **À confirmer** si la date change. Les disponibilités individuelles des membres ne sont plus suivies.
 
 ## Setlist du concert
 
@@ -45,7 +41,7 @@ Dans **Documents du concert**, ajouter une fiche reçue en PDF ou le lien d’un
 
 Les responsables disposent du lien **Supprimer le concert**, en bas de son dossier. Une page présente les conséquences avant confirmation.
 
-La suppression est définitive : dossier technique de cette date, contacts, conditions, disponibilités, setlist, invitations et réponses de la salle sont retirés. Les documents restent dans la bibliothèque du groupe. La référence technique et les autres concerts sont conservés.
+La suppression est définitive : dossier technique de cette date, contacts, conditions, setlist, invitations et réponses de la salle sont retirés. Les documents restent dans la bibliothèque du groupe. La référence technique et les autres concerts sont conservés.
 
 Une suppression dans BacklineBridge ne supprime pas l’événement Bandsintown. Il pourra être réimporté. Un concert modifié depuis l’ouverture de la confirmation doit être relu avant suppression.
 
@@ -77,7 +73,7 @@ Un responsable peut supprimer une entrée du patch, annuler l’action ou la res
 
 Dans le concert, ouvrir **Récupérer la référence**, comparer puis cocher les sections : patch, plan, matériel, informations et notes techniques.
 
-**Les sections cochées sont remplacées.** Les autres sections, les conditions, les disponibilités et les versions déjà partagées restent conservées. Exemple : reprendre uniquement le nouveau dessin de batterie conserve le patch adapté à la salle.
+**Les sections cochées sont remplacées.** Les autres sections, les conditions et les versions déjà partagées restent conservées. Exemple : reprendre uniquement le nouveau dessin de batterie conserve le patch adapté à la salle.
 
 Si quelqu’un modifie un dossier pendant ta saisie, recharger avant de confirmer pour éviter d’effacer son travail.
 
@@ -111,10 +107,49 @@ Le plan s’ouvre en vue d’ensemble. Utiliser **+ / −** pour zoomer, faire d
 
 **Télécharger la fiche PDF** reprend le plan enregistré, le patch, le matériel demandé et les notes techniques. Enregistrer le plan avant de télécharger.
 
-Le PDF exclut les conditions privées, les disponibilités et les entrées supprimées. Celui de la salle utilise la copie partagée ; ses réponses ne remplacent pas les demandes du groupe. Les liens expirés ou révoqués ne permettent plus de télécharger.
+Le PDF exclut les conditions privées et les entrées supprimées. Celui de la salle utilise la copie partagée ; ses réponses ne remplacent pas les demandes du groupe. Les liens expirés ou révoqués ne permettent plus de télécharger.
 
 ## Dates à venir et historique
 
 La liste place les **Concerts à venir** en premier, par date croissante. Les **Concerts passés** apparaissent ensuite, du plus récent au plus ancien, avec un badge **Passé**. Leurs dossiers restent consultables.
 
 La séparation se fait au changement de jour dans le fuseau Europe/Paris. Une date d’aujourd’hui reste dans les dates à venir : l’application ne connaît pas encore l’heure réelle de fin du concert. Le statut **En attente / Validé** reste indépendant du passage de la date.
+
+
+## Enjeu du concert
+
+Chaque carte de la liste et chaque dossier possède un encart **Enjeu**. Le déplier pour lire la précision ou la modifier : **1 Faible**, **2 Modéré**, **3 Notable**, **4 Fort**, **5 Majeur**. **À évaluer** reste le choix initial ; il ne signifie pas « faible ».
+
+La note facultative (500 caractères) explique le choix : public attendu, professionnels présents, potentiel de rencontres, conditions particulières… L’enjeu reste indépendant du cachet et du statut **En attente / Validé**.
+
+Les responsables, le manager et le booker peuvent le modifier. Les autres membres de l’équipe peuvent le lire. Il n’est jamais transmis à la salle ni intégré au PDF technique.
+
+En haut de la liste, choisir un niveau pour filtrer les dates, puis **Enjeu le plus fort** pour les classer. **Tous** et **Par date** rétablissent la vue habituelle. Les concerts à venir et passés restent séparés.
+
+Les imports [Orfeo](orfeo.md) et [Bandsintown](bandsintown.md) conservent cette appréciation interne.
+
+
+## Lire rapidement la fiche technique
+
+Le plan utilise des symboles sans vignettes. Les repères courts de patch, de mix et de dimensions restent sur le dessin ; **Repères et précisions** donne les textes complets sous le plan. L’éditeur conserve le déplacement, la rotation, la taille et les liens au patch. Le PDF suit cette présentation et conserve les précisions complètes dans ses repères.
+
+Le patch utilise les termes techniques anglais. Le crayon modifie une entrée, la corbeille la retire avec les droits habituels et l’icône de note déplie une précision longue. Les mentions courtes, comme « OWN MIC », restent immédiatement visibles. Chaque action porte une infobulle et reste utilisable au clavier. Sur mobile, micro et pied sont réunis sous le nom pour réduire la hauteur des lignes.
+
+**Kit batterie complet** regroupe les fûts et le hardware. Déplier sa composition pour voir les dimensions et préférences. La salle garde une réponse par élément : elle peut confirmer l’ensemble avec **Tout disponible**, puis préciser les exceptions. Ce regroupement n’ajoute aucun matériel absent de la demande d’origine.
+
+La traduction des libellés standards conserve les numéros de canal, les liaisons du plan et les textes personnalisés. Les publications déjà envoyées restent figées ; créer un nouveau lien pour transmettre le dossier actualisé.
+
+
+## Couleurs, style et contacts techniques
+
+Les familles partagent la même palette dans le patch, le plan et le PDF : **batterie jaune**, **basse vert**, **guitares bleu**, **claviers violet**, **voix rose**, **utilitaires gris**, **effets orange**, **retours turquoise**. Le nom de la famille reste affiché : la couleur n’est pas le seul repère.
+
+Le patch s’ouvre **Par canal**. **Par famille** rapproche les sources de même famille, sans changer leurs numéros ; **Par canal** rétablit l’ordre numérique. Le PDF conserve l’ordre des canaux.
+
+Le PDF porte le nom du groupe, avec son style et ses contacts techniques partageables. Les coordonnées administratives privées ne sont pas utilisées. Une publication conserve les contacts qui existaient lors de sa création ; créer un nouveau lien pour transmettre une mise à jour.
+
+Les **contacts du groupe** et les **notes techniques** ont chacun leur bouton crayon.
+Les contacts, le style et la présentation du live sont communs aux fiches du groupe.
+Les notes modifiées depuis un concert restent propres à cette date. Une fiche déjà
+publiée pour la salle conserve sa version ; publiez une nouvelle version pour transmettre
+les changements.

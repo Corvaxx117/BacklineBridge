@@ -17,7 +17,6 @@ final readonly class ConcertCreator
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private ConcertAvailabilityManager $availability,
         private BandMembershipRepository $memberships,
         private PatchLineCopier $copier,
         private NotificationRecorder $notifications,
@@ -35,14 +34,13 @@ final readonly class ConcertCreator
         ?string $startTime = null,
     ): Concert {
         $concert = $this->prepare($reference, $date, $venue, $city, $status, $notes, $createdBy, $startTime);
-        $this->availability->initialize($concert);
         $this->notifications->concertCreated($concert);
         $this->entityManager->flush();
 
         return $concert;
     }
 
-    /** Prépare le dossier sans demande de disponibilité ; l’appelant valide la transaction. */
+    /** Prépare le dossier ; l’appelant valide la transaction. */
     public function prepare(
         TechnicalSheet $reference,
         \DateTimeImmutable $date,

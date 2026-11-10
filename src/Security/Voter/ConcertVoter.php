@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Security\Voter;
 
 use App\Entity\Concert;
-use App\Repository\BandsintownConcertRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
@@ -19,14 +18,12 @@ final class ConcertVoter extends Voter
     public const EDIT = 'CONCERT_EDIT';
     public const UPDATE = 'CONCERT_UPDATE';
     public const CONDITIONS = 'CONCERT_CONDITIONS';
-    public const RESPOND_AVAILABILITY = 'CONCERT_RESPOND_AVAILABILITY';
     public const IMPORT_REFERENCE = 'CONCERT_IMPORT_REFERENCE';
     public const DELETE = 'CONCERT_DELETE';
     public const CONTACTS = 'CONCERT_CONTACTS';
 
     public function __construct(
         private readonly AccessDecisionManagerInterface $decisions,
-        private readonly BandsintownConcertRepository $bandsintown,
     ) {
     }
 
@@ -41,7 +38,6 @@ final class ConcertVoter extends Voter
                     self::UPDATE,
                     self::CONDITIONS,
                     self::SHARE,
-                    self::RESPOND_AVAILABILITY,
                     self::IMPORT_REFERENCE,
                     self::DELETE,
                     self::CONTACTS,
@@ -63,7 +59,6 @@ final class ConcertVoter extends Voter
             self::CONDITIONS => BandVoter::CONDITIONS,
             self::CONTACTS => BandVoter::COLLABORATE,
             self::DELETE => BandVoter::MANAGE_TECHNICAL,
-            self::RESPOND_AVAILABILITY => BandVoter::RESPOND_AVAILABILITY,
             self::SHARE,
             self::IMPORT_REFERENCE => BandVoter::MANAGE_TECHNICAL,
             default => null,
@@ -74,6 +69,6 @@ final class ConcertVoter extends Voter
             return false;
         }
 
-        return self::RESPOND_AVAILABILITY !== $attribute || !$this->bandsintown->isImported($subject);
+        return true;
     }
 }

@@ -7,10 +7,11 @@ namespace App\Controller\Concert\Conditions;
 use App\Dto\Concert\ConcertConditionsInput;
 use App\Entity\Concert;
 use App\Entity\ConcertConditions;
+use App\Entity\OrfeoConcert;
 use App\Form\ConcertConditionsType;
-use App\Repository\BandsintownConcertRepository;
 use App\Security\Voter\ConcertVoter;
 use App\Service\Concert\ConcertConditionsUpdater;
+use Doctrine\DBAL\Exception\RetryableException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -18,6 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route(
@@ -33,7 +35,6 @@ final class EditAction extends AbstractController
         #[MapEntity(id: 'id')] Concert $concert,
         EntityManagerInterface $entityManager,
         ConcertConditionsUpdater $updater,
-        BandsintownConcertRepository $bandsintown,
     ): Response {
         $this->denyAccessUnlessGranted(ConcertVoter::CONDITIONS, $concert);
         $input = ConcertConditionsInput::fromConditions(
@@ -42,10 +43,9 @@ final class EditAction extends AbstractController
                 ->findOneBy(['concert' => $concert]),
             $concert->getDate()->format('Y-m-d'),
         );
-        $form = $this->createForm(ConcertConditionsType::class, $input, [
-            'engineer_presence' => $bandsintown->isImported($concert),
-        ]);
+        $form = $this->createForm(ConcertConditionsType::class, $input);
         $form->handleRequest($request);
+        $status = $form->isSubmitted() ? 422 : 200;
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $updater->save($concert, $input);
@@ -53,7 +53,7 @@ final class EditAction extends AbstractController
 
                 return $this->redirectToRoute(
                     'app_concert_show',
-                    ['id' => $concert->getId()],
+                    ['id' => $concert->getId(), '_fragment' => 'concert-conditions'],
                     Response::HTTP_SEE_OTHER,
                 );
             } catch (UniqueConstraintViolationException) {
@@ -67,6 +67,10 @@ final class EditAction extends AbstractController
                     ['id' => $concert->getId()],
                     Response::HTTP_SEE_OTHER,
                 );
+            } catch (ConflictHttpException|RetryableException $exception) {
+                $form->addError(new FormError($exception instanceof ConflictHttpException
+                    ? $exception->getMessage() : 'Une modification est en cours. Recharge les conditions puis réessaie.'));
+                $status = 409;
             } catch (\DomainException $exception) {
                 $form->addError(new FormError($exception->getMessage()));
             }
@@ -74,8 +78,12 @@ final class EditAction extends AbstractController
 
         return $this->render(
             'concert/conditions.html.twig',
-            ['concert' => $concert, 'form' => $form->createView()],
-            new Response(status: $form->isSubmitted() ? 422 : 200),
+            [
+                'concert' => $concert,
+                'form' => $form->createView(),
+                'orfeoSource' => $entityManager->getRepository(OrfeoConcert::class)->findOneBy(['concert' => $concert]),
+            ],
+            new Response(status: $status),
         );
     }
 }

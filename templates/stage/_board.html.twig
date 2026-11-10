@@ -15,11 +15,24 @@
     </div>
     <div class="stage-scroll" tabindex="0" aria-label="Plan de scène, vue depuis le public">
         <div class="stage-viewport" data-stage-viewport>
-            <div class="stage-board" {{ editable|default(false) ? 'data-stage-board' : '' }}>
+            <div
+                class="stage-board"
+                style="--stage-base-scale: {{ stage_base_scale() }};"
+                {{ editable|default(false) ? 'data-stage-board' : '' }}
+            >
                 <span class="stage-orientation stage-back">Fond de scène</span>
                 {% for item in items %}
+                    {% set caption = item.notes|split('·')|first|trim %}
                     <div
-                        class="stage-node stage-{{ item.kind }}"
+                        class="stage-node stage-{{ item.kind }} {{
+                        item.kind == 'power' and item.label == 'Alimentation'
+                            ? 'stage-symbol-only'
+                            : ''
+                        }}"
+                        data-technical-family="{{ item.family|default(
+                            technical_stage_family(item)
+                        ) }}"
+                        title="{{ item.label }}{{ item.notes ? ' · ' ~ item.notes : '' }}"
                         style="left: {{ item.x|number_format(
                             1,
                             '.',
@@ -46,7 +59,7 @@
                             }}
                         </span>
                         <strong>{{ item.label }}</strong>
-                        <small>{{ item.notes }}</small>
+                        <small>{{ (caption|length) <= 32 ? caption : '' }}</small>
                         {% if item.patchLabel|default('') %}
                             <span
                                 class="stage-patch-badge {{
@@ -65,3 +78,30 @@
         </div>
     </div>
 </div>
+
+{% if items %}
+    <details class="stage-legend">
+        <summary>
+            Repères et précisions · {{ items|length }} éléments
+        </summary>
+        <dl>
+            {% for item in items %}
+                <div>
+                    <dt
+                        data-technical-family="{{ item.family|default(
+                            technical_stage_family(item)
+                        ) }}"
+                    >
+                        {{ item.label }}
+                    </dt>
+                    <dd>
+                        {{ item.notes ? : 'Pas de précision supplémentaire.' }}{% if
+                            item.patchLabel|default('') %}
+                            · {{ item.patchLabel }}
+                        {% endif %}
+                    </dd>
+                </div>
+            {% endfor %}
+        </dl>
+    </details>
+{% endif %}

@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Importer Orfeo · {{ app_name }}
+{% endblock %}
+{% block body %}
+    <a class="back-link" href="{{ path('app_concert_index') }}">← Revenir aux concerts</a>
+    <section class="workspace-heading">
+        <div>
+            <p class="eyebrow">
+                {{ band.name }} · Import de concerts
+            </p>
+            <h1>Depuis Orfeo<span class="title-period">.</span></h1>
+            <p>
+                Retrouver les dates et les contacts renseignés par le booking.
+            </p>
+        </div>
+    </section>
+    <section class="workspace-panel workspace-form">
+        {% if configured %}
+            <h2>Préparer l’aperçu</h2>
+            <p class="workspace-hint">
+                Seuls les spectacles du groupe sont consultés. Aucun concert ne sera créé avant ta
+                sélection.
+            </p>
+            {{ form_start(form) }}{{ form_errors(form) }}
+            <div class="workspace-fields">
+                {{ form_row(form.period) }}
+            </div>
+            <button class="button button-primary" type="submit">Charger l’aperçu Orfeo</button>
+            {{ form_end(form) }}
+        {% else %}
+            <h2>Connexion à configurer</h2>
+            <p>
+                L’administrateur doit renseigner la clé, les spectacles autorisés et les statuts
+                confirmés dans la configuration privée. La clé reste sur le serveur.
+            </p>
+        {% endif %}
+    </section>
+    <section class="workspace-panel">
+        <h2>Une représentation, un dossier de concert</h2>
+        <p>
+            Les dates confirmées et les options restent distinctes. Un horaire inconnu reste à
+            confirmer. Les annulations sont signalées, sans supprimer de concert dans BB.
+        </p>
+        <p class="workspace-hint">
+            Tu pourras rattacher une date à un concert existant, y compris importé de Bandsintown.
+            Le patch, le plan, la setlist, les conditions et les notes internes seront conservés.
+        </p>
+    </section>
+{% endblock %}

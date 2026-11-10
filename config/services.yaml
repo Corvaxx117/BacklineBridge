@@ -78,6 +78,28 @@ services:
         arguments: ['google-tokens', 3500, '%kernel.cache_dir%/private/google-tokens']
         tags: [cache.pool]
 
+    App\Integration\Orfeo\OrfeoGateway:
+        alias: App\Integration\Orfeo\OrfeoClient
+
+    # Appels serveur uniquement : la clé et les contacts ne passent pas par le profiler.
+    orfeo.http_client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: ['Symfony\Component\HttpClient\HttpClient', 'create']
+        autowire: false
+        autoconfigure: false
+        arguments:
+            - base_uri: 'https://orfeoapp.com/'
+              headers: { Accept: 'application/json' }
+              timeout: 5
+              max_duration: 12
+              max_redirects: 0
+
+    cache.orfeo:
+        class: Symfony\Component\Cache\Adapter\FilesystemAdapter
+        factory: ['@App\Service\Cache\PrivateCacheFactory', 'create']
+        arguments: ['orfeo', 300, '%kernel.cache_dir%/private/orfeo']
+        tags: [cache.pool]
+
     App\Integration\WebPush\PushGateway:
         alias: App\Integration\WebPush\WebPushGateway
 

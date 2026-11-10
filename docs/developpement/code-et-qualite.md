@@ -7,7 +7,7 @@ Les contrôleurs reçoivent les actions ; les services appliquent les règles ; 
 | Dossier | Contenu |
 | --- | --- |
 | `src/Controller/` | Une action par classe, rangée par fonctionnalité |
-| `src/Service/` | Création de concerts, import, ventes, disponibilités… |
+| `src/Service/` | Création de concerts, import, ventes, conditions… |
 | `src/Entity/`, `src/Repository/` | Données et recherches |
 | `src/Form/`, `src/Dto/`, `src/Validator/`, `src/ValueObject/` | Saisie et vérifications |
 | `src/Security/Voter/` | Autorisations côté serveur |

@@ -28,7 +28,6 @@ final class BandVoter extends Voter
     public const PLAN_CONCERT = 'BAND_PLAN_CONCERT';
     public const CONDITIONS = 'BAND_CONDITIONS';
     public const COLLABORATE = 'BAND_COLLABORATE';
-    public const RESPOND_AVAILABILITY = 'BAND_RESPOND_AVAILABILITY';
 
     public function __construct(
         private readonly BandMembershipRepository $memberships,
@@ -54,7 +53,6 @@ final class BandVoter extends Voter
                     self::CONDITIONS,
                     self::MANAGE_TECHNICAL,
                     self::COLLABORATE,
-                    self::RESPOND_AVAILABILITY,
                 ],
                 true,
             );
@@ -80,7 +78,6 @@ final class BandVoter extends Voter
             self::CALENDAR_PUBLISH, self::SETLIST => $this->editors->allows($user, $subject),
             self::EDIT_PATCH => $role->canEdit(),
             self::DELETE_PATCH, self::MANAGE_TECHNICAL => $role->canManage(),
-            self::RESPOND_AVAILABILITY => BandRole::Manager === $role,
             self::PLAN_CONCERT, self::CONDITIONS => $role->canPlanConcerts(),
             self::COLLABORATE => BandRole::Viewer !== $role,
             default => false,

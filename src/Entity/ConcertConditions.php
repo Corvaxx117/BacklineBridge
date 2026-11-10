@@ -7,9 +7,11 @@ namespace App\Entity;
 use App\Enum\Accommodation;
 use App\Enum\EngineerPayment;
 use App\Enum\EngineerPresence;
+use App\Enum\FeeBasis;
 use App\Enum\PaymentFramework;
 use App\Enum\PaymentMethod;
 use App\Enum\TransportCoverage;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -66,6 +68,14 @@ class ConcertConditions
         return $this->engineerPaymentFramework;
     }
 
+    #[ORM\Column(length: 10, enumType: FeeBasis::class, options: ['default' => 'unknown'])]
+    private FeeBasis $feeBasis = FeeBasis::Unknown;
+
+    public function getFeeBasis(): FeeBasis
+    {
+        return $this->feeBasis;
+    }
+
     #[ORM\Column(name: 'fee_cents', nullable: true)]
     private ?int $feeCents = null;
 
@@ -74,6 +84,37 @@ class ConcertConditions
 
     #[ORM\Column(length: 2000, nullable: true)]
     private ?string $notes = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $accommodationNotes = null;
+
+    public function getAccommodationNotes(): ?string
+    {
+        return $this->accommodationNotes;
+    }
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $transportNotes = null;
+
+    public function getTransportNotes(): ?string
+    {
+        return $this->transportNotes;
+    }
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $mealNotes = null;
+
+    public function getMealNotes(): ?string
+    {
+        return $this->mealNotes;
+    }
+
+    public function updateLogistics(?string $accommodationNotes, ?string $transportNotes, ?string $mealNotes): void
+    {
+        $this->accommodationNotes = $accommodationNotes;
+        $this->transportNotes = $transportNotes;
+        $this->mealNotes = $mealNotes;
+    }
 
     public function __construct(Concert $concert)
     {
@@ -136,6 +177,7 @@ class ConcertConditions
         ?int $engineerFeeCents,
         ?string $notes,
         EngineerPresence $engineerPresence = EngineerPresence::Unknown,
+        FeeBasis $feeBasis = FeeBasis::Unknown,
     ): void {
         $this->accommodation = $accommodation;
         $this->transportCoverage = $transportCoverage;
@@ -144,6 +186,7 @@ class ConcertConditions
         $this->engineerPayment = $engineerPayment;
         $this->engineerPaymentFramework = $engineerPaymentFramework;
         $this->feeCents = $feeCents;
+        $this->feeBasis = $feeBasis;
         $this->engineerFeeCents = $engineerFeeCents;
         $this->notes = $notes;
         $this->engineerPresence = $engineerPresence;
