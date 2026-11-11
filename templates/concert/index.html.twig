@@ -26,8 +26,8 @@
             {% endif %}
             <h1 id="page-title">Concerts<span class="title-period">.</span></h1>
             <p class="hero-description">
-                Une date, une salle, un patch à préparer.<br />Chaque concert possède son propre
-                dossier technique.
+                Retrouvez les dates du groupe et préparez les informations et le dossier technique
+                de chaque concert.
             </p>
         </div>
         {% if canCreate %}
@@ -85,7 +85,7 @@
     {% if concerts is empty and not filters.filtered %}
         <section class="patch-panel empty-state" aria-labelledby="empty-title">
             <span class="empty-channel" aria-hidden="true">01</span>
-            <h2 id="empty-title">Votre première date vous attend.</h2>
+            <h2 id="empty-title">Aucun concert pour le moment.</h2>
             <p>
                 {{ canCreate
                     ? 'Partez de la fiche du groupe pour préparer le prochain concert.'
