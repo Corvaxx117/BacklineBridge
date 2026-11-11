@@ -29,11 +29,17 @@ class ConcertRepository extends ServiceEntityRepository
         $filters ??= ConcertListFilters::fromQuery([]);
         $params = ['user' => $user->getId()];
         $where = '';
-        if ('unrated' === $filters->level) {
-            $where = 'WHERE concert.importance_level IS NULL';
-        } elseif ('all' !== $filters->level) {
-            $where = 'WHERE concert.importance_level = :importance';
-            $params['importance'] = (int) $filters->level;
+        if ('' !== $filters->search) {
+            $where = <<<'SQL'
+                WHERE (
+                    LOWER(concert.venue) LIKE :search ESCAPE '!'
+                    OR LOWER(concert.city) LIKE :search ESCAPE '!'
+                    OR LOWER(concert.notes) LIKE :search ESCAPE '!'
+                    OR LOWER(sheet.band_name) LIKE :search ESCAPE '!'
+                )
+                SQL;
+            // Une recherche littérale : % et _ ne deviennent pas des jokers SQL.
+            $params['search'] = '%'.strtr(mb_strtolower($filters->search), ['!' => '!!', '%' => '!%', '_' => '!_']).'%';
         }
         $order = 'importance' === $filters->sort
             ? 'CASE WHEN concert.importance_level IS NULL THEN 1 ELSE 0 END ASC, concert.importance_level DESC, '

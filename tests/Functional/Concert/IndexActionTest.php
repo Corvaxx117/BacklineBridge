@@ -15,7 +15,7 @@ final class IndexActionTest extends DatabaseTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'Concerts');
-        self::assertSelectorTextContains('.empty-state', 'première date');
+        self::assertSelectorTextContains('.empty-state', 'Aucun concert pour le moment');
         self::assertSelectorExists('a[href="/concerts/new"]');
     }
 

@@ -6,7 +6,9 @@ namespace App\Dto\Concert;
 
 final readonly class ConcertListFilters
 {
-    private function __construct(public string $sort, public string $level)
+    public const int MAX_SEARCH_LENGTH = 160;
+
+    private function __construct(public string $sort, public string $search)
     {
     }
 
@@ -14,16 +16,14 @@ final readonly class ConcertListFilters
     public static function fromQuery(array $query): self
     {
         $sort = isset($query['sort']) && 'importance' === $query['sort'] ? 'importance' : 'date';
-        $level = $query['enjeu'] ?? 'all';
-        if (!is_string($level) || !in_array($level, ['all', 'unrated', '1', '2', '3', '4', '5'], true)) {
-            $level = 'all';
-        }
+        $search = $query['q'] ?? '';
+        $search = is_string($search) ? mb_substr(trim($search), 0, self::MAX_SEARCH_LENGTH) : '';
 
-        return new self($sort, $level);
+        return new self($sort, $search);
     }
 
     public function isFiltered(): bool
     {
-        return 'all' !== $this->level;
+        return '' !== $this->search;
     }
 }
