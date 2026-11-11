@@ -7,6 +7,8 @@ Dans **Concerts → Importer des concerts → Depuis Orfeo**, les responsables, 
 3. Laisser **Mettre aussi à jour les informations des concerts existants** décoché pour conserver leurs date, salle, ville, horaire et statut. Le cocher permet de reprendre ces cinq informations depuis Orfeo.
 4. Choisir si les contacts doivent être ajoutés, puis appliquer la sélection.
 
+Le bouton affiche un indicateur pendant le chargement et empêche un deuxième envoi. En cas d’erreur, il redevient disponible pour réessayer.
+
 L’aperçu expire après 15 minutes. Une modification concurrente oblige à le recharger. Un même couple projet / représentation ne crée pas de doublon lors d’un nouvel import. Plusieurs représentations d’un même projet produisent plusieurs concerts.
 
 ## Ce qui est repris

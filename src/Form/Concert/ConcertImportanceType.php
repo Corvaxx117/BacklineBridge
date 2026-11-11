@@ -27,7 +27,7 @@ final class ConcertImportanceType extends AbstractType
                 'help' => 'Appréciation interne : public attendu, pros présents, potentiel, conditions… 500 caractères maximum.',
                 'attr' => ['rows' => 3, 'maxlength' => 500]])
             ->add('returnSort', HiddenType::class, ['empty_data' => 'date'])
-            ->add('returnLevel', HiddenType::class, ['empty_data' => 'all'])
+            ->add('returnSearch', HiddenType::class, ['empty_data' => ''])
             ->add('returnTo', HiddenType::class, ['empty_data' => 'list']);
     }
 

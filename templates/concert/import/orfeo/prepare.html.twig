@@ -2,6 +2,9 @@
 {% block title %}
     Importer Orfeo · {{ app_name }}
 {% endblock %}
+{% block page_assets %}
+    <script src="{{ asset('/scripts/import-preview.js') }}" defer></script>
+{% endblock %}
 {% block body %}
     <a class="back-link" href="{{ path('app_concert_index') }}">← Revenir aux concerts</a>
     <section class="workspace-heading">
@@ -22,11 +25,30 @@
                 Seuls les spectacles du groupe sont consultés. Aucun concert ne sera créé avant ta
                 sélection.
             </p>
-            {{ form_start(form) }}{{ form_errors(form) }}
+            {{
+                form_start(
+                    form,
+                    {
+                        attr: {
+                            'data-import-preview': ''
+                        }
+                    }
+                )
+            }}{{ form_errors(form) }}
             <div class="workspace-fields">
                 {{ form_row(form.period) }}
             </div>
-            <button class="button button-primary" type="submit">Charger l’aperçu Orfeo</button>
+            <button
+                class="button button-primary import-preview-button"
+                type="submit"
+                data-import-submit
+            >
+                <span class="import-loading-indicator" aria-hidden="true"></span>
+                <span data-import-label>Charger l’aperçu Orfeo</span>
+            </button>
+            <p class="workspace-hint" role="status" data-import-status hidden>
+                Chargement des dates Orfeo… Cela peut prendre quelques instants.
+            </p>
             {{ form_end(form) }}
         {% else %}
             <h2>Connexion à configurer</h2>

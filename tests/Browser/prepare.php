@@ -106,7 +106,7 @@ $input = new InvitationInput();
 $input->label = 'Régie fictive';
 $invitation = $issuer->issue($concert, $input);
 file_put_contents($root.'/var/browser/state.json', json_encode([
-    'sheetId' => $sheet->getId(), 'concertId' => $concert->getId(),
+    'bandId' => $band->getId(), 'sheetId' => $sheet->getId(), 'concertId' => $concert->getId(),
     'email' => $user->getEmail(), 'password' => 'BrowserTest2026!',
     'invitation' => '/invitation/'.$invitation->token,
 ], JSON_THROW_ON_ERROR));

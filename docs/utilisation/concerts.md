@@ -121,7 +121,7 @@ La note facultative (500 caractères) explique le choix : public attendu, profes
 
 Les responsables, le manager et le booker peuvent le modifier. Les autres membres de l’équipe peuvent le lire. Il n’est jamais transmis à la salle ni intégré au PDF technique.
 
-En haut de la liste, choisir un niveau pour filtrer les dates, puis **Enjeu le plus fort** pour les classer. **Tous** et **Par date** rétablissent la vue habituelle. Les concerts à venir et passés restent séparés.
+En haut de la liste, seuls les tris **Par date** et **Enjeu le plus fort** sont proposés. La recherche retrouve un mot ou une expression dans la salle, la ville, les notes ou le nom du groupe. Elle conserve le tri choisi ; la croix efface la recherche. Les concerts à venir et passés restent séparés.
 
 Les imports [Orfeo](orfeo.md) et [Bandsintown](bandsintown.md) conservent cette appréciation interne.
 

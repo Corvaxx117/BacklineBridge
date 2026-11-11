@@ -22,8 +22,8 @@ final class ConcertImportanceInput
     #[Assert\Choice(choices: ['date', 'importance'])]
     public string $returnSort = 'date';
 
-    #[Assert\Choice(choices: ['all', 'unrated', '1', '2', '3', '4', '5'])]
-    public string $returnLevel = 'all';
+    #[Assert\Length(max: ConcertListFilters::MAX_SEARCH_LENGTH)]
+    public ?string $returnSearch = null;
 
     #[Assert\Choice(choices: ['list', 'concert'])]
     public string $returnTo = 'list';

@@ -134,18 +134,12 @@
     gap: 12px 24px;
     margin-bottom: 28px;
 }
-.concert-level-filters,
 .concert-sort-links {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 6px;
 }
-.concert-level-filters > .eyebrow,
-.concert-sort-links > .eyebrow {
-    margin-right: 5px;
-}
-.concert-filter,
 .concert-sort-links > a {
     display: inline-flex;
     align-items: center;
@@ -158,11 +152,6 @@
     text-decoration: none;
     font-size: 13px;
 }
-.concert-filter-score {
-    min-width: 44px;
-    font-variant-numeric: tabular-nums;
-}
-.concert-filter:hover,
 .concert-sort-links > a:hover {
     background: var(--surface-hover);
 }
@@ -188,10 +177,67 @@
     .concert-filter-bar {
         gap: 12px;
     }
-    .concert-level-filters > .eyebrow {
+}
+
+.concert-search {
+    display: flex;
+    align-items: center;
+    flex: 1 1 280px;
+    max-width: 480px;
+    min-width: 0;
+    gap: 6px;
+    margin: 0;
+}
+.concert-search input[type='search'] {
+    flex: 1 1 0;
+    min-width: 0;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    margin: 0;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 16px;
+}
+.concert-search input::placeholder {
+    color: var(--text-muted);
+}
+.concert-search button,
+.concert-search-clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    text-decoration: none;
+    font: inherit;
+    font-size: 23px;
+}
+.concert-search button svg {
+    width: 19px;
+    height: 19px;
+}
+.concert-search button:hover,
+.concert-search-clear:hover {
+    background: var(--surface-hover);
+}
+.concert-search :is(input, button, a):focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+@media (max-width: 550px) {
+    .concert-search {
         flex-basis: 100%;
-    }
-    .concert-level-filters {
-        gap: 5px;
+        max-width: none;
     }
 }
