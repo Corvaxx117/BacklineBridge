@@ -67,3 +67,37 @@
         flex-direction: column;
     }
 }
+
+.import-preview-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+}
+.import-loading-indicator {
+    display: none;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+}
+.is-loading .import-loading-indicator {
+    display: inline-block;
+    animation: import-preview-spin 800ms linear infinite;
+}
+.is-loading .import-preview-button {
+    cursor: wait;
+    transform: none;
+}
+@keyframes import-preview-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .is-loading .import-loading-indicator {
+        animation: none;
+    }
+}

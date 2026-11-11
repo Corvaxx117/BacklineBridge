@@ -12,7 +12,7 @@
             </p>
             <h1 id="page-title">To Do<span class="title-period">.</span></h1>
             <p>
-                Des idées aux actions : qui fait quoi, et pour quand ?
+                Créez des tâches, attribuez-les et suivez leur avancement et leurs échéances.
             </p>
         </div>
         {% if is_granted('BAND_COLLABORATE', band) %}
@@ -111,11 +111,11 @@
                             {% if search or scope != 'all' %}
                                 Aucune tâche pour ce filtre.
                             {% elseif status.value == 'todo' %}
-                                Le prochain chantier du groupe commence ici.
+                                Aucune tâche à faire pour le moment.
                             {% elseif status.value == 'doing' %}
                                 Les tâches démarrées apparaîtront ici.
                             {% else %}
-                                Les missions accomplies trouveront leur place ici.
+                                Aucune tâche terminée pour le moment.
                             {% endif %}
                         </p>
                     {% endfor %}

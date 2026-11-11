@@ -78,6 +78,16 @@ final class OrfeoImportTest extends DatabaseTestCase
         $this->client->request('POST', $this->reviewUri, $values);
     }
 
+    public function testPreviewFormProvidesLoadingFeedbackWithoutRequiringJavascript(): void
+    {
+        $this->client->request('GET', $this->prepareUri);
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('script[src^="/scripts/import-preview.js"]');
+        self::assertSelectorExists('form[method="post"][data-import-preview] button[data-import-submit]:not([disabled])');
+        self::assertSelectorExists('[data-import-status][role="status"][hidden]');
+        self::assertSelectorExists('input[name="orfeo_fetch[_token]"]');
+    }
+
     public function testPreviewIsReadonlyAndImportCreatesOneConcertWithItsOwnPatchAndContacts(): void
     {
         $this->preview();

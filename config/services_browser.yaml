@@ -1,0 +1,11 @@
+# Données synthétiques : les tests navigateur n’appellent jamais Orfeo.
+services:
+    App\Integration\Orfeo\OrfeoConfiguration:
+        arguments: ['1', 'synthetic-browser-orfeo-key', '301', '44', 'Europe/Paris', false]
+
+    App\Tests\Browser\Support\OrfeoGateway:
+        autowire: false
+        autoconfigure: false
+
+    App\Integration\Orfeo\OrfeoGateway:
+        alias: App\Tests\Browser\Support\OrfeoGateway

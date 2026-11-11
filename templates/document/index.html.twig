@@ -12,7 +12,7 @@
             </p>
             <h1 id="page-title">Documents<span class="title-period">.</span></h1>
             <p class="hero-description">
-                Les PDF utiles et les liens du groupe, réunis au même endroit.
+                Retrouvez les PDF et les liens partagés par le groupe, ou ajoutez-en de nouveaux.
             </p>
         </div>
         {% if is_granted('BAND_COLLABORATE', band) %}
@@ -131,7 +131,7 @@
             <h2>
                 {{ search or category
                     ? 'Aucun résultat pour cette recherche.'
-                    : 'Les documents du groupe ont leur place ici.' }}
+                    : 'Aucun document pour le moment.' }}
             </h2>
             <p>
                 {{ search or category

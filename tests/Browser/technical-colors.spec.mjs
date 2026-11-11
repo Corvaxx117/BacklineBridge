@@ -63,3 +63,38 @@ test('les familles sont colorées dans les deux thèmes et les coordonnées rest
     await expect(page.locator('.stage-drums')).toHaveAttribute('data-technical-family', 'drums');
     await expect(page.locator('.stage-amp[data-technical-family="guitar"]')).toHaveCount(2);
 });
+
+test('les séparateurs du patch restent continus sur mobile et alignés sur ordinateur', async ({
+    page,
+}, testInfo) => {
+    await login(page);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Tout déplier', exact: true }).click();
+    const widths = testInfo.project.name === 'mobile' ? [390, 320] : [1440];
+    for (const width of widths) {
+        await page.setViewportSize({ width, height: 1000 });
+        for (const theme of ['light', 'dark']) {
+            await page.evaluate((theme) => (document.documentElement.dataset.theme = theme), theme);
+            const borders = await page
+                .locator('.patch-table tbody .is-family-start:not(:first-child)')
+                .evaluateAll((rows) =>
+                    rows.map((row) => ({
+                        row: getComputedStyle(row).borderTopWidth,
+                        cells: [...row.children]
+                            .filter((cell) => getComputedStyle(cell).display !== 'none')
+                            .map((cell) => getComputedStyle(cell).borderTopWidth),
+                    })),
+                );
+            expect(borders.length).toBeGreaterThan(0);
+            for (const border of borders) {
+                if (width <= 550) {
+                    expect(border.row).toBe('2px');
+                    expect(border.cells.every((value) => value === '0px')).toBe(true);
+                } else expect(border.cells.every((value) => value === '2px')).toBe(true);
+            }
+            expect(
+                await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+            ).toBe(true);
+        }
+    }
+});

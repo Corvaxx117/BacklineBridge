@@ -42,8 +42,10 @@
 .is-family-start .patch-family-name {
     display: inline;
 }
-.patch-table--compact tbody .is-family-start:not(:first-child) > * {
-    border-top: 2px solid var(--family-border);
+@media (min-width: 551px) {
+    .patch-table--compact tbody .is-family-start:not(:first-child) > * {
+        border-top: 2px solid var(--family-border);
+    }
 }
 .patch-sort {
     display: flex;
@@ -254,6 +256,10 @@
     }
 }
 @media (max-width: 550px) {
+    /* Sur mobile, les cellules deviennent une grille : un seul trait sur la ligne entière. */
+    .patch-table--compact tbody .is-family-start:not(:first-child) {
+        border-top: 2px solid var(--family-border);
+    }
     .patch-sort button {
         min-height: 44px;
     }
