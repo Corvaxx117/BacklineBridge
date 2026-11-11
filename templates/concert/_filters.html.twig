@@ -1,59 +1,59 @@
 <div class="concert-filter-bar">
-    <nav class="concert-level-filters" aria-label="Filtrer les concerts par enjeu">
-        <span class="eyebrow">Enjeu</span>
-        {% for value, label in {
-            all: 'Tous',
-            unrated: 'À évaluer'
-        } %}
+    <form
+        class="concert-search"
+        method="get"
+        action="{{ path('app_concert_index') }}"
+        role="search"
+        aria-label="Rechercher un concert"
+    >
+        <label class="visually-hidden" for="concert-search">Rechercher un concert</label>
+        <input
+            type="search"
+            id="concert-search"
+            name="q"
+            value="{{ filters.search }}"
+            maxlength="160"
+            placeholder="Salle, ville ou notes…"
+        />
+        <input type="hidden" name="sort" value="{{ filters.sort }}" />
+        <button type="submit" aria-label="Rechercher" title="Rechercher">
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                aria-hidden="true"
+            >
+                <circle cx="10.5" cy="10.5" r="6.5" />
+                <path d="m16 16 4.5 4.5" />
+            </svg>
+        </button>
+        {% if filters.filtered %}
             <a
-                class="concert-filter {{ filters.level == value ? 'is-active' : '' }}"
+                class="concert-search-clear"
                 href="{{
                 path(
                     'app_concert_index',
                     {
-                        sort: filters.sort,
-                        enjeu: value
+                        sort: filters.sort
                     }
                 )
                 }}"
-                {{ filters.level == value ? 'aria-current="page"' : '' }}
+                aria-label="Effacer la recherche"
+                title="Effacer la recherche"
             >
-                {{ label }}
+                <span aria-hidden="true">×</span>
             </a>
-        {% endfor %}
-        {% for level in importanceLevels %}
-            <a
-                class="concert-filter concert-filter-score {{
-                filters.level == level.value ~ ''
-                    ? 'is-active'
-                    : ''
-                }}"
-                href="{{
-                path(
-                    'app_concert_index',
-                    {
-                        sort: filters.sort,
-                        enjeu: level.value
-                    }
-                )
-                }}"
-                title="Enjeu {{ level.label|lower }}"
-                aria-label="Enjeu {{ level.value }} sur 5 · {{ level.label }}"
-                {{ filters.level == level.value ~ '' ? 'aria-current="page"' : '' }}
-            >
-                {{ level.value }}
-            </a>
-        {% endfor %}
-    </nav>
+        {% endif %}
+    </form>
     <nav class="concert-sort-links" aria-label="Trier les concerts">
-        <span class="eyebrow">Trier</span>
         <a
             href="{{
             path(
                 'app_concert_index',
                 {
                     sort: 'date',
-                    enjeu: filters.level
+                    q: filters.search
                 }
             )
             }}"
@@ -68,7 +68,7 @@
                 'app_concert_index',
                 {
                     sort: 'importance',
-                    enjeu: filters.level
+                    q: filters.search
                 }
             )
             }}"

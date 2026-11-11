@@ -28,7 +28,7 @@ final class EditAction extends AbstractController
         $input = ConcertImportanceInput::fromConcert($concert);
         $filters = ConcertListFilters::fromQuery($request->query->all());
         $input->returnSort = $filters->sort;
-        $input->returnLevel = $filters->level;
+        $input->returnSearch = $filters->search;
         $form = $this->createForm(ConcertImportanceType::class, $input,
             ['csrf_token_id' => 'concert_importance_'.$concert->getId()])->handleRequest($request);
         $status = $form->isSubmitted() ? 422 : 200;
@@ -41,7 +41,7 @@ final class EditAction extends AbstractController
                 }
 
                 return $this->redirectToRoute('app_concert_index', ['sort' => $input->returnSort,
-                    'enjeu' => $input->returnLevel, '_fragment' => 'concert-'.$concert->getId()], 303);
+                    'q' => $input->returnSearch ?? '', '_fragment' => 'concert-'.$concert->getId()], 303);
             } catch (ConflictHttpException|OptimisticLockException) {
                 $form->addError(new FormError('Ce concert a changé depuis l’ouverture du formulaire. Ta note reste affichée ; recharge la version actuelle avant de réessayer.'));
                 $status = 409;

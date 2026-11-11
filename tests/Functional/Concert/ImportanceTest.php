@@ -25,9 +25,9 @@ final class ImportanceTest extends CollaborationTestCase
         $form = $crawler->filter('#enjeu-'.$id.' form')->form();
         $this->client->submit($form, ['concert_importance' => [
             'level' => '5', 'note' => '<script>secret</script> · Pros attendus',
-            'returnSort' => 'importance', 'returnLevel' => '5',
+            'returnSort' => 'importance', 'returnSearch' => 'Salle',
         ]]);
-        self::assertResponseRedirects('/concerts?sort=importance&enjeu=5#concert-'.$id, 303);
+        self::assertResponseRedirects('/concerts?sort=importance&q=Salle#concert-'.$id, 303);
         $this->entityManager()->clear();
         $saved = $this->entityManager()->find(Concert::class, $id);
         self::assertSame(ConcertImportance::Major, $saved->getImportance());
@@ -132,7 +132,7 @@ final class ImportanceTest extends CollaborationTestCase
         self::assertSelectorNotExists('.concert-importance');
     }
 
-    public function testFiltersAndImportanceSortingKeepPastAndFutureSeparated(): void
+    public function testTheTwoSortOrdersKeepPastAndFutureSeparatedAndIgnoreOldLevelFilters(): void
     {
         $creator = static::getContainer()->get(ConcertCreator::class);
         foreach ([
@@ -153,12 +153,12 @@ final class ImportanceTest extends CollaborationTestCase
         self::assertSame(['Passée forte', 'Passée faible'],
             $crawler->filter('[aria-labelledby="past-concerts-title"] h3')->each(static fn ($node): string => $node->text()));
         $crawler = $this->client->request('GET', '/concerts?enjeu=1&sort=importance');
-        self::assertSame(['Future faible', 'Passée faible'], $crawler->filter('.concert-card h3')->each(static fn ($node): string => $node->text()));
-        $crawler = $this->client->request('GET', '/concerts?enjeu=unrated');
-        self::assertSame(['Future sans enjeu'], $crawler->filter('.concert-card h3')->each(static fn ($node): string => $node->text()));
-        $this->client->request('GET', '/concerts?enjeu=3');
-        self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('body', 'Aucun concert pour ce niveau');
+        self::assertSelectorCount(5, '.concert-card');
+        self::assertSelectorNotExists('.concert-level-filters');
+        self::assertSelectorCount(2, '.concert-sort-links a');
+        $crawler = $this->client->request('GET', '/concerts?sort=date');
+        self::assertSame(['Future faible', 'Future sans enjeu', 'Future majeure'],
+            $crawler->filter('[aria-labelledby="upcoming-concerts-title"] h3')->each(static fn ($node): string => $node->text()));
         $this->client->request('GET', '/concerts?enjeu[]=5&sort[]=importance');
         self::assertResponseIsSuccessful();
         self::assertSelectorCount(5, '.concert-card');
